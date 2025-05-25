@@ -1,0 +1,657 @@
+/* --- style.css --- */
+
+/* Global Reset and Box Sizing */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    /* margin: 0; /* Already handled by global reset */
+    padding: 20px; /* Padding around the whole page content */
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align to top for potentially long content */
+    min-height: 100vh;
+}
+
+.quiz-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 700px; /* Max width for desktop */
+}
+
+.quiz-container > h1 { /* Main Quiz Title */
+    text-align: center;
+    color: #005A9C; /* Rowing-esque blue */
+    margin-bottom: 25px;
+}
+
+/* Core Page Visibility Logic */
+.page {
+    display: none; /* All pages (intro, questions, results) hidden by default */
+}
+.page.active {
+    display: block; /* Only the active page is shown */
+}
+
+
+/* --- Styles for Intro Page (#quiz-intro) --- */
+#quiz-intro h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #333;
+    margin-bottom: 10px;
+}
+#quiz-intro p {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #555;
+}
+#startBtn {
+    display: block;
+    margin: 20px auto 0;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+#startBtn:hover {
+    background-color: #0056b3;
+}
+
+
+/* --- Styles for Question Page (#quiz-questions) --- */
+.question {
+    margin-bottom: 30px; /* Increased space between questions */
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #fdfdfd; /* Slightly off-white */
+}
+.question .question-text {
+    font-weight: bold;
+    margin-bottom: 25px; /* Space between question text and options */
+    font-size: 1.05em;
+    color: #333;
+}
+
+/* Horizontal Options Styles */
+.options-wrapper-horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+    position: relative;
+}
+
+.scale-end-label { /* For "Disagree" and "Agree" text */
+    font-size: 0.9em;
+    color: #555;
+    flex-shrink: 0;
+    padding: 0 10px;
+    width: 20%; /* Give them some defined width */
+}
+.scale-end-label.disagree-end {
+    text-align: right;
+}
+.scale-end-label.agree-end {
+    text-align: left;
+}
+
+.scale-points-container { /* Holds the 7 dots and the line */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-grow: 1; /* Takes up space between labels */
+    position: relative;
+    height: 40px; /* Ensures consistent height */
+    margin: 0 5px; /* Small gap from end labels */
+}
+
+.scale-points-container::before { /* The horizontal connecting line */
+    content: '';
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 2px;
+    background-color: #ccc;
+    z-index: 0; /* Behind the dots */
+}
+
+.scale-point { /* Container for each dot (radio + label) */
+    position: relative;
+    z-index: 1; /* Ensure dots are above the line */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scale-point input[type="radio"] { /* The actual radio button, hidden */
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2; /* Above the label's dot visual for clickability */
+}
+
+.dot-label { /* The visible, clickable dot (styled label) */
+    display: inline-block;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Default dot size (also for Neutral, or can be overridden) */
+.dot-label { width: 14px; height: 14px; } /* Neutral */
+.scale-point.weak .dot-label { width: 18px; height: 18px; }
+.scale-point.medium .dot-label { width: 22px; height: 22px; }
+.scale-point.strong .dot-label { width: 28px; height: 28px; }
+
+.scale-point input[type="radio"]:checked + .dot-label {
+    background-color: #007BFF;
+    transform: scale(1.15); /* Slightly more pop on selection */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.scale-point input[type="radio"]:focus + .dot-label { /* Accessibility focus */
+    outline: 2px solid #007BFF;
+    outline-offset: 2px;
+}
+
+/* N/A Option Styles */
+.na-option {
+    display: flex;
+    align-items: center;
+    margin-left: 25px; /* More distinct separation for N/A */
+    flex-shrink: 0;
+    position: relative; /* <<< CRITICAL FIX from earlier for click bug */
+}
+.na-option input[type="radio"] { /* The hidden N/A radio */
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%; /* Covers its parent .na-option */
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 1;
+}
+.na-option .na-dot-label { /* The "N/A" text label */
+    cursor: pointer;
+    padding: 6px 10px; /* Slightly larger click area */
+    font-size: 0.9em;
+    color: #555;
+    border: 1px solid #ccc; /* Subtle border for N/A */
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.na-option input[type="radio"]:checked + .na-dot-label {
+    background-color: #007BFF;
+    color: white;
+    border-color: #0056b3;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.na-option input[type="radio"]:focus + .na-dot-label {
+    border-color: #007BFF;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Progress Bar */
+#progress-bar-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    margin: 25px 0;
+    height: 20px; /* Explicit height for container */
+    overflow: hidden; /* Ensure progress bar stays within rounded corners */
+}
+#progress-bar {
+    height: 100%; /* Fill container height */
+    width: 0%;
+    background-color: #28a745; /* Green for progress */
+    border-radius: 5px; /* Match container */
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    transition: width 0.4s ease-in-out;
+}
+
+/* Navigation Buttons (Next, Prev, Finish) */
+.navigation-buttons {
+    margin-top: 25px;
+    text-align: center;
+}
+.navigation-buttons button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+.navigation-buttons button:hover {
+    background-color: #0056b3;
+}
+#prev-btn {
+    background-color: #6c757d; /* Grey for previous */
+}
+#prev-btn:hover {
+    background-color: #5a6268;
+}
+#finish-btn {
+    background-color: #28a745; /* Green for finish */
+}
+#finish-btn:hover {
+    background-color: #1e7e34;
+}
+/* Add this to your CSS file */
+#set-na-btn {
+    margin-left: 10px;
+    background-color: #f0ad4e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#set-na-btn:hover {
+    background-color: #ec971f;
+}
+
+/* --- Styles for Results Page (#results-page) --- */
+#results-page h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+.dimension-result { /* Container for each dimension's bar */
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #fdfdfd;
+}
+.dimension-result h4 { /* Dimension name (e.g., "Primary Focus") */
+    margin-top: 0;
+    margin-bottom: 12px;
+    text-align: center;
+    color: #005A9C;
+}
+.result-labels { /* Holds Pole1 name, Percentage lean, Pole2 name */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+.pole-label { /* Pole1 and Pole2 names */
+    color: #444;
+    flex-basis: 38%; /* Adjust distribution */
+}
+.pole-label.pole1 { text-align: left; }
+.pole-label.pole2 { text-align: right; }
+.pole-percentage { /* "XX% DominantPole" or "Balanced" */
+    font-weight: bold;
+    color: #007BFF;
+    text-align: center;
+    flex-basis: 24%; /* Adjust distribution */
+}
+.result-bar-container { width: 100%; }
+.bar-track { /* The background track for the two-segment bar */
+    display: flex;
+    width: 100%;
+    height: 22px;
+    background-color: #e9ecef;
+    border-radius: 11px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+}
+.bar-segment { /* Individual colored segments (Pole1, Pole2) */
+    height: 100%;
+    transition: width 0.6s ease-in-out;
+}
+.bar-segment.bar-pole1 { background-color: #ffc107; } /* Example: Yellow for Pole1 */
+.bar-segment.bar-pole2 { background-color: #28a745; } /* Example: Green for Pole2 */
+/* Rounded ends for segments that are at the edge */
+.bar-track .bar-segment:first-child:not(:last-child) { border-top-left-radius: 11px; border-bottom-left-radius: 11px; }
+.bar-track .bar-segment:last-child:not(:first-child) { border-top-right-radius: 11px; border-bottom-right-radius: 11px; }
+.bar-track .bar-segment:only-child { border-radius: 11px; } /* If 100% one pole */
+
+.rower-type-description { /* Box for the final personality paragraph */
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    text-align: left;
+}
+.rower-type-description h3 { /* "Your Rower Profile: Archetype" */
+    margin-top: 0;
+    color: #005A9C;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.rower-type-description p {
+    margin-bottom: 12px;
+    line-height: 1.7;
+    color: #495057;
+}
+
+#restartBtn { /* "Take Again" button on results page */
+    display: block;
+    margin: 30px auto 0;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+#restartBtn:hover {
+    background-color: #0056b3;
+}
+
+
+/* --- Responsive Design Adjustments --- */
+
+/* Medium devices (tablets, large phones in portrait) - Stacking options */
+@media (max-width: 768px) {
+    .quiz-container > h1 {
+        font-size: 1.8em; /* Slightly smaller main title */
+    }
+    .scale-end-label.agree-end {
+        margin-top: 8px; /* Space above "Agree" if it's below the scale */
+    }
+
+    .scale-points-container {
+        width: 100%; /* Scale takes full available width */
+        margin-top: 5px;
+        margin-bottom: 5px;
+        display: flex;      /* Keep flex for dots */
+        flex-wrap: wrap;    /* !!! Allow dots to wrap to next line !!! */
+        justify-content: center; /* Center dots if they wrap */
+    }
+
+    .scale-point {
+        margin: 3px 5px; /* Add some space around dots when they wrap */
+    }
+
+    /* Dot size reductions for tablets */
+    .dot-label { width: 22px; height: 22px; }
+    .scale-point.weak .dot-label { width: 14px; height: 14px; }
+    .scale-point.medium .dot-label { width: 18px; height: 18px; }
+    .scale-point.strong .dot-label { width: 22px; height: 22px; }
+    .scale-point:not(.strong):not(.medium):not(.weak) .dot-label { width: 12px; height: 12px; } /* Neutral */
+
+    .na-option {
+        width: auto; /* Let N/A size to its content */
+        margin-top: 15px;
+        margin-left: 0; /* Remove left margin when stacked */
+    }
+}
+
+/* Small devices (phones in portrait) - Further refinements */
+@media (max-width: 480px) {
+    body {
+        padding: 10px; /* Less padding on the overall page */
+    }
+    .quiz-container {
+        padding: 15px; /* Less padding inside the quiz box */
+    }
+    .quiz-container > h1 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    .question {
+        padding: 10px;
+        margin-bottom: 25px;
+    }
+    .question .question-text {
+        font-size: 1em; /* Or 0.95em */
+        margin-bottom: 20px;
+    }
+
+    .scale-end-label {
+        font-size: 0.85em;
+    }
+
+    /* Hide the connecting line entirely on very small screens as it can look messy with wrapped dots */
+    .scale-points-container::before {
+        display: none;
+    }
+    .scale-points-container {
+        height: auto; /* Allow height to adjust if dots wrap to multiple lines */
+        padding: 5px 0; /* Some vertical padding if dots wrap */
+    }
+
+    /* Further dot size reductions for phones */
+    .dot-label { width: 20px; height: 20px; }
+    .scale-point.weak .dot-label { width: 12px; height: 12px; }
+    .scale-point.medium .dot-label { width: 16px; height: 16px; }
+    .scale-point.strong .dot-label { width: 20px; height: 20px; }
+    .scale-point:not(.strong):not(.medium):not(.weak) .dot-label { width: 10px; height: 10px; } /* Neutral */
+
+    .na-option .na-dot-label {
+        font-size: 0.85em;
+        padding: 5px 8px;
+    }
+
+    /* Ensure buttons are still easily tappable */
+    .navigation-buttons button, #startBtn, #restartBtn {
+        padding: 10px 18px;
+        font-size: 15px;
+        width: auto; /* Allow buttons to size to content or set a min-width */
+        min-width: 100px; /* Example min-width */
+    }
+    #startBtn, #restartBtn { /* Ensure single buttons are not overly wide */
+        max-width: 200px;
+    }
+}
+
+/* Optional: Very small devices, if you need to go further */
+@media (max-width: 360px) {
+    .quiz-container > h1 {
+        font-size: 1.3em;
+    }
+    .question .question-text {
+        font-size: 0.9em;
+    }
+    .dot-label { width: 18px; height: 18px; }
+    .scale-point.weak .dot-label { width: 10px; height: 10px; }
+    .scale-point.medium .dot-label { width: 14px; height: 14px; }
+    .scale-point.strong .dot-label { width: 18px; height: 18px; }
+    .scale-point:not(.strong):not(.medium):not(.weak) .dot-label { width: 8px; height: 8px; }
+}
+
+/* --- In your style.css --- */
+
+/* ... (Global reset, body, .quiz-container, .page, #quiz-intro, .question text etc. as before) ... */
+
+.options-wrapper-horizontal {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap onto new lines */
+    align-items: center; /* Align items nicely if they wrap to different heights */
+    justify-content: center; /* Center the whole block of options if it's narrower than container */
+    width: 100%;
+    margin-top: 10px;
+    position: relative;
+}
+
+/* --- Styling for the labels and dot scale to achieve "labels above" --- */
+
+.scale-end-label { /* Common style for "Disagree" and "Agree" */
+    font-size: 0.9em;
+    color: #555;
+    padding: 0 1px; /* Some padding */
+    width: 48%; /* Each label takes up half of the top row */
+    margin-bottom: 8px; /* Space below the labels, above the dots */
+    /* Order them to appear first */
+    order: 1;
+}
+.scale-end-label.disagree-end {
+    text-align: left; /* If you want Disagree on left of its 50% width */
+}
+.scale-end-label.agree-end {
+    text-align: right; /* If you want Agree on right of its 50% width */
+}
+
+.scale-points-container { /* Holds the 7 dots and the line */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: relative;
+    height: 40px;
+    width: 100%; /* Dots scale takes full width below labels */
+    margin: 0 0 10px 0; /* Margin below dots, before N/A */
+    /* Order it to appear after the labels */
+    order: 2;
+}
+.scale-points-container::before { /* The horizontal connecting line */
+    content: '';
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 2px;
+    background-color: #ccc;
+    z-index: 0;
+}
+/* ... (rest of .scale-point, .dot-label styles for DOTS - REMAINS THE SAME as previous full CSS) ... */
+/* Dot sizes for DESKTOP (and default for mobile before specific overrides) */
+.dot-label { width: 14px; height: 14px; }
+.scale-point.weak .dot-label { width: 18px; height: 18px; }
+.scale-point.medium .dot-label { width: 22px; height: 22px; }
+.scale-point.strong .dot-label { width: 28px; height: 28px; }
+
+
+.na-option {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center N/A if it takes full width */
+    flex-shrink: 0;
+    position: relative;
+    width: 100%; /* N/A takes full width at the bottom */
+    margin-top: 5px; /* Space above N/A */
+    /* Order it to appear last */
+    order: 3;
+}
+/* ... (rest of N/A styles - REMAINS THE SAME as previous full CSS) ... */
+
+
+/* --- Responsive Design Adjustments --- */
+/* The "labels above" layout is now the default for ALL screen sizes.
+   The media queries will now mostly be for adjusting sizes, paddings, and
+   hiding the line on very small screens. */
+
+@media (max-width: 768px) { /* Tablet and large phone portrait */
+    .quiz-container > h1 { font-size: 1.8em; }
+
+    .scale-end-label {
+        /* width: 45%; /* Can adjust if 50% is too wide with padding */
+        font-size: 0.9em; /* Keep or slightly reduce */
+    }
+
+    .scale-points-container {
+        /* Dots are already set to wrap via parent flex-wrap and width: 100% on this element
+           No, .scale-points-container itself won't wrap its children dots unless it also has flex-wrap.
+           But the parent .options-wrapper-horizontal has flex-wrap.
+           For the dots themselves to wrap *within* .scale-points-container if it becomes too narrow
+           for all 7 dots, .scale-points-container would need flex-wrap too.
+           However, since .scale-points-container is width: 100%, the question is if the 7 dots
+           can fit in that 100% width.
+        */
+        /* If individual dots need to wrap within their line: */
+        /* flex-wrap: wrap;  /* Add to .scale-points-container if dots themselves should wrap */
+        /* justify-content: center; /* If dots wrap, center them */
+    }
+
+    .scale-point {
+        margin: 3px 4px; /* Slightly reduce dot margins */
+    }
+
+    /* Dot size reductions for tablets */
+    .dot-label { width: 22px; height: 22px; }
+    .scale-point.weak .dot-label { width: 14px; height: 14px; }
+    .scale-point.medium .dot-label { width: 18px; height: 18px; }
+    .scale-point.strong .dot-label { width: 22px; height: 22px; }
+    .scale-point:not(.strong):not(.medium):not(.weak) .dot-label { width: 12px; height: 12px; }
+
+    .na-option {
+        margin-top: 10px; /* More space for N/A */
+    }
+}
+
+@media (max-width: 480px) { /* Small devices (phones in portrait) */
+    
+        .scale-end-label.disagree-end {
+            order: 1; /* First item on the first line */
+            flex-basis: 50%; /* Slightly reduce width to ensure they fit */
+            flex-shrink: 0;
+            text-align: left;
+            font-size: 0.8em;
+            padding: 0px; /* Reduce padding */
+            margin-bottom: 8px;
+        }
+    
+        .scale-end-label.agree-end {
+            order: 2; /* Second item on the first line */
+            flex-basis: 50%; /* Slightly reduce width to ensure they fit */
+            flex-shrink: 0;
+            text-align: right;
+            font-size: 0.8em;
+            padding: 0px; /* Reduce padding */
+            margin-bottom: 8px;
+        }
+    
+        /* This implies that if Disagree and Agree labels fit, they'll be on one line.
+           If not, one might wrap.
+           Then dots and N/A will wrap below.
+        */
+    
+        .scale-points-container {
+            order: 3; /* Dots come after the label pair */
+            width: 100%; /* Take full width on its own line */
+            /* ... other mobile styles for dots ... */
+            margin-bottom: 10px;
+        }
+        .scale-points-container::before { display: none; }
+    
+        .na-option {
+            order: 4; /* N/A last */
+            width: 100%; /* Take full width on its own line */
+            justify-content: center;
+            margin-top: 10px;
+            /* ... other mobile styles for N/A ... */
+        }
+}
+
+/* ... (rest of your CSS for progress bar, results page, etc. - REMAINS THE SAME) ... */

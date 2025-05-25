@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rowing Personality Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Rowing Personality Quiz</h1> <!-- Title is always visible -->
+
+        <div id="quiz-intro" class="page"> <!-- Step 0 & elements for restart -->
+            <h2>Welcome to the Rowing Personality Quiz!</h2>
+            <p>Answer the following questions to discover your rowing archetype.</p>
+            <button id="startBtn">Start Quiz</button>
+        </div>
+
+        <div id="quiz-questions" class="page"> <!-- Step 1 -->
+            <div id="question-area">
+                <!-- Questions will be dynamically inserted here -->
+            </div>
+            <div id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div class="navigation-buttons">
+                <button id="prev-btn">Previous</button>
+                <button id="next-btn">Next</button>
+                <button id="finish-btn">Finish Quiz</button>
+                <!-- Add this button next to the "next" and "finish" buttons -->
+                <button id="set-na-btn" class="btn">Fill with N/A</button>
+            </div>
+        </div>
+
+        <div id="results-page" class="page"> <!-- Step 2 -->
+            <h2>Your Rowing Profile</h2>
+            <div id="results-content">
+                <!-- Results (sliders/bars) will be dynamically inserted here -->
+            </div>
+            <div id="results-description" class="rower-type-description">
+                <!-- Descriptive paragraph will be dynamically inserted here -->
+            </div>
+            <button id="restartBtn">Take Again</button>
+        </div>
+    </div>
+    <script src="descriptions.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
