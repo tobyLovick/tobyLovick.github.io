@@ -6,7 +6,7 @@ const EXPERIENCE_DIMENSION_KEY = 'experience';
 const DIMENSIONS = { /* ... your dimensions ... */
     CT: { name: "Rowing Style", pole1: "Chopper", pole2: "Techie", score: 0, maxAbsScore: 0 },
     KG: { name: "Motivation", pole1: "Kicks", pole2: "Glory", score: 0, maxAbsScore: 0 },
-    LW: { name: "Mindset", pole1: "Laid-back", pole2: "Wanker", score: 0, maxAbsScore: 0 },
+    LW: { name: "Mindset", pole1: "Laid-back", pole2: "Way Too Deep", score: 0, maxAbsScore: 0 },
     IE: { name: "Team Dynamic", pole1: "Introvert", pole2: "Extrovert", score: 0, maxAbsScore: 0 },
     [EXPERIENCE_DIMENSION_KEY]: { name: "Experience Level", pole1: "Senior", pole2: "Novice", score: 0, maxAbsScore: 0 }
 };
