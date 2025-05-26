@@ -17,58 +17,45 @@ const ROWER_ARCHETYPES = {
     },
     "CKWI": { // Chopper, Kicks, Way-too-deep, Introvert
         title: "CKWI - The Rowbridge Doom-Scroller",
-        paragraph: "BIO NOT FOUND hehe"
+        paragraph: "BIO NOT FOUND"
     },
     "CKWE": { // Chopper, Kicks, Way-too-deep, Extrovert
         title: "CKWE - The Swap-Monkey",
-        paragraph: "You love the thrill of rowing and enjoy discussing its deeper meaning with others. Your energy and depth make you a fascinating presence on the team."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "CGLI": { // Chopper, Glory, Laidback, Introvert
         title: "CGLI - Ryan Gosling's \"Drive\"",
-        paragraph: "You aim for glory but prefer to let your actions speak louder than words. Your laidback and introverted nature keeps you grounded while striving for success."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "CGLE": { // Chopper, Glory, Laidback, Extrovert
         title: "CGLE - The Club Favourite",
-        paragraph: "You row for glory and inspire others with your laidback yet confident demeanor. Your social energy makes you a natural leader."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "CGWI": { // Chopper, Glory, Way-too-deep, Introvert
         title: "CGWI - The hard-erg enthusiast",
-        paragraph: "You row for glory with a deep and thoughtful approach. Your introverted nature helps you stay focused on your goals."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "CGWE": { // Chopper, Glory, Way-too-deep, Extrovert
         title: "CGWE - 10th Man Tom",
-        paragraph: "You combine a drive for glory with a deep understanding of rowing. Your extroverted nature helps you inspire and lead others."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TKLI": { // Techie, Kicks, Laidback, Introvert
         title: "TKLI - The Natural Talent",
-        paragraph: "You enjoy the technical aspects of rowing and approach it with a laidback attitude. Your introverted nature allows you to focus on perfecting your craft."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TKLE": { // Techie, Kicks, Laidback, Extrovert
         title: "TKLE - Manic Pixie Dream Rower",
-        paragraph: "You love exploring the technical side of rowing and sharing your discoveries with others. Your laidback and social nature makes you a joy to be around."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TKWI": { // Techie, Kicks, Way-too-deep, Introvert
         title: "TKWI - The Conundrum",
-        paragraph: "You dive deep into the technical details of rowing, often losing yourself in thought. Your introverted nature helps you focus on innovation."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TKWE": { // Techie, Kicks, Way-too-deep, Extrovert
         title: "TKWE - The drunken Lightie",
-        paragraph: "You combine technical expertise with a deep understanding of rowing. Your extroverted nature helps you share your insights with the team."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TGLI": { // Techie, Glory, Laidback, Introvert
         title: "TGLI - The Love of the Game",
-        paragraph: "You aim for glory through technical mastery, preferring to work quietly behind the scenes. Your laidback nature keeps you calm under pressure."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TGLE": { // Techie, Glory, Laidback, Extrovert
         title: "TGLE -The Respectable Rower ",
-        paragraph: "You strive for glory with a technical edge and inspire others with your approachable demeanor. Your social energy makes you a natural motivator."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TGWI": { // Techie, Glory, Way-too-deep, Introvert
         title: "TGWI - The Tryhard",
-        paragraph: "You combine a drive for glory with a deep understanding of rowing mechanics. Your introverted nature helps you focus on achieving your goals."
-    },
+        paragraph: "BIO NOT FOUND"    },
     "TGWE": { // Techie, Glory, Way-too-deep, Extrovert
         title: "TGWE - Leader amongst Rowers",
-        paragraph: "You aim for glory with a technical and philosophical approach. Your extroverted nature helps you inspire and lead your team."
-    },
+        paragraph: "BIO NOT FOUND"    },
 };
