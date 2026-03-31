@@ -1,0 +1,238 @@
+/* -------------------------------------------------------
+   Tutorial extras: syntax highlighting, admonitions,
+   tables, math, and active nav item styling
+   ------------------------------------------------------- */
+
+/* --- Syntax Highlighting (Pygments default) --- */
+
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #3D7B7B; font-style: italic }
+.highlight .err { border: 1px solid #F00 }
+.highlight .k { color: #008000; font-weight: bold }
+.highlight .o { color: #666 }
+.highlight .ch { color: #3D7B7B; font-style: italic }
+.highlight .cm { color: #3D7B7B; font-style: italic }
+.highlight .cp { color: #9C6500 }
+.highlight .cpf { color: #3D7B7B; font-style: italic }
+.highlight .c1 { color: #3D7B7B; font-style: italic }
+.highlight .cs { color: #3D7B7B; font-style: italic }
+.highlight .gd { color: #A00000 }
+.highlight .ge { font-style: italic }
+.highlight .ges { font-weight: bold; font-style: italic }
+.highlight .gr { color: #E40000 }
+.highlight .gh { color: #000080; font-weight: bold }
+.highlight .gi { color: #008400 }
+.highlight .go { color: #717171 }
+.highlight .gp { color: #000080; font-weight: bold }
+.highlight .gs { font-weight: bold }
+.highlight .gu { color: #800080; font-weight: bold }
+.highlight .gt { color: #04D }
+.highlight .kc { color: #008000; font-weight: bold }
+.highlight .kd { color: #008000; font-weight: bold }
+.highlight .kn { color: #008000; font-weight: bold }
+.highlight .kp { color: #008000 }
+.highlight .kr { color: #008000; font-weight: bold }
+.highlight .kt { color: #B00040 }
+.highlight .m { color: #666 }
+.highlight .s { color: #BA2121 }
+.highlight .na { color: #687822 }
+.highlight .nb { color: #008000 }
+.highlight .nc { color: #00F; font-weight: bold }
+.highlight .no { color: #800 }
+.highlight .nd { color: #A2F }
+.highlight .ni { color: #717171; font-weight: bold }
+.highlight .ne { color: #CB3F38; font-weight: bold }
+.highlight .nf { color: #00F }
+.highlight .nl { color: #767600 }
+.highlight .nn { color: #00F; font-weight: bold }
+.highlight .nt { color: #008000; font-weight: bold }
+.highlight .nv { color: #19177C }
+.highlight .ow { color: #A2F; font-weight: bold }
+.highlight .w { color: #BBB }
+.highlight .mb { color: #666 }
+.highlight .mf { color: #666 }
+.highlight .mh { color: #666 }
+.highlight .mi { color: #666 }
+.highlight .mo { color: #666 }
+.highlight .sa { color: #BA2121 }
+.highlight .sb { color: #BA2121 }
+.highlight .sc { color: #BA2121 }
+.highlight .dl { color: #BA2121 }
+.highlight .sd { color: #BA2121; font-style: italic }
+.highlight .s2 { color: #BA2121 }
+.highlight .se { color: #AA5D1F; font-weight: bold }
+.highlight .sh { color: #BA2121 }
+.highlight .si { color: #A45A77; font-weight: bold }
+.highlight .sx { color: #008000 }
+.highlight .sr { color: #A45A77 }
+.highlight .s1 { color: #BA2121 }
+.highlight .ss { color: #19177C }
+.highlight .bp { color: #008000 }
+.highlight .fm { color: #00F }
+.highlight .vc { color: #19177C }
+.highlight .vg { color: #19177C }
+.highlight .vi { color: #19177C }
+.highlight .vm { color: #19177C }
+.highlight .il { color: #666 }
+
+/* Code block wrapper */
+.highlight {
+    border-radius: 4px;
+    margin: 1.5em 0;
+    overflow-x: auto;
+}
+
+.highlight pre {
+    margin: 0;
+    padding: 1em 1.5em;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.9em;
+}
+
+/* Inline code */
+code {
+    background: #f0f0f0;
+    border-radius: 3px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.88em;
+    padding: 0.1em 0.4em;
+}
+
+/* Don't double-style code inside .highlight blocks */
+.highlight code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+}
+
+/* --- Admonitions --- */
+
+.admonition {
+    border-left: 4px solid #f0f0f0;
+    border-radius: 4px;
+    margin: 1.5em 0;
+    padding: 1em 1.5em;
+    background: #f8f9fa;
+}
+
+.admonition-title {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.05em;
+}
+
+.admonition.note   { border-left-color: #5bc0de; background: #f0f8fc; }
+.admonition.note .admonition-title { color: #2980b9; }
+
+.admonition.tip    { border-left-color: #5cb85c; background: #f0faf0; }
+.admonition.tip .admonition-title { color: #27ae60; }
+
+.admonition.warning { border-left-color: #f0ad4e; background: #fffbf0; }
+.admonition.warning .admonition-title { color: #d68910; }
+
+.admonition.danger  { border-left-color: #d9534f; background: #fdf0f0; }
+.admonition.danger .admonition-title { color: #c0392b; }
+
+.admonition.info    { border-left-color: #5bc0de; background: #f0f8fc; }
+.admonition.info .admonition-title { color: #2980b9; }
+
+.admonition.example { border-left-color: #9b59b6; background: #f8f0fc; }
+.admonition.example .admonition-title { color: #8e44ad; }
+
+/* --- Tables --- */
+
+table {
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    width: 100%;
+    font-size: 0.95em;
+}
+
+table th {
+    background: #f0f0f0;
+    font-weight: bold;
+    text-align: left;
+    padding: 0.6em 1em;
+    border: 1px solid #ddd;
+}
+
+table td {
+    padding: 0.5em 1em;
+    border: 1px solid #ddd;
+}
+
+table tr:nth-child(even) td {
+    background: #fafafa;
+}
+
+/* --- Math display --- */
+
+/* Ensure display math doesn't overflow on narrow screens */
+.MathJax_Display, mjx-container[display="true"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+}
+
+/* Boxed equations — match Editorial style */
+.boxed {
+    border: 2px solid #888;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 0.3em 0.8em;
+}
+
+/* --- Active nav item in sidebar --- */
+
+#menu ul li a.active {
+    color: #f56a6a;
+    font-weight: bold;
+}
+
+/* --- Prev/Next page navigation --- */
+
+.page-nav {
+    margin-top: 2em;
+    padding-top: 1.5em;
+    border-top: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+/* --- Content typography tweaks --- */
+
+/* MkDocs renders headings without the Editorial theme's spacing — fix */
+#main .inner section h2 {
+    margin-top: 2em;
+}
+
+#main .inner section h3 {
+    margin-top: 1.5em;
+}
+
+/* Footnotes */
+.footnote {
+    font-size: 0.85em;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 2em;
+    padding-top: 1em;
+    color: #666;
+}
+
+/* Definition lists */
+dl dt {
+    font-weight: bold;
+    margin-top: 1em;
+}
+
+dl dd {
+    margin-left: 2em;
+    margin-top: 0.3em;
+}

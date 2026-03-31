@@ -1,0 +1,392 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>The Bayesian Evidence – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>The Bayesian Evidence</h1>
+						</header>
+						
+
+						<h1 id="the-bayesian-evidence">The Bayesian Evidence</h1>
+<p>← Back to <a href="../">index</a> | Previous: <a href="../bayesian-inference/">bayesian-inference</a></p>
+<hr />
+<h2 id="the-most-important-quantity">The Most Important Quantity</h2>
+<p>In <a href="../bayesian-inference/">bayesian-inference</a>, we saw that the evidence <span class="arithmatex">\(\mathcal{Z}\)</span> appears as a normalizing constant:</p>
+<div class="arithmatex">\[\mathcal{P}(\theta) = \frac{\mathcal{L}(\theta)\pi(\theta)}{\mathcal{Z}}\]</div>
+<p>For <strong>parameter inference</strong>, <span class="arithmatex">\(\mathcal{Z}\)</span> is just a nuisance—it doesn't affect the posterior shape.</p>
+<p><strong>But for model comparison, the evidence is everything.</strong></p>
+<hr />
+<h2 id="what-is-the-evidence">What Is the Evidence?</h2>
+<p>The evidence is the <strong>average likelihood under the prior</strong>:</p>
+<div class="arithmatex">\[\boxed{\mathcal{Z} = p(d|\mathcal{M}) = \int \mathcal{L}(\theta)\pi(\theta) \, d\theta = \langle \mathcal{L} \rangle_\pi}\]</div>
+<p>It answers: <strong>"How well does this model, with its parameter space and priors, predict the observed data?"</strong></p>
+<h3 id="three-interpretations">Three Interpretations</h3>
+<ol>
+<li><strong>Marginalized likelihood</strong>: The likelihood with parameters integrated out</li>
+<li><strong>Prior predictive probability</strong>: How surprised is the model by seeing this data?</li>
+<li><strong>Average model performance</strong>: Expected likelihood if we sampled parameters from the prior</li>
+</ol>
+<p>All three perspectives are equivalent and useful in different contexts.</p>
+<hr />
+<h2 id="why-the-evidence-matters">Why the Evidence Matters</h2>
+<p>Consider comparing two models:</p>
+<p><strong>Model A:</strong> Simple (few parameters, narrow predictions)
+<strong>Model B:</strong> Complex (many parameters, wide predictions)</p>
+<p>If both models fit the data equally well, which should we prefer?</p>
+<h3 id="the-occam-penalty">The Occam Penalty</h3>
+<p>The evidence naturally implements <strong>Occam's razor</strong> through the prior volume:</p>
+<ul>
+<li><strong>Simple model</strong>: Concentrates prior on narrow range → high <span class="arithmatex">\(\mathcal{L}\)</span> everywhere in prior → high <span class="arithmatex">\(\mathcal{Z}\)</span></li>
+<li><strong>Complex model</strong>: Spreads prior over wide range → high <span class="arithmatex">\(\mathcal{L}\)</span> only in small region → low <span class="arithmatex">\(\mathcal{Z}\)</span></li>
+</ul>
+<p><strong>Intuition:</strong> A complex model must fit <strong>significantly better</strong> to overcome the penalty for wasting prior volume. This is why <a href="../prior-choice/">prior-choice</a> matters for evidence—the prior encodes the model's predictions.</p>
+<h3 id="visual-intuition">Visual Intuition</h3>
+<p>Imagine two models predicting a measurement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Model A (simple):
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Prior range: [0, 2]
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Likelihood peak: at 1.0
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Evidence: High (most of prior has good likelihood)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Model B (complex):
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Prior range: [0, 10]
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>Likelihood peak: at 1.0 (same fit!)
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>Evidence: Lower (most of prior has terrible likelihood)
+</code></pre></div>
+<p>Model B spreads its prior over a wider range but the data only fall in a small region of that space. This "wasted" volume penalizes the evidence.</p>
+<hr />
+<h2 id="mathematical-decomposition">Mathematical Decomposition</h2>
+<p>The evidence can be beautifully decomposed using the <strong>Kullback-Leibler divergence</strong>[^Trotta2008]:</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} = \int \mathcal{P}(\theta) \log\frac{\mathcal{P}(\theta)}{\pi(\theta)} d\theta\]</div>
+<p>This measures the <strong>information gain</strong> from prior to posterior.</p>
+<p>Rearranging gives:</p>
+<div class="arithmatex">\[\boxed{\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} - \mathcal{D}_{\text{KL}}}\]</div>
+<p><strong>Interpretation:</strong></p>
+<div class="arithmatex">\[\text{Evidence} = \text{Goodness of fit} - \text{Complexity penalty}\]</div>
+<ul>
+<li><strong><span class="arithmatex">\(\langle \log\mathcal{L} \rangle_{\mathcal{P}}\)</span></strong>: How well does the model fit (averaged over posterior)?</li>
+<li><strong><span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span></strong>: How much did the posterior compress from the prior?</li>
+</ul>
+<p>Models that require <strong>large compression</strong> (high <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span>) are penalized.</p>
+<hr />
+<h2 id="the-laplace-approximation">The Laplace Approximation</h2>
+<p>For a likelihood that's approximately Gaussian near the posterior peak (many cosmological problems!), we can further decompose[^Trotta2008]:</p>
+<div class="arithmatex">\[\langle \log\mathcal{L} \rangle_{\mathcal{P}} \approx \log\mathcal{L}_{\text{max}} - \frac{\hat{d}}{2}\]</div>
+<p>where <span class="arithmatex">\(\hat{d}\)</span> is the <strong>Bayesian model dimensionality</strong>[^Handley2019]—the effective number of constrained parameters.</p>
+<p>Substituting into the previous equation:</p>
+<div class="arithmatex">\[\boxed{\Delta\log\mathcal{Z} \approx \Delta\log\mathcal{L}_{\text{max}} - \frac{\Delta\hat{d}}{2} - \Delta\mathcal{D}_{\text{KL}}}\]</div>
+<p><strong>This is the fundamental equation of model comparison.</strong></p>
+<h3 id="interpreting-the-terms">Interpreting the Terms</h3>
+<p>Comparing Model 0 (complex) to Model 1 (simple):</p>
+<ol>
+<li><strong><span class="arithmatex">\(\Delta\log\mathcal{L}_{\text{max}}\)</span></strong>: How much better is the complex model's best fit?</li>
+<li><strong><span class="arithmatex">\(-\Delta\hat{d}/2\)</span></strong>: Penalty for additional constrained parameters (~0.5 per dimension)</li>
+<li><strong><span class="arithmatex">\(-\Delta\mathcal{D}_{\text{KL}}\)</span></strong>: Penalty for requiring more information gain</li>
+</ol>
+<p><strong>Rule of thumb:</strong> Adding one well-constrained parameter costs <span class="arithmatex">\(\approx 0.5\)</span> in log-evidence. The complex model must improve the fit by <span class="arithmatex">\(\Delta\log\mathcal{L}_{\text{max}} \gtrsim 0.5\)</span> per parameter to be favored.</p>
+<hr />
+<h2 id="example-curvature-in-cosmology">Example: Curvature in Cosmology</h2>
+<p><strong>Model 1:</strong> Flat <span class="arithmatex">\(\Lambda\)</span>CDM (6 parameters, <span class="arithmatex">\(\Omega_k = 0\)</span> fixed)
+<strong>Model 2:</strong> Curved <span class="arithmatex">\(\Lambda\)</span>CDM (7 parameters, <span class="arithmatex">\(\Omega_k\)</span> free)</p>
+<p>Suppose we run both models on CMB data:</p>
+<p><strong>Results:</strong>
+- Model 1: <span class="arithmatex">\(\log\mathcal{L}_{\text{max}} = 87573.4\)</span>
+- Model 2: <span class="arithmatex">\(\log\mathcal{L}_{\text{max}} = 87573.7\)</span> (slightly better fit)
+- <span class="arithmatex">\(\Delta\hat{d} \approx 1\)</span> (curvature is somewhat constrained)
+- Measured: <span class="arithmatex">\(\Omega_k = 0.03 \pm 0.12\)</span> (consistent with zero)</p>
+<p><strong>Evidence comparison:</strong></p>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} \approx (87573.7 - 87573.4) - \frac{1}{2} - \Delta\mathcal{D}_{\text{KL}}$$
+$$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
+<p><strong>Conclusion:</strong> The flat model is (weakly) preferred. The improved fit from freeing curvature doesn't justify the additional parameter.</p>
+<p><strong>This is Occam's razor in action</strong>: Even though the data are <em>consistent</em> with small curvature, they don't <em>require</em> it, so the simpler model wins.</p>
+<hr />
+<h2 id="why-not-just-use-chi2">Why Not Just Use <span class="arithmatex">\(\chi^2\)</span>?</h2>
+<p>You might ask: "Why not just compare <span class="arithmatex">\(\chi^2\)</span> values?"</p>
+<p><strong>Problems with <span class="arithmatex">\(\chi^2\)</span> comparison:</strong></p>
+<ol>
+<li><strong>No complexity penalty</strong>: More parameters always improve <span class="arithmatex">\(\chi^2\)</span></li>
+<li><strong>Arbitrary thresholds</strong>: How much improvement is "enough"?</li>
+<li><strong>Ignores prior volume</strong>: Doesn't account for parameter space coverage</li>
+<li><strong>Not probabilistic</strong>: Can't make statements like "Model A is 12× more likely"</li>
+</ol>
+<p><strong>AIC and BIC</strong> (Akaike/Bayesian Information Criteria) attempt to add complexity penalties, but these are approximations to the full Bayesian evidence in specific limits.</p>
+<p><strong>The evidence is the principled answer</strong>: It exactly balances fit quality against complexity through integration over the full prior volume.</p>
+<hr />
+<h2 id="computing-the-evidence">Computing the Evidence</h2>
+<p>The evidence is a high-dimensional integral:</p>
+<div class="arithmatex">\[\mathcal{Z} = \int_{\Omega_\theta} \mathcal{L}(\theta)\pi(\theta) d\theta\]</div>
+<p>This is <strong>fundamentally different</strong> from parameter estimation:</p>
+<ul>
+<li><strong>MCMC</strong> samples the posterior <span class="arithmatex">\(\mathcal{P} \propto \mathcal{L}\pi\)</span> (explores high-likelihood peak)</li>
+<li><strong>Evidence</strong> requires sampling the <strong>entire prior volume</strong> (including low-likelihood regions)</li>
+</ul>
+<p><strong>Methods for computing evidence:</strong></p>
+<ol>
+<li><strong><a href="../nested-sampling/">nested-sampling</a></strong>: Transforms the integral to 1D, directly computes <span class="arithmatex">\(\mathcal{Z}\)</span></li>
+<li><strong>Thermodynamic integration</strong>: Chains between prior and posterior</li>
+<li><strong>Harmonic mean estimator</strong>: Post-processes MCMC samples (can be unstable)</li>
+<li><strong>Learned harmonic mean</strong>: Uses machine learning for more stable estimation[^McEwen2021]</li>
+</ol>
+<p>For rigorous model comparison, <a href="../nested-sampling/">nested-sampling</a> is the gold standard—it's specifically designed to compute evidence accurately.</p>
+<hr />
+<h2 id="evidence-in-model-comparison">Evidence in Model Comparison</h2>
+<p>To compare models <span class="arithmatex">\(\mathcal{M}_0\)</span> and <span class="arithmatex">\(\mathcal{M}_1\)</span>, we compute the <strong>Bayes factor</strong>:</p>
+<div class="arithmatex">\[B_{01} = \frac{\mathcal{Z}_0}{\mathcal{Z}_1} = \frac{p(d|\mathcal{M}_0)}{p(d|\mathcal{M}_1)}\]</div>
+<p>If we assign equal prior probabilities to the models, then:</p>
+<div class="arithmatex">\[\frac{p(\mathcal{M}_0|d)}{p(\mathcal{M}_1|d)} = B_{01}\]</div>
+<p>We typically work with <span class="arithmatex">\(\Delta\log\mathcal{Z} = \log B_{01}\)</span>.</p>
+<p><strong>Jeffreys' scale for interpretation:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><span class="arithmatex">\(\|\Delta\log\mathcal{Z}\|\)</span></th>
+<th style="text-align: center;">Odds</th>
+<th style="text-align: center;">Strength</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(&lt; 1\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(&lt; 3:1\)</span></td>
+<td style="text-align: center;">Inconclusive</td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(1\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(\sim 3:1\)</span></td>
+<td style="text-align: center;">Weak evidence</td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(2.5\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(\sim 12:1\)</span></td>
+<td style="text-align: center;">Moderate evidence</td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(5\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(\sim 150:1\)</span></td>
+<td style="text-align: center;">Strong evidence</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../model-comparison/">model-comparison</a> for detailed examples.</p>
+<hr />
+<h2 id="the-evidence-is-model-independent">The Evidence Is Model-Independent</h2>
+<p>A powerful feature: Evidence comparisons for different components of your model <strong>factorize</strong>.</p>
+<p>Suppose you want to compare:
+- Cosmologies: <span class="arithmatex">\(\Lambda\)</span>CDM vs <span class="arithmatex">\(w_0w_a\)</span>CDM
+- Scatter models: Gaussian vs Student's t</p>
+<p>You can compute four evidences:</p>
+<div class="arithmatex">\[\mathcal{Z}_{ij} = p(d|\text{Cosmology}_i, \text{Scatter}_j)\]</div>
+<p>Then marginalize to compare cosmologies <strong>independent of scatter choice</strong>:</p>
+<div class="arithmatex">\[p(d|\text{Cosmology}_i) = \sum_j p(d|\text{Cosmology}_i, \text{Scatter}_j)p(\text{Scatter}_j)\]</div>
+<p><strong>This is unique to the Bayesian framework</strong>: You can rigorously separate physical and statistical model assumptions.</p>
+<hr />
+<h2 id="key-insights">Key Insights</h2>
+<ol>
+<li><strong>Evidence = marginalized likelihood</strong> over the prior</li>
+<li><strong>Occam's razor is automatic</strong> through the <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> penalty</li>
+<li><strong>Complexity costs ~0.5 per constrained parameter</strong> (rule of thumb)</li>
+<li><strong>Evidence requires special methods</strong> (standard MCMC doesn't give it)</li>
+<li><strong>Model comparison is rigorous</strong> via Bayes factors</li>
+<li><strong>Different model aspects can be separated</strong> and marginalized independently</li>
+</ol>
+<hr />
+<h2 id="the-hierarchy-of-inference">The Hierarchy of Inference</h2>
+<p>We've now climbed the full hierarchy:</p>
+<ol>
+<li><strong>Point estimates</strong> (MLE): <span class="arithmatex">\(\theta_{\text{best}}\)</span></li>
+<li><strong>Parameter constraints</strong> (Posterior): <span class="arithmatex">\(\theta \pm \sigma\)</span></li>
+<li><strong>Model comparison</strong> (Evidence): <span class="arithmatex">\(\mathcal{M}_0\)</span> vs <span class="arithmatex">\(\mathcal{M}_1\)</span></li>
+</ol>
+<p><strong>Each level is more computationally expensive, but more scientifically valuable.</strong></p>
+<p>In cosmology, we often care more about detecting new physics (model comparison) than precisely measuring known parameters. The evidence is how we do this rigorously.</p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../model-comparison/">model-comparison</a> - Applying evidence to compare cosmological models
+- <a href="../nested-sampling/">nested-sampling</a> - The algorithm for computing evidence
+- <a href="../computing-evidence/">computing-evidence</a> - Practical methods comparison</p>
+<p><strong>Related:</strong>
+- <a href="../bayesian-inference/">bayesian-inference</a> - The general framework
+- <a href="../kl-divergence/">kl-divergence</a> - Understanding the complexity penalty</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
+<p>[Jeffreys1961]: Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.</p>
+<p>[Handley2019]: Handley, W. J., &amp; Lemos, P. (2019). Quantifying dimensionality: Bayesian cosmological model complexity. <em>Physical Review D</em>, 100(10), 103511.</p>
+<p>[McEwen2021]: McEwen, J. D., et al. (2021). Machine learning assisted Bayesian model comparison: learnt harmonic mean estimator. <em>MNRAS</em>, 508(3), 3771-3795.</p>
+<p>[Trotta2007]: Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../bayesian-inference/" class="button">← Bayesian Inference</a>
+							
+							
+							<a href="../kl-divergence/" class="button primary" style="float:right">KL Divergence →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="./" class="active">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

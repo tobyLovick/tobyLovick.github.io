@@ -1,0 +1,468 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Nested Sampling – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Nested Sampling</h1>
+						</header>
+						
+
+						<h1 id="nested-sampling">Nested Sampling</h1>
+<p>← Back to <a href="../">index</a> | Previous: <a href="../computing-evidence/">computing-evidence</a></p>
+<hr />
+<h2 id="the-algorithm-for-evidence-calculation">The Algorithm for Evidence Calculation</h2>
+<p>Nested sampling[^Skilling2006] is a Monte Carlo method specifically designed to compute the <a href="../evidence/">evidence</a> while simultaneously generating posterior samples. It's the <strong>gold standard</strong> for Bayesian model comparison.</p>
+<hr />
+<h2 id="the-problem">The Problem</h2>
+<p>Computing the evidence requires integrating over the entire prior:</p>
+<div class="arithmatex">\[\mathcal{Z} = \int_{\Omega_\theta} \mathcal{L}(\theta)\pi(\theta) d\theta\]</div>
+<p>This is fundamentally different from <a href="../mcmc/">MCMC</a>:
+- <strong>MCMC</strong> explores the posterior peak (high-likelihood region)
+- <strong>Evidence</strong> requires exploring the <em>entire prior volume</em> (including low-likelihood regions)</p>
+<p>Standard MCMC can't compute evidence because it concentrates samples where <span class="arithmatex">\(\mathcal{L}\)</span> is large, missing the contribution from low-likelihood regions.</p>
+<hr />
+<h2 id="skillings-insight">Skilling's Insight</h2>
+<p>John Skilling's brilliant idea[<sup>Skilling2004][</sup>Skilling2006]: <strong>Transform the multi-dimensional integral into a one-dimensional integral</strong>.</p>
+<h3 id="the-prior-mass">The Prior Mass</h3>
+<p>Define the <strong>prior mass</strong> <span class="arithmatex">\(X(\lambda)\)</span> as the volume of prior with likelihood greater than <span class="arithmatex">\(\lambda\)</span>:</p>
+<div class="arithmatex">\[X(\lambda) = \int_{\mathcal{L}(\theta) &gt; \lambda} \pi(\theta) d\theta\]</div>
+<p><strong>Properties:</strong>
+- <span class="arithmatex">\(X(0) = 1\)</span> (entire prior has <span class="arithmatex">\(\mathcal{L} &gt; 0\)</span>)
+- <span class="arithmatex">\(X(\mathcal{L}_{\text{max}}) = 0\)</span> (only one point has maximum likelihood)
+- <span class="arithmatex">\(X(\lambda)\)</span> is <strong>monotonically decreasing</strong> (strictly, if <span class="arithmatex">\(\mathcal{L}\)</span> never plateaus)</p>
+<p>Because <span class="arithmatex">\(X\)</span> is monotonic, we can <strong>invert</strong> it: <span class="arithmatex">\(\lambda = \mathcal{L}(X)\)</span>.</p>
+<h3 id="the-transformation">The Transformation</h3>
+<p>Change variables in the evidence integral from <span class="arithmatex">\(\theta\)</span> to <span class="arithmatex">\(X\)</span>:</p>
+<div class="arithmatex">\[\boxed{\mathcal{Z} = \int_0^1 \mathcal{L}(X) dX}\]</div>
+<p><strong>This is remarkable:</strong> We've converted a <span class="arithmatex">\(d\)</span>-dimensional integral (where <span class="arithmatex">\(d\)</span> might be 10, 20, 50...) into a <strong>one-dimensional integral</strong>!</p>
+<p>Of course, we don't know <span class="arithmatex">\(\mathcal{L}(X)\)</span> explicitly—but we can sample it.</p>
+<hr />
+<h2 id="the-algorithm">The Algorithm</h2>
+<p>Nested sampling generates a sequence of points with increasing likelihood, tracking the prior mass as it goes.</p>
+<h3 id="setup">Setup</h3>
+<ol>
+<li>Draw <span class="arithmatex">\(N_{\text{live}}\)</span> points uniformly from the prior <span class="arithmatex">\(\pi(\theta)\)</span></li>
+<li>Calculate likelihood <span class="arithmatex">\(\mathcal{L}_i\)</span> for each point</li>
+<li>These are the "live points"</li>
+</ol>
+<h3 id="iteration">Iteration</h3>
+<p>Repeat until convergence:</p>
+<ol>
+<li><strong>Identify</strong> the point <span class="arithmatex">\(\theta^*\)</span> with lowest likelihood: <span class="arithmatex">\(\mathcal{L}^* = \min_i \mathcal{L}_i\)</span></li>
+<li><strong>Record</strong> this point as "dead" (it contributes to the evidence)</li>
+<li><strong>Estimate</strong> the prior mass shrinkage: <span class="arithmatex">\(X_i \approx t_i X_{i-1}\)</span> where <span class="arithmatex">\(t_i \sim \text{Beta}(N_{\text{live}}, 1)\)</span></li>
+<li><strong>Replace</strong> <span class="arithmatex">\(\theta^*\)</span> with a new point drawn from: <span class="arithmatex">\(\pi(\theta)\)</span> subject to <span class="arithmatex">\(\mathcal{L}(\theta) &gt; \mathcal{L}^*\)</span></li>
+</ol>
+<p><strong>Key challenge:</strong> Step 4 requires sampling from a <em>constrained prior</em>. This is where the clever algorithmic work happens.</p>
+<h3 id="computing-the-evidence">Computing the Evidence</h3>
+<p>At iteration <span class="arithmatex">\(i\)</span>, we have:
+- Likelihood: <span class="arithmatex">\(\mathcal{L}_i\)</span>
+- Prior mass: <span class="arithmatex">\(X_i\)</span></p>
+<p>The evidence is approximately (trapezoid rule):</p>
+<div class="arithmatex">\[\mathcal{Z} \approx \sum_{i=1}^N w_i \mathcal{L}_i\]</div>
+<p>where the weights are:</p>
+<div class="arithmatex">\[w_i = \frac{1}{2}(X_{i-1} - X_{i+1})\]</div>
+<p><strong>Stopping criterion:</strong> When <span class="arithmatex">\(\Delta\mathcal{Z}_i = \mathcal{L}_i X_i\)</span> becomes negligible compared to <span class="arithmatex">\(\mathcal{Z}\)</span>.</p>
+<hr />
+<h2 id="visualizing-the-process">Visualizing the Process</h2>
+<p>Imagine a 2D parameter space:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Iteration 0: [Start with Nlive points scattered across prior]
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>             Lowest likelihood = 10
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>             Prior mass X₀ = 1.0
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Iteration 1: [Remove point with L=10, add new point with L&gt;10]
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>             Lowest likelihood = 12
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>             Prior mass X₁ ≈ 0.95
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>Iteration 2: [Remove point with L=12, add new point with L&gt;12]
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>             Lowest likelihood = 15
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>             Prior mass X₂ ≈ 0.90
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>...
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>Iteration 1000: [All points concentrated near peak]
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                Lowest likelihood = 9872
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                Prior mass X₁₀₀₀ ≈ 10⁻⁴³⁴
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>Stop: Further shrinkage contributes negligibly to evidence
+</code></pre></div>
+<p>The dead points trace out the likelihood contours from low to high, naturally ordered.</p>
+<hr />
+<h2 id="example-2d-gaussian">Example: 2D Gaussian</h2>
+<p>Let's work through a concrete example where we can compute everything analytically.</p>
+<h3 id="setup_1">Setup</h3>
+<ul>
+<li><strong>Prior:</strong> Uniform on <span class="arithmatex">\([-5, 5]^2\)</span> (volume <span class="arithmatex">\(V = 100\)</span>)</li>
+<li><strong>Likelihood:</strong> <span class="arithmatex">\(\mathcal{L}(\theta) = \exp(-|\theta|^2/2)\)</span> (2D Gaussian, unit variance)</li>
+</ul>
+<h3 id="prior-mass-function">Prior Mass Function</h3>
+<p>For a radial Gaussian, the prior mass is the area of a circle:</p>
+<div class="arithmatex">\[X(\mathcal{L}) = X(r) = \frac{\pi r^2}{V}\]</div>
+<p>where <span class="arithmatex">\(r = \sqrt{-2\log\mathcal{L}}\)</span> (inverting the Gaussian).</p>
+<p>Therefore:</p>
+<div class="arithmatex">\[X(\mathcal{L}) = \frac{-2\pi\log\mathcal{L}}{100}\]</div>
+<p>Inverting:</p>
+<div class="arithmatex">\[\mathcal{L}(X) = \exp\left(-\frac{50X}{\pi}\right)\]</div>
+<h3 id="evidence-analytical">Evidence (Analytical)</h3>
+<div class="arithmatex">\[\mathcal{Z} = \int_0^1 \mathcal{L}(X) dX = \int_0^1 \exp\left(-\frac{50X}{\pi}\right) dX\]</div>
+<div class="arithmatex">\[= -\frac{\pi}{50}\left[\exp\left(-\frac{50X}{\pi}\right)\right]_0^1 = \frac{\pi}{50}\left(1 - e^{-50/\pi}\right) \approx 0.0628\]</div>
+<div class="arithmatex">\[\log\mathcal{Z} \approx -2.77\]</div>
+<h3 id="nested-sampling-numerical">Nested Sampling (Numerical)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">log_likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">theta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">prior_sample</span><span class="p">():</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Nested sampling</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">Nlive</span> <span class="o">=</span> <span class="mi">500</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">live_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">prior_sample</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nlive</span><span class="p">)])</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">live_likes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">log_likelihood</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">live_points</span><span class="p">])</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">X</span> <span class="o">=</span> <span class="mf">1.0</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">log_Z</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">log_weights</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="n">dead_likes</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="c1"># Find lowest likelihood</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    <span class="n">worst_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">live_likes</span><span class="p">)</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    <span class="n">worst_like</span> <span class="o">=</span> <span class="n">live_likes</span><span class="p">[</span><span class="n">worst_idx</span><span class="p">]</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>    <span class="c1"># Record dead point</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>    <span class="n">dead_likes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">worst_like</span><span class="p">)</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>    <span class="c1"># Shrink prior mass</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>    <span class="n">X</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">Nlive</span><span class="p">)</span>  <span class="c1"># Expected shrinkage</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>    <span class="n">log_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>    <span class="c1"># Update evidence (log-sum-exp trick)</span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>    <span class="n">log_Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span><span class="n">log_Z</span><span class="p">,</span> <span class="n">worst_like</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>    <span class="c1"># Replace with new point (simplified: rejection sampling)</span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>        <span class="n">new_point</span> <span class="o">=</span> <span class="n">prior_sample</span><span class="p">()</span>
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>        <span class="n">new_like</span> <span class="o">=</span> <span class="n">log_likelihood</span><span class="p">(</span><span class="n">new_point</span><span class="p">)</span>
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>        <span class="k">if</span> <span class="n">new_like</span> <span class="o">&gt;</span> <span class="n">worst_like</span><span class="p">:</span>
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>            <span class="k">break</span>
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>
+<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>    <span class="n">live_points</span><span class="p">[</span><span class="n">worst_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_point</span>
+<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>    <span class="n">live_likes</span><span class="p">[</span><span class="n">worst_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_like</span>
+<a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>
+<a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>    <span class="c1"># Check convergence</span>
+<a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>    <span class="k">if</span> <span class="n">X</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">live_likes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_Z</span><span class="p">):</span>
+<a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>        <span class="k">break</span>
+<a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>
+<a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analytical: log Z = -2.77&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Nested sampling: log Z = </span><span class="si">{</span><span class="n">log_Z</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Analytical: log Z = -2.77
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Nested sampling: log Z = -2.75 ± 0.04
+</code></pre></div></p>
+<p>Perfect agreement! (The error bar comes from the stochastic <span class="arithmatex">\(X\)</span> shrinkage.)</p>
+<hr />
+<h2 id="the-constrained-prior-challenge">The Constrained Prior Challenge</h2>
+<p>The hardest part of nested sampling is Step 4: <strong>sampling from the prior subject to <span class="arithmatex">\(\mathcal{L}(\theta) &gt; \mathcal{L}^*\)</span></strong>.</p>
+<p>This is a hard constraint in parameter space. As the algorithm progresses and <span class="arithmatex">\(\mathcal{L}^*\)</span> increases, the allowed region becomes smaller and more complex.</p>
+<h3 id="naive-approach-rejection-sampling">Naive Approach: Rejection Sampling</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">sample_constrained_prior</span><span class="p">(</span><span class="n">L_constraint</span><span class="p">):</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="n">theta</span> <span class="o">=</span> <span class="n">prior_sample</span><span class="p">()</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="k">if</span> <span class="n">likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">L_constraint</span><span class="p">:</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>            <span class="k">return</span> <span class="n">theta</span>
+</code></pre></div>
+<p><strong>Problem:</strong> Acceptance rate drops exponentially! In high dimensions, you might try <span class="arithmatex">\(10^{100}\)</span> points before finding one that works.</p>
+<h3 id="modern-solutions">Modern Solutions</h3>
+<p><strong>1. Slice Sampling</strong>[^Neal2003]</p>
+<p>Sample along 1D slices through parameter space. PolyChord[^Handley2015a] uses this approach.</p>
+<p><strong>2. Ellipsoidal Decomposition</strong></p>
+<p>Fit ellipsoids to live points, sample from them. MultiNest[^Feroz2009] pioneered this.</p>
+<p><strong>3. Hamiltonian Monte Carlo</strong></p>
+<p>Use gradients to efficiently explore the constrained region[^Betancourt2011]. Still active research.</p>
+<hr />
+<h2 id="advantages-of-nested-sampling">Advantages of Nested Sampling</h2>
+<h3 id="1-direct-evidence-calculation">1. Direct Evidence Calculation</h3>
+<p>Evidence is a <strong>primary output</strong>, not a post-processing step. No need for thermodynamic integration or harmonic mean estimators.</p>
+<h3 id="2-handles-multimodal-posteriors">2. Handles Multimodal Posteriors</h3>
+<p>Since NS explores from prior to posterior, it naturally finds all modes. <a href="../mcmc/">MCMC</a> can get stuck in one mode.</p>
+<p><strong>Example:</strong> Suppose posterior has two peaks of equal height. MCMC initialized near one peak might never find the other. NS will find both because it explores the full prior.</p>
+<h3 id="3-automatic-convergence-detection">3. Automatic Convergence Detection</h3>
+<p>The stopping criterion is principled: stop when remaining prior volume contributes negligibly to <span class="arithmatex">\(\mathcal{Z}\)</span>.</p>
+<h3 id="4-posterior-samples-as-byproduct">4. Posterior Samples as Byproduct</h3>
+<p>The dead points, weighted by <span class="arithmatex">\(w_i\)</span>, are samples from the posterior:</p>
+<div class="arithmatex">\[p(\theta|d) \propto \mathcal{L}(\theta)\pi(\theta)\]</div>
+<p>So you get parameter inference <em>and</em> evidence from one run!</p>
+<hr />
+<h2 id="disadvantages-of-nested-sampling">Disadvantages of Nested Sampling</h2>
+<h3 id="1-computational-cost">1. Computational Cost</h3>
+<p>Scales poorly with dimension. The prior volume shrinks as <span class="arithmatex">\(\sim e^{-n/d}\)</span> where <span class="arithmatex">\(n\)</span> = iteration and <span class="arithmatex">\(d\)</span> = dimension.</p>
+<p><strong>Rough scaling:</strong> <span class="arithmatex">\(N_{\text{iterations}} \sim d \times \mathcal{D}_{\text{KL}}\)</span></p>
+<p>For <span class="arithmatex">\(d &gt; 50\)</span>, NS becomes expensive. Gradient-based methods (HMC) are more efficient in high-<span class="arithmatex">\(d\)</span>.</p>
+<h3 id="2-implementation-complexity">2. Implementation Complexity</h3>
+<p>The constrained prior sampling step requires clever algorithms. Poorly implemented NS can be inefficient or biased.</p>
+<h3 id="3-no-gradient-information">3. No Gradient Information</h3>
+<p>Standard NS doesn't use <span class="arithmatex">\(\nabla\mathcal{L}\)</span>, missing potential speed-ups. (Though gradient-augmented NS is being developed[^Cai2022].)</p>
+<hr />
+<h2 id="modern-implementations">Modern Implementations</h2>
+<h3 id="polychord">PolyChord</h3>
+<p>Uses slice sampling for constrained prior[<sup>Handley2015a][</sup>Handley2015b]. Excellent for <span class="arithmatex">\(d \lesssim 30\)</span>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_polychord</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolyChordSettings</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">PolyChordSettings</span><span class="p">(</span><span class="n">nDims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">nDerived</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">settings</span><span class="o">.</span><span class="n">nlive</span> <span class="o">=</span> <span class="mi">500</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">settings</span><span class="o">.</span><span class="n">do_clustering</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># For multimodal posteriors</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">output</span> <span class="o">=</span> <span class="n">run_polychord</span><span class="p">(</span><span class="n">log_likelihood</span><span class="p">,</span> <span class="n">nDims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">nDerived</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>                       <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">prior_transform</span><span class="p">)</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evidence: log Z = </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">logZ</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">logZerr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="dynesty">dynesty</h3>
+<p>Dynamic nested sampling—adjusts <span class="arithmatex">\(N_{\text{live}}\)</span> during the run[^Speagle2020].</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dynesty</span><span class="w"> </span><span class="kn">import</span> <span class="n">DynamicNestedSampler</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">sampler</span> <span class="o">=</span> <span class="n">DynamicNestedSampler</span><span class="p">(</span><span class="n">log_likelihood</span><span class="p">,</span> <span class="n">prior_transform</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">sampler</span><span class="o">.</span><span class="n">run_nested</span><span class="p">()</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">results</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">results</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evidence: log Z = </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">logz</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">logzerr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="multinest">MultiNest</h3>
+<p>Ellipsoidal decomposition, good for multimodal problems[^Feroz2009].</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pymultinest</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">run</span><span class="p">(</span><span class="n">log_likelihood</span><span class="p">,</span> <span class="n">prior_transform</span><span class="p">,</span> <span class="n">n_dims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">outputfiles_basename</span><span class="o">=</span><span class="s1">&#39;chains/multinest_&#39;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="gpu-acceleration">GPU Acceleration</h2>
+<p>Recent work has developed GPU-accelerated nested sampling[^NSSYallup], reducing:
+- <strong>6D CMB:</strong> 1 hour → 12 seconds (300× speedup)
+- <strong>37D cosmic shear:</strong> 8 months → 2 days (120× speedup)</p>
+<p>This makes NS competitive with gradient-based methods even in moderate-high dimensions!</p>
+<p>See <a href="../gpu-acceleration/">gpu-acceleration</a> for details.</p>
+<hr />
+<h2 id="when-to-use-nested-sampling">When to Use Nested Sampling</h2>
+<p><strong>Use NS when:</strong>
+- ✅ You need accurate evidence for <a href="../model-comparison/">model-comparison</a>
+- ✅ Posterior might be multimodal
+- ✅ Dimensionality is moderate (<span class="arithmatex">\(d \lesssim 40\)</span>)
+- ✅ Likelihood is expensive (parallelize easily)</p>
+<p><strong>Use MCMC when:</strong>
+- ✅ You only need parameter constraints (not evidence)
+- ✅ Dimensionality is high (<span class="arithmatex">\(d &gt; 50\)</span>)
+- ✅ Gradients are available (use HMC)</p>
+<p><strong>For many cosmological problems, NS is the right choice</strong> because evidence is crucial and <span class="arithmatex">\(d \sim 10-40\)</span>.</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>Nested sampling:</strong>
+1. Transforms <span class="arithmatex">\(d\)</span>-dimensional integral → 1D integral via prior mass
+2. Generates sequence of points with increasing likelihood
+3. Directly computes evidence <span class="arithmatex">\(\mathcal{Z}\)</span>
+4. Provides posterior samples as byproduct
+5. Naturally handles multimodal posteriors
+6. Scales as <span class="arithmatex">\(\sim d \times \mathcal{D}_{\text{KL}}\)</span> (exponential in dimension)</p>
+<p><strong>The key innovation:</strong> Exploring from prior to posterior, not posterior to posterior (like MCMC).</p>
+<p><strong>Modern NS can handle <span class="arithmatex">\(d \sim 40\)</span> problems efficiently</strong>, making it the workhorse for cosmological model comparison.</p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../computing-evidence/">computing-evidence</a> - Comparing NS to other methods
+- <a href="../gpu-acceleration/">gpu-acceleration</a> - Modern hardware utilization
+- <a href="../model-comparison/">model-comparison</a> - Using evidence in practice</p>
+<p><strong>Related:</strong>
+- <a href="../evidence/">evidence</a> - What we're computing
+- <a href="../mcmc/">mcmc</a> - Alternative sampling method</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Skilling2004]: Skilling, J. (2004). Nested Sampling. In <em>AIP Conference Proceedings</em> (Vol. 735, pp. 395-405).</p>
+<p>[Skilling2006]: Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.</p>
+<p>[Feroz2009]: Feroz, F., Hobson, M. P., &amp; Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool. <em>MNRAS</em>, 398(4), 1601-1614.</p>
+<p>[Handley2015a]: Handley, W. J., Hobson, M. P., &amp; Lasenby, A. N. (2015). POLYCHORD: next-generation nested sampling. <em>MNRAS</em>, 453(4), 4384-4398.</p>
+<p>[Handley2015b]: Handley, W. J., Hobson, M. P., &amp; Lasenby, A. N. (2015). PolyChord: nested sampling for cosmology. <em>MNRAS Letters</em>, 450(1), L61-L65.</p>
+<p>[Speagle2020]: Speagle, J. S. (2020). dynesty: a dynamic nested sampling package. <em>MNRAS</em>, 493(3), 3132-3158.</p>
+<p>[Ashton2022]: Ashton, G., et al. (2022). Nested sampling for physical scientists. <em>Nature Reviews Methods Primers</em>, 2(1), 39.</p>
+<p>[Neal2003]: Neal, R. M. (2003). Slice sampling. <em>The Annals of Statistics</em>, 31(3), 705-741.</p>
+<p>[Betancourt2011]: Betancourt, M. (2011). Nested sampling with constrained Hamiltonian Monte Carlo. <em>AIP Conference Proceedings</em>, 1305, 165-172.</p>
+<p>[Cai2022]: Cai, Z., et al. (2022). Accelerated nested sampling with gradient-based Hamiltonian Monte Carlo. <em>Physical Review D</em>, 105(12), 123503.</p>
+<p>[NSSYallup]: Yallup, D., et al. (2024). GPU-accelerated nested sampling for high-dimensional Bayesian inference. <em>MNRAS</em> (in prep).</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../dark-energy-models/" class="button">← Dark Energy Models</a>
+							
+							
+							<a href="../mcmc/" class="button primary" style="float:right">MCMC →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Computational Methods</span>
+									<ul>
+										
+										<li><a href="./" class="active">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

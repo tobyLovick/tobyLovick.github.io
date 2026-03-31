@@ -1,0 +1,409 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>KL Divergence – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>KL Divergence</h1>
+						</header>
+						
+
+						<h1 id="kullback-leibler-divergence">Kullback-Leibler Divergence</h1>
+<p>← Back to <a href="../">index</a> | See also: <a href="../evidence/">evidence</a>, <a href="../tension-statistics/">tension-statistics</a></p>
+<hr />
+<h2 id="the-information-theoretic-foundation">The Information-Theoretic Foundation</h2>
+<p>The Kullback-Leibler (KL) divergence[^KullbackLeibler1951] is a fundamental quantity in information theory that measures the "distance" between two probability distributions. In Bayesian inference, it quantifies how much we <strong>learn from data</strong>—the information gained in going from prior to posterior.</p>
+<hr />
+<h2 id="definition">Definition</h2>
+<p>For two probability distributions <span class="arithmatex">\(P\)</span> and <span class="arithmatex">\(Q\)</span> over the same variable <span class="arithmatex">\(\theta\)</span>:</p>
+<div class="arithmatex">\[\boxed{\mathcal{D}_{\text{KL}}(P||Q) = \int P(\theta) \log\frac{P(\theta)}{Q(\theta)} d\theta}\]</div>
+<p><strong>In Bayesian inference</strong>, we use it to measure the information gain from prior <span class="arithmatex">\(\pi\)</span> to posterior <span class="arithmatex">\(\mathcal{P}\)</span>:</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} = \int \mathcal{P}(\theta) \log\frac{\mathcal{P}(\theta)}{\pi(\theta)} d\theta\]</div>
+<p><strong>Read as:</strong> "The KL divergence from the prior to the posterior"</p>
+<hr />
+<h2 id="intuition-information-gain">Intuition: Information Gain</h2>
+<h3 id="the-shannon-information">The Shannon Information</h3>
+<p>Before introducing KL divergence, consider <strong>Shannon Information</strong>[^Shannon1948] at a specific parameter value:</p>
+<div class="arithmatex">\[\mathcal{I}(\theta) = \log\frac{\mathcal{P}(\theta)}{\pi(\theta)}\]</div>
+<p>This measures the "surprise" or information content at point <span class="arithmatex">\(\theta\)</span>:
+- If <span class="arithmatex">\(\mathcal{P}(\theta) \gg \pi(\theta)\)</span>: High information (data concentrated probability here)
+- If <span class="arithmatex">\(\mathcal{P}(\theta) \ll \pi(\theta)\)</span>: Negative information (data ruled out this region)
+- If <span class="arithmatex">\(\mathcal{P}(\theta) = \pi(\theta)\)</span>: Zero information (data didn't change beliefs here)</p>
+<h3 id="kl-as-average-information">KL as Average Information</h3>
+<p>The KL divergence is simply the <strong>posterior-weighted average</strong> of Shannon Information:</p>
+<div class="arithmatex">\[\boxed{\mathcal{D}_{\text{KL}} = \langle \mathcal{I} \rangle_{\mathcal{P}} = \left\langle \log\frac{\mathcal{P}}{\pi} \right\rangle_{\mathcal{P}}}\]</div>
+<p><strong>Interpretation:</strong> How much information, on average, did we gain about <span class="arithmatex">\(\theta\)</span> by observing the data?</p>
+<hr />
+<h2 id="properties">Properties</h2>
+<h3 id="1-non-negativity">1. Non-Negativity</h3>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} \geq 0\]</div>
+<p>with equality <strong>if and only if</strong> <span class="arithmatex">\(\mathcal{P} = \pi\)</span> (i.e., data told us nothing).</p>
+<p><strong>Proof sketch:</strong> By Jensen's inequality applied to the convex function <span class="arithmatex">\(-\log\)</span>.</p>
+<h3 id="2-asymmetry">2. Asymmetry</h3>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}}(P||Q) \neq \mathcal{D}_{\text{KL}}(Q||P)\]</div>
+<p>KL divergence is <strong>not</strong> a true distance metric (doesn't satisfy triangle inequality). It's a <strong>directed</strong> measure of information.</p>
+<h3 id="3-additivity">3. Additivity</h3>
+<p>For independent parameters <span class="arithmatex">\(\theta = (\theta_1, \theta_2)\)</span>:</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}}(\theta_1, \theta_2) = \mathcal{D}_{\text{KL}}(\theta_1) + \mathcal{D}_{\text{KL}}(\theta_2)\]</div>
+<p>Information from independent sources adds linearly.</p>
+<h3 id="4-invariance-under-reparametrization">4. Invariance Under Reparametrization</h3>
+<p>If <span class="arithmatex">\(\phi = f(\theta)\)</span> is a bijection:</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}}(\phi) = \mathcal{D}_{\text{KL}}(\theta)\]</div>
+<p>The information content doesn't depend on how you parameterize the problem.</p>
+<hr />
+<h2 id="connection-to-evidence-occams-razor">Connection to Evidence: Occam's Razor</h2>
+<p>The KL divergence appears naturally in the decomposition of <a href="../evidence/">evidence</a>:</p>
+<div class="arithmatex">\[\boxed{\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} - \mathcal{D}_{\text{KL}}}\]</div>
+<p><strong>Derivation:</strong></p>
+<p>Starting from Bayes' theorem:
+$<span class="arithmatex">\(\mathcal{P}(\theta) = \frac{\mathcal{L}(\theta)\pi(\theta)}{\mathcal{Z}}\)</span>$</p>
+<p>Take logarithms:
+$<span class="arithmatex">\(\log\mathcal{P}(\theta) = \log\mathcal{L}(\theta) + \log\pi(\theta) - \log\mathcal{Z}\)</span>$</p>
+<p>Average over the posterior:
+$<span class="arithmatex">\(\langle \log\mathcal{P} \rangle_{\mathcal{P}} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} + \langle \log\pi \rangle_{\mathcal{P}} - \log\mathcal{Z}\)</span>$</p>
+<p>Rearrange:
+$<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} - \left(\langle \log\mathcal{P} \rangle_{\mathcal{P}} - \langle \log\pi \rangle_{\mathcal{P}}\right)\)</span>$</p>
+<p>The term in parentheses is exactly <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span>. ∎</p>
+<h3 id="interpretation-as-occam-penalty">Interpretation as Occam Penalty</h3>
+<div class="arithmatex">\[\text{log Evidence} = \underbrace{\langle \log\mathcal{L} \rangle_{\mathcal{P}}}_{\text{Goodness of fit}} - \underbrace{\mathcal{D}_{\text{KL}}}_{\text{Complexity penalty}}\]</div>
+<ul>
+<li><strong><span class="arithmatex">\(\langle \log\mathcal{L} \rangle_{\mathcal{P}}\)</span>:</strong> How well does the model fit the data?</li>
+<li><strong><span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span>:</strong> How much did the posterior have to compress from the prior?</li>
+</ul>
+<p><strong>Models requiring large compression are penalized</strong> because they made vague predictions (wide prior) and needed extensive tuning by data (narrow posterior).</p>
+<p>This is <strong>Occam's Razor implemented automatically</strong>: simpler models (narrow priors that already predict the data well) have low <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> and thus higher evidence.</p>
+<hr />
+<h2 id="the-volumetric-approximation">The Volumetric Approximation</h2>
+<p>For broad priors where <span class="arithmatex">\(\pi(\theta)\)</span> is approximately constant over the posterior support:</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} \approx \log\frac{V_{\pi}}{V_{\mathcal{P}}}\]</div>
+<p>where:
+- <span class="arithmatex">\(V_{\pi}\)</span> = volume of prior support
+- <span class="arithmatex">\(V_{\mathcal{P}}\)</span> = volume of posterior support</p>
+<p><strong>Intuition:</strong> KL divergence measures how much the allowed parameter space has shrunk.</p>
+<p><strong>Example:</strong>
+- Prior uniform on <span class="arithmatex">\([0, 10]^d\)</span> → <span class="arithmatex">\(V_\pi = 10^d\)</span>
+- Posterior concentrated in region of volume <span class="arithmatex">\(V_\mathcal{P} = 1\)</span>
+- Then <span class="arithmatex">\(\mathcal{D}_{\text{KL}} \approx d \log 10 \approx 2.3d\)</span></p>
+<p>This approximation becomes exact for uniform ("top-hat") distributions and remains accurate when the prior is "locally flat" around the posterior.</p>
+<hr />
+<h2 id="computing-kl-divergence">Computing KL Divergence</h2>
+<h3 id="from-nested-sampling">From Nested Sampling</h3>
+<p><a href="../nested-sampling/">Nested sampling</a> naturally computes <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> as a byproduct[^Skilling2006]:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># PolyChord output includes D_KL automatically</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_polychord</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">output</span> <span class="o">=</span> <span class="n">run_polychord</span><span class="p">(</span><span class="n">loglike</span><span class="p">,</span> <span class="n">nDims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">prior_transform</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">D_KL</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">info</span>  <span class="c1"># Information content (nats)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Information gain: </span><span class="si">{</span><span class="n">D_KL</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> nats&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equivalent bits: </span><span class="si">{</span><span class="n">D_KL</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> bits&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="from-mcmc-samples-approximate">From MCMC Samples (Approximate)</h3>
+<p>If you only have MCMC posterior samples, you can estimate:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_kde</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Posterior samples from MCMC</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">mcmc_samples</span>  <span class="c1"># Shape: (n_samples, n_dims)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Estimate posterior density at each sample using KDE</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">kde_post</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">log_post</span> <span class="o">=</span> <span class="n">kde_post</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># Evaluate prior density at each sample</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">log_prior</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">log_prior_func</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">])</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="c1"># KL divergence estimate</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">D_KL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_post</span> <span class="o">-</span> <span class="n">log_prior</span><span class="p">)</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;D_KL ≈ </span><span class="si">{</span><span class="n">D_KL</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> nats&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Warning:</strong> This requires density estimation and can be unreliable in high dimensions. Prefer nested sampling when accurate <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> is needed.</p>
+<hr />
+<h2 id="examples">Examples</h2>
+<h3 id="example-1-gaussian-posterior">Example 1: Gaussian Posterior</h3>
+<p><strong>Setup:</strong>
+- Prior: <span class="arithmatex">\(\pi(\theta) = \mathcal{N}(0, \sigma_{\text{prior}}^2)\)</span>
+- Posterior: <span class="arithmatex">\(\mathcal{P}(\theta) = \mathcal{N}(\mu, \sigma_{\text{post}}^2)\)</span></p>
+<p><strong>Analytical KL divergence:</strong></p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} = \frac{1}{2}\left[\log\frac{\sigma_{\text{prior}}^2}{\sigma_{\text{post}}^2} + \frac{\sigma_{\text{post}}^2 + \mu^2}{\sigma_{\text{prior}}^2} - 1\right]\]</div>
+<p>For <span class="arithmatex">\(\mu = 0\)</span> (posterior still centered):</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} = \frac{1}{2}\log\frac{\sigma_{\text{prior}}^2}{\sigma_{\text{post}}^2} + \frac{1}{2}\left(\frac{\sigma_{\text{post}}^2}{\sigma_{\text{prior}}^2} - 1\right)\]</div>
+<p><strong>Special case:</strong> If <span class="arithmatex">\(\sigma_{\text{post}} \ll \sigma_{\text{prior}}\)</span> (strong data):</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} \approx \frac{1}{2}\log\frac{\sigma_{\text{prior}}^2}{\sigma_{\text{post}}^2}\]</div>
+<p><strong>Numerical example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">sigma_prior</span> <span class="o">=</span> <span class="mf">10.0</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">sigma_post</span> <span class="o">=</span> <span class="mf">1.0</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">D_KL</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sigma_prior</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">sigma_post</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;D_KL = </span><span class="si">{</span><span class="n">D_KL</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> nats&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># Output: D_KL = 2.30 nats</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># In &quot;number of e-foldings&quot;</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prior/Posterior volume ratio: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">D_KL</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">:1&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># Output: 10:1 (posterior is 10× narrower)</span>
+</code></pre></div></p>
+<h3 id="example-2-cosmological-parameters">Example 2: Cosmological Parameters</h3>
+<p>From a typical CMB analysis (6-parameter <span class="arithmatex">\(\Lambda\)</span>CDM):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Parameter    Prior range       Posterior width    Contribution to D_KL
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>------------------------------------------------------------------------
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Ωb h²        [0.005, 0.1]      ±0.0001           ~6.9 nats
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Ωc h²        [0.001, 0.99]     ±0.001            ~6.9 nats
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>H₀           [20, 100]         ±0.5 km/s/Mpc     ~5.4 nats
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>ln(10¹⁰As)   [1.61, 3.91]      ±0.01             ~5.1 nats
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>ns           [0.8, 1.2]        ±0.004            ~4.6 nats
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>τ            [0.01, 0.8]       ±0.007            ~4.8 nats
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>Total: D_KL ≈ 33.7 nats ≈ 48.6 bits
+</code></pre></div>
+<p><strong>Interpretation:</strong> Planck CMB data provides approximately <strong>34 nats</strong> (49 bits) of information about these 6 parameters.</p>
+<hr />
+<h2 id="bayesian-model-dimensionality">Bayesian Model Dimensionality</h2>
+<p>KL divergence gives the <strong>total</strong> information, but not how it's distributed across parameters. The <strong>Bayesian Model Dimensionality</strong>[^HandleyLemos2019] measures the effective number of constrained parameters:</p>
+<div class="arithmatex">\[\boxed{\frac{d}{2} = \text{var}(\mathcal{I})_{\mathcal{P}} = \left\langle \left(\log\frac{\mathcal{P}}{\pi}\right)^2 \right\rangle_{\mathcal{P}} - \mathcal{D}_{\text{KL}}^2}\]</div>
+<p><strong>Interpretation:</strong>
+- <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> = mean information (first moment)
+- <span class="arithmatex">\(d\)</span> = variance of information (second moment)</p>
+<p><strong>Properties:</strong>
+- For <span class="arithmatex">\(n\)</span> independent, equally-constrained parameters: <span class="arithmatex">\(d \approx n\)</span>
+- For highly correlated parameters: <span class="arithmatex">\(d &lt; n\)</span> (degeneracies reduce effective dimensionality)
+- For weakly constrained parameters: <span class="arithmatex">\(d \approx 0\)</span> (data didn't learn about them)</p>
+<p>See <a href="../tension-statistics/#bayesian-model-dimensionality">tension quantification</a> for applications.</p>
+<hr />
+<h2 id="kl-divergence-in-tension-quantification">KL Divergence in Tension Quantification</h2>
+<p>In <a href="../tension-statistics/">tension-statistics</a>, KL divergence plays a central role through the <strong>Information Ratio</strong>:</p>
+<div class="arithmatex">\[\log I = \mathcal{D}_{\text{KL}}^A + \mathcal{D}_{\text{KL}}^B - \mathcal{D}_{\text{KL}}^{AB}\]</div>
+<p>This measures the "surprise of agreement" between datasets <span class="arithmatex">\(A\)</span> and <span class="arithmatex">\(B\)</span>:
+- If datasets agree: joint analysis gains similar information as separate analyses → <span class="arithmatex">\(\log I\)</span> large
+- If datasets conflict: joint posterior is very narrow (high <span class="arithmatex">\(\mathcal{D}_{\text{KL}}^{AB}\)</span>) → <span class="arithmatex">\(\log I\)</span> small</p>
+<hr />
+<h2 id="connection-to-other-information-measures">Connection to Other Information Measures</h2>
+<h3 id="fisher-information">Fisher Information</h3>
+<p>The <strong>Fisher Information</strong> matrix is:</p>
+<div class="arithmatex">\[\mathcal{F}_{ij} = -\left\langle \frac{\partial^2 \log\mathcal{L}}{\partial\theta_i \partial\theta_j} \right\rangle_{\mathcal{P}}\]</div>
+<p><strong>Connection:</strong> In the Gaussian approximation (Laplace approximation):</p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} \approx \frac{1}{2}\log\det(\mathcal{F})\]</div>
+<p>The KL divergence is related to the determinant of the Fisher matrix (which measures the curvature of the likelihood).</p>
+<h3 id="mutual-information">Mutual Information</h3>
+<p>For two variables <span class="arithmatex">\(X\)</span> and <span class="arithmatex">\(Y\)</span>:</p>
+<div class="arithmatex">\[I(X; Y) = \mathcal{D}_{\text{KL}}(P(X,Y) || P(X)P(Y))\]</div>
+<p>Mutual information measures how much learning <span class="arithmatex">\(X\)</span> tells you about <span class="arithmatex">\(Y\)</span>—a symmetric version of KL divergence.</p>
+<h3 id="relative-entropy">Relative Entropy</h3>
+<p>KL divergence is also called <strong>relative entropy</strong> because it measures the inefficiency of assuming distribution <span class="arithmatex">\(Q\)</span> when the true distribution is <span class="arithmatex">\(P\)</span>.</p>
+<p>In coding theory: extra bits needed if you use wrong distribution for compression.</p>
+<hr />
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="my-kl-divergence-is-huge">"My KL divergence is huge!"</h3>
+<p><strong>Not necessarily bad.</strong> <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> scales with:
+- Number of dimensions
+- Width of prior
+- Strength of data</p>
+<p><strong>Example:</strong> 100-dimensional problem with <span class="arithmatex">\(\mathcal{D}_{\text{KL}} = 200\)</span> nats means each parameter contributes ~2 nats on average—quite reasonable!</p>
+<h3 id="kl-divergence-is-a-distance">"KL divergence is a distance"</h3>
+<p><strong>Not quite.</strong> It's asymmetric and doesn't satisfy triangle inequality. Use "divergence" not "distance."</p>
+<h3 id="i-can-compute-it-from-mcmc-samples">"I can compute it from MCMC samples"</h3>
+<p><strong>Be careful.</strong> Requires estimating <span class="arithmatex">\(\mathcal{P}(\theta)\)</span> via density estimation, which is unreliable in high dimensions. Prefer methods that compute it directly (nested sampling).</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>KL Divergence measures:</strong>
+1. Information gain from prior to posterior
+2. Compression of parameter space by data
+3. The Occam penalty in the evidence decomposition
+4. "Surprise" in tension quantification</p>
+<p><strong>Key equations:</strong></p>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} = \int \mathcal{P} \log\frac{\mathcal{P}}{\pi} d\theta = \langle \mathcal{I} \rangle_{\mathcal{P}}\]</div>
+<div class="arithmatex">\[\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} - \mathcal{D}_{\text{KL}}\]</div>
+<div class="arithmatex">\[\mathcal{D}_{\text{KL}} \approx \log\frac{V_{\pi}}{V_{\mathcal{P}}} \quad \text{(volumetric approximation)}\]</div>
+<p><strong>Typical values:</strong>
+- 1 well-constrained parameter: <span class="arithmatex">\(\mathcal{D}_{\text{KL}} \sim 3-5\)</span> nats
+- 6-parameter CMB analysis: <span class="arithmatex">\(\mathcal{D}_{\text{KL}} \sim 30-40\)</span> nats
+- High-dimensional weak lensing: <span class="arithmatex">\(\mathcal{D}_{\text{KL}} \sim 100-200\)</span> nats</p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../evidence/">evidence</a> - How KL appears in evidence decomposition
+- <a href="../tension-statistics/">tension-statistics</a> - Using KL in tension quantification
+- <a href="../model-comparison/">model-comparison</a> - Occam's razor in action</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[KullbackLeibler1951]: Kullback, S., &amp; Leibler, R. A. (1951). On information and sufficiency. <em>The Annals of Mathematical Statistics</em>, 22(1), 79-86.</p>
+<p>[Shannon1948]: Shannon, C. E. (1948). A mathematical theory of communication. <em>Bell System Technical Journal</em>, 27(3), 379-423.</p>
+<p>[Skilling2006]: Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.</p>
+<p>[HandleyLemos2019]: Handley, W. J., &amp; Lemos, P. (2019). Quantifying dimensionality: Bayesian cosmological model complexity. <em>Physical Review D</em>, 100(10), 103511.</p>
+<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
+<p>[Mackay2003]: MacKay, D. J. C. (2003). <em>Information Theory, Inference, and Learning Algorithms</em>. Cambridge University Press.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../evidence/" class="button">← The Bayesian Evidence</a>
+							
+							
+							<a href="../prior-choice/" class="button primary" style="float:right">Prior Choice →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="./" class="active">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

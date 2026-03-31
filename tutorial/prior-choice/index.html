@@ -1,0 +1,401 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Prior Choice – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Prior Choice</h1>
+						</header>
+						
+
+						<h1 id="prior-choice">Prior Choice</h1>
+<p>← Back to <a href="../">index</a> | See also: <a href="../analytical-update/">analytical-update</a>, <a href="../bayesian-inference/">bayesian-inference</a></p>
+<hr />
+<h2 id="the-prior-dilemma">The Prior Dilemma</h2>
+<p>In <a href="../bayesian-inference/">bayesian-inference</a>, we must specify a <strong>prior distribution</strong> <span class="arithmatex">\(\pi(\theta)\)</span> before seeing data. But how do we choose it?</p>
+<p>This is both Bayesian inference's greatest strength (incorporating prior knowledge) and its most controversial aspect ("aren't you just making stuff up?").</p>
+<hr />
+<h2 id="principles-for-prior-choice">Principles for Prior Choice</h2>
+<h3 id="1-physical-constraints">1. Physical Constraints</h3>
+<p><strong>Use what you know about the parameter's range.</strong></p>
+<p><strong>Examples:</strong>
+- Probabilities: <span class="arithmatex">\(\theta \in [0, 1]\)</span>
+- Matter density: <span class="arithmatex">\(\Omega_m \in [0, 1]\)</span> (can't exceed closure density)
+- Hubble constant: <span class="arithmatex">\(H_0 \in [50, 100]\)</span> km/s/Mpc (excludes unphysical values)</p>
+<p><strong>Implementation:</strong> Uniform prior on physically allowed range.</p>
+<h3 id="2-scale-invariance">2. Scale Invariance</h3>
+<p><strong>For scale parameters (quantities that span orders of magnitude), use log-uniform priors.</strong></p>
+<p><strong>Example:</strong> If <span class="arithmatex">\(\sigma\)</span> could be anywhere from 0.01 to 100, we don't know the scale. Use:</p>
+<div class="arithmatex">\[\pi(\sigma) \propto \frac{1}{\sigma}\]</div>
+<p>This makes all decades equally likely: <span class="arithmatex">\([0.1, 1]\)</span>, <span class="arithmatex">\([1, 10]\)</span>, <span class="arithmatex">\([10, 100]\)</span> get equal prior weight.</p>
+<p><strong>Why?</strong> Being "uncertain about the scale" means being uncertain about <span class="arithmatex">\(\log\sigma\)</span>, not <span class="arithmatex">\(\sigma\)</span> itself.</p>
+<h3 id="3-previous-measurements">3. Previous Measurements</h3>
+<p><strong>Use posteriors from earlier experiments as priors for new ones.</strong></p>
+<p><strong>Example:</strong> Planck 2018 measured <span class="arithmatex">\(H_0 = 67.4 \pm 0.5\)</span> km/s/Mpc. For a new analysis combining SNe + BAO:</p>
+<div class="arithmatex">\[\pi(H_0) = \mathcal{N}(67.4, 0.5^2)\]</div>
+<p>This is Bayesian <strong>learning</strong>: each experiment refines our beliefs.</p>
+<h3 id="4-theoretical-expectations">4. Theoretical Expectations</h3>
+<p><strong>Encode predictions from theory.</strong></p>
+<p><strong>Example:</strong> Inflation predicts <span class="arithmatex">\(n_s \approx 0.96\)</span> (nearly scale-invariant). We could use:</p>
+<div class="arithmatex">\[\pi(n_s) = \mathcal{N}(0.96, 0.02^2)\]</div>
+<p>But be careful: this can bias against discovering new physics!</p>
+<h3 id="5-maximum-entropy-uninformative">5. Maximum Entropy (Uninformative)</h3>
+<p><strong>When you truly have no information, maximize entropy subject to constraints.</strong>[^Jaynes1957]</p>
+<p><strong>Example:</strong> For <span class="arithmatex">\(\theta \in [0,1]\)</span> with no other information:</p>
+<div class="arithmatex">\[\pi(\theta) = \mathcal{U}(0,1)\]</div>
+<p>This is the "most uncertain" distribution on <span class="arithmatex">\([0,1]\)</span>.</p>
+<hr />
+<h2 id="the-beta-prior-a-deep-dive">The Beta Prior: A Deep Dive</h2>
+<p>The <a href="../analytical-update/#the-beta-binomial-model">Beta distribution</a> is perfect for probabilities:</p>
+<div class="arithmatex">\[\text{Beta}(\theta|\alpha, \beta) = \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{B(\alpha,\beta)}\]</div>
+<p>But <strong>how do we choose <span class="arithmatex">\(\alpha\)</span> and <span class="arithmatex">\(\beta\)</span>?</strong></p>
+<h3 id="interpretation-1-pseudocounts">Interpretation 1: Pseudocounts</h3>
+<p><strong>Think of <span class="arithmatex">\(\alpha\)</span> and <span class="arithmatex">\(\beta\)</span> as "prior data":</strong></p>
+<ul>
+<li><span class="arithmatex">\(\alpha - 1\)</span> = "successes" you've seen before</li>
+<li><span class="arithmatex">\(\beta - 1\)</span> = "failures" you've seen before</li>
+<li>Total "prior sample size" = <span class="arithmatex">\(\alpha + \beta - 2\)</span></li>
+</ul>
+<p><strong>Example from <a href="../analytical-update/">analytical-update</a>:</strong></p>
+<p><strong><span class="arithmatex">\(\text{Beta}(2, 2)\)</span></strong> = "I've seen 1 Towpath win and 1 Meadow win"
+- Weak prior, equivalent to 2 races of prior data
+- Easily updated by real data (84 races)</p>
+<p><strong><span class="arithmatex">\(\text{Beta}(10, 10)\)</span></strong> = "I've seen 9 wins each side"
+- Stronger prior, equivalent to 18 races of prior data
+- Requires more data to shift beliefs</p>
+<h3 id="interpretation-2-quality-control-analogy">Interpretation 2: Quality Control Analogy</h3>
+<p><strong>Beautiful interpretation for the rowing example:</strong></p>
+<p>Imagine the race organizers tested whether their finish line skew properly compensates for the bend:
+- Each test race checks if the course is balanced
+- <span class="arithmatex">\(\alpha\)</span> = test races where Towpath won
+- <span class="arithmatex">\(\beta\)</span> = test races where Meadow won</p>
+<p><strong><span class="arithmatex">\(\text{Beta}(1, 1)\)</span>:</strong> "Never checked the course" (uniform)</p>
+<p><strong><span class="arithmatex">\(\text{Beta}(2, 2)\)</span>:</strong> "Checked once, seemed fair" (weak fairness belief)</p>
+<p><strong><span class="arithmatex">\(\text{Beta}(10, 10)\)</span>:</strong> "Checked 18 times, always fair" (strong fairness belief)</p>
+<p><strong>This makes the prior concrete:</strong> How many checks would justify your prior belief?</p>
+<h3 id="interpretation-3-effective-sample-size">Interpretation 3: Effective Sample Size</h3>
+<p>The <strong>prior strength</strong> is measured by:</p>
+<div class="arithmatex">\[n_0 = \alpha + \beta\]</div>
+<p>After observing <span class="arithmatex">\(n\)</span> data points with <span class="arithmatex">\(k\)</span> successes, the posterior mean is:</p>
+<div class="arithmatex">\[\mathbb{E}[\theta|\text{data}] = \frac{\alpha + k}{\alpha + \beta + n} = \frac{n_0 \bar{\theta}_0 + n\bar{\theta}}{n_0 + n}\]</div>
+<p>where <span class="arithmatex">\(\bar{\theta}_0 = \alpha/(\alpha+\beta)\)</span> (prior mean) and <span class="arithmatex">\(\bar{\theta} = k/n\)</span> (data proportion).</p>
+<p><strong>Interpretation:</strong> Posterior mean is a <strong>weighted average</strong> of prior belief and data, weighted by sample sizes!</p>
+<p><strong>Example:</strong> <span class="arithmatex">\(\text{Beta}(10, 10)\)</span> prior with 54/84 Towpath wins:</p>
+<div class="arithmatex">\[\mathbb{E}[\theta] = \frac{20 \cdot 0.5 + 84 \cdot 0.643}{20 + 84} = \frac{10 + 54}{104} \approx 0.615\]</div>
+<p>The strong prior (<span class="arithmatex">\(n_0 = 20\)</span>) pulls the estimate toward 0.5, but data (<span class="arithmatex">\(n=84\)</span>) dominate.</p>
+<hr />
+<h2 id="special-cases-of-the-beta-distribution">Special Cases of the Beta Distribution</h2>
+<h3 id="textbeta1-1-uniform"><span class="arithmatex">\(\text{Beta}(1, 1)\)</span> - Uniform</h3>
+<div class="arithmatex">\[\pi(\theta) = 1\]</div>
+<p>All values equally likely. <strong>Jeffreys prior</strong> for Binomial likelihood[^Jeffreys1961].</p>
+<p><strong>When to use:</strong> True ignorance about <span class="arithmatex">\(\theta\)</span>.</p>
+<h3 id="textbeta05-05-jeffreys-prior"><span class="arithmatex">\(\text{Beta}(0.5, 0.5)\)</span> - Jeffreys Prior</h3>
+<div class="arithmatex">\[\pi(\theta) \propto \theta^{-1/2}(1-\theta)^{-1/2}\]</div>
+<p>U-shaped: concentrates near 0 and 1.</p>
+<p><strong>When to use:</strong> Scale-invariant prior (rare in practice).</p>
+<h3 id="textbetaalpha-alpha-symmetric"><span class="arithmatex">\(\text{Beta}(\alpha, \alpha)\)</span> - Symmetric</h3>
+<p>Centered at <span class="arithmatex">\(\theta = 0.5\)</span>.</p>
+<p><strong>When to use:</strong> Belief in symmetry/fairness. Larger <span class="arithmatex">\(\alpha\)</span> = stronger belief.</p>
+<h3 id="textbetaalpha-beta-with-alpha-neq-beta-asymmetric"><span class="arithmatex">\(\text{Beta}(\alpha, \beta)\)</span> with <span class="arithmatex">\(\alpha \neq \beta\)</span> - Asymmetric</h3>
+<p>Peaked away from 0.5.</p>
+<p><strong>When to use:</strong> Prior belief in bias. E.g., <span class="arithmatex">\(\text{Beta}(7, 3)\)</span> if you think Towpath likely has advantage.</p>
+<hr />
+<h2 id="sensitivity-analysis">Sensitivity Analysis</h2>
+<p><strong>Key question:</strong> Do my conclusions depend on the prior?</p>
+<p><strong>Test:</strong> Run analysis with multiple priors:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">beta</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Observed data</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">84</span><span class="p">,</span> <span class="mi">54</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Three priors</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">priors</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Uniform&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Weak fairness&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;Strong fairness&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;Very strong fairness&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">]</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="k">for</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta_param</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">priors</span><span class="p">:</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">posterior</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="n">beta_param</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">mean</span> <span class="o">=</span> <span class="n">posterior</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">ci</span> <span class="o">=</span> <span class="n">posterior</span><span class="o">.</span><span class="n">ppf</span><span class="p">([</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">])</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2"> θ = </span><span class="si">{</span><span class="n">mean</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, 95% CI: [</span><span class="si">{</span><span class="n">ci</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">ci</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Uniform                   θ = 0.640, 95% CI: [0.547, 0.728]
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Weak fairness             θ = 0.636, 95% CI: [0.544, 0.724]
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Strong fairness           θ = 0.615, 95% CI: [0.527, 0.700]
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Very strong fairness      θ = 0.590, 95% CI: [0.509, 0.669]
+</code></pre></div></p>
+<p><strong>Interpretation:</strong>
+- With moderate data (84 races), all reasonable priors give similar results
+- Even very strong fairness prior (<span class="arithmatex">\(n_0 = 40\)</span>) still shows Towpath advantage
+- <strong>Conclusion is robust to prior choice</strong></p>
+<p><strong>General rule:</strong> If conclusions change dramatically with reasonable prior choices, you probably need more data.</p>
+<hr />
+<h2 id="prior-choice-for-bayesian-evidence">Prior Choice for <a href="../evidence/">Bayesian Evidence</a></h2>
+<p><strong>Critical point:</strong> For <a href="../model-comparison/">model-comparison</a>, prior choice <strong>always matters</strong>.</p>
+<p>The <a href="../evidence/">evidence</a> is:</p>
+<div class="arithmatex">\[\mathcal{Z} = \int \mathcal{L}(\theta)\pi(\theta) d\theta\]</div>
+<p>Unlike parameter inference (where data dominate), evidence <strong>directly depends on prior volume</strong>.</p>
+<h3 id="example-comparing-fair-vs-biased-course">Example: Comparing Fair vs Biased Course</h3>
+<p><strong>Model A:</strong> Fair course, <span class="arithmatex">\(\theta = 0.5\)</span> (no free parameters)</p>
+<p><strong>Model B:</strong> Biased course, <span class="arithmatex">\(\theta\)</span> free with prior <span class="arithmatex">\(\text{Beta}(\alpha, \beta)\)</span></p>
+<p>The Bayes factor depends on the prior:</p>
+<p><strong>Wide prior</strong> (e.g., <span class="arithmatex">\(\text{Beta}(1, 1)\)</span>): Model B wastes prior volume → penalized
+<strong>Narrow prior</strong> (e.g., <span class="arithmatex">\(\text{Beta}(50, 50)\)</span>): Model B concentrates near data → favored</p>
+<p><strong>This is a feature, not a bug!</strong> The prior encodes the model's predictions:
+- Wide prior = "model predicts anything could happen" (vague)
+- Narrow prior = "model makes specific prediction" (bold)</p>
+<p>See <a href="../model-comparison/#the-occam-penalty">Occam penalty</a> for why this is desirable.</p>
+<hr />
+<h2 id="practical-guidelines">Practical Guidelines</h2>
+<h3 id="for-parameter-inference">For Parameter Inference</h3>
+<p>✅ <strong>Use informative priors</strong> when you have genuine prior knowledge
+✅ <strong>Use weakly informative priors</strong> when uncertain (e.g., <span class="arithmatex">\(\text{Beta}(2,2)\)</span> instead of <span class="arithmatex">\(\text{Beta}(1,1)\)</span>)
+✅ <strong>Run sensitivity analysis</strong> with multiple priors
+✅ <strong>Report your prior choice</strong> and justify it</p>
+<p>❌ Don't use priors that exclude the truth
+❌ Don't cherry-pick priors to get desired results
+❌ Don't claim priors "don't matter" without checking</p>
+<h3 id="for-model-comparison">For Model Comparison</h3>
+<p>✅ <strong>Priors encode model predictions</strong> - choose them carefully
+✅ <strong>Use same prior philosophy</strong> for all models (e.g., all weakly informative)
+✅ <strong>Document prior rationale</strong> - why these values?
+✅ <strong>Consider prior predictive checks</strong> - does the prior predict reasonable data?</p>
+<p>See <a href="../computing-evidence/#common-pitfalls">common pitfalls</a> for evidence-specific prior issues.</p>
+<hr />
+<h2 id="examples-from-cosmology">Examples from Cosmology</h2>
+<h3 id="cmb-analysis">CMB Analysis</h3>
+<p><strong>Parameter:</strong> Spectral index <span class="arithmatex">\(n_s\)</span></p>
+<p><strong>Prior:</strong> <span class="arithmatex">\(\mathcal{U}(0.8, 1.2)\)</span>
+- Physically motivated: excludes extreme scale-dependence
+- Wide enough to not constrain data</p>
+<p><strong>Why not <span class="arithmatex">\(\mathcal{U}(0, 2)\)</span>?</strong> Wider prior doesn't change posterior but wastes volume, penalizing evidence.</p>
+<h3 id="dark-energy-equation-of-state">Dark Energy Equation of State</h3>
+<p><strong>Parameter:</strong> <span class="arithmatex">\(w\)</span> (equation of state)</p>
+<p><strong>Prior:</strong> <span class="arithmatex">\(\mathcal{U}(-2, 0)\)</span>
+- Physical bound: <span class="arithmatex">\(w \geq -1\)</span> for normal matter
+- Extended to <span class="arithmatex">\(w &lt; -1\)</span> for exotic "phantom" energy</p>
+<p><strong>Debate:</strong> Should we use <span class="arithmatex">\(\mathcal{U}(-1.5, -0.5)\)</span> (narrower) or <span class="arithmatex">\(\mathcal{U}(-2, 0)\)</span>?
+- Narrower: "I expect <span class="arithmatex">\(w\)</span> near -1" (informed by theory)
+- Wider: "I'm open to exotic physics" (conservative)</p>
+<p>Different priors can change Bayes factors by <span class="arithmatex">\(\Delta\log\mathcal{Z} \sim 1-2\)</span>!</p>
+<hr />
+<h2 id="the-objective-bayes-debate">The "Objective Bayes" Debate</h2>
+<p><strong>Question:</strong> Can we choose priors "objectively" without subjective judgment?</p>
+<p><strong>Jeffreys approach:</strong> Use invariance principles (e.g., scale-invariance) to derive "objective" priors[^Jeffreys1961].</p>
+<p><strong>Berger-Bernardo:</strong> Maximize expected information gain[^BergerBernardo1992].</p>
+<p><strong>Maximum entropy:</strong> Choose the "most uncertain" prior subject to constraints[^Jaynes1957].</p>
+<p><strong>Pragmatic view:</strong> There's no single "objective" prior. Instead:
+1. Be <strong>transparent</strong> about your choice
+2. <strong>Justify</strong> it with physical reasoning
+3. Check <strong>sensitivity</strong> to reasonable alternatives
+4. Use <strong>weakly informative</strong> priors when uncertain</p>
+<p><strong>Remember:</strong> Bayesian inference is honest about incorporating prior knowledge. Pretending we have no priors doesn't make them go away—it just makes them implicit!</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>Prior choice guidelines:</strong></p>
+<ol>
+<li><strong>Use physical constraints</strong> to bound parameter ranges</li>
+<li><strong>Encode prior information</strong> when you have it (previous experiments, theory)</li>
+<li><strong>Pseudocount interpretation</strong> for Beta priors (how many prior "data points"?)</li>
+<li><strong>Effective sample size</strong> determines prior strength vs data</li>
+<li><strong>Sensitivity analysis</strong> checks robustness</li>
+<li><strong>For evidence:</strong> Priors encode model predictions (always matter!)</li>
+</ol>
+<p><strong>The Beta distribution:</strong>
+- <span class="arithmatex">\(\text{Beta}(\alpha, \beta)\)</span> = <span class="arithmatex">\((\alpha-1)\)</span> successes, <span class="arithmatex">\((\beta-1)\)</span> failures
+- <span class="arithmatex">\(n_0 = \alpha + \beta\)</span> = effective prior sample size
+- Posterior = weighted average of prior and data</p>
+<p><strong>Golden rule:</strong> Be transparent, be principled, and check sensitivity.</p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../analytical-update/">analytical-update</a> - Seeing prior choice in action
+- <a href="../model-comparison/">model-comparison</a> - How priors affect evidence
+- <a href="../bayesian-inference/">bayesian-inference</a> - The general framework</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Jaynes1957]: Jaynes, E. T. (1957). Information theory and statistical mechanics. <em>Physical Review</em>, 106(4), 620.</p>
+<p>[Jeffreys1961]: Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.</p>
+<p>[BergerBernardo1992]: Berger, J. O., &amp; Bernardo, J. M. (1992). On the development of reference priors. <em>Bayesian Statistics</em>, 4, 35-60.</p>
+<p>[Gelman2013]: Gelman, A., et al. (2013). <em>Bayesian Data Analysis</em> (3rd ed.). CRC Press.</p>
+<p>[Robert2007]: Robert, C. P. (2007). <em>The Bayesian Choice</em> (2nd ed.). Springer.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../kl-divergence/" class="button">← KL Divergence</a>
+							
+							
+							<a href="../model-comparison/" class="button primary" style="float:right">Model Comparison →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="./" class="active">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

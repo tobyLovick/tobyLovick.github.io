@@ -1,0 +1,326 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Bayes' Theorem – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Bayes' Theorem</h1>
+						</header>
+						
+
+						<h1 id="bayes-theorem">Bayes' Theorem</h1>
+<p>← Back to <a href="../">index</a> | Previous: <a href="../conditional-probability/">conditional-probability</a></p>
+<hr />
+<h2 id="the-fundamental-theorem">The Fundamental Theorem</h2>
+<p>From <a href="../conditional-probability/">conditional-probability</a>, we know that the joint probability of events <span class="arithmatex">\(A\)</span> and <span class="arithmatex">\(B\)</span> can be expressed in two equivalent ways:</p>
+<div class="arithmatex">\[P(A \cap B) = P(A|B)P(B) = P(B|A)P(A)\]</div>
+<p>Rearranging gives us <strong>Bayes' theorem</strong>:</p>
+<div class="arithmatex">\[\boxed{P(A|B) = \frac{P(B|A)P(A)}{P(B)}}\]</div>
+<p><strong>This is the entire foundation of Bayesian inference.</strong></p>
+<hr />
+<h2 id="interpreting-the-terms">Interpreting the Terms</h2>
+<p>When we apply this to scientific inference with hypothesis <span class="arithmatex">\(H\)</span> and data <span class="arithmatex">\(D\)</span>:</p>
+<div class="arithmatex">\[P(H|D) = \frac{P(D|H)P(H)}{P(D)}\]</div>
+<ul>
+<li><strong><span class="arithmatex">\(P(H)\)</span></strong> = <strong>Prior</strong>: Our belief about <span class="arithmatex">\(H\)</span> <em>before</em> seeing the data</li>
+<li><strong><span class="arithmatex">\(P(D|H)\)</span></strong> = <strong>Likelihood</strong>: How probable is this data under hypothesis <span class="arithmatex">\(H\)</span>?</li>
+<li><strong><span class="arithmatex">\(P(H|D)\)</span></strong> = <strong>Posterior</strong>: Our updated belief about <span class="arithmatex">\(H\)</span> <em>after</em> seeing the data</li>
+<li><strong><span class="arithmatex">\(P(D)\)</span></strong> = <strong>Evidence</strong>: The total probability of the data (normalizing constant)</li>
+</ul>
+<p>In words:</p>
+<div class="arithmatex">\[\boxed{\text{Posterior} = \frac{\text{Likelihood} \times \text{Prior}}{\text{Evidence}}}\]</div>
+<p><strong>The power of Bayes' theorem</strong>: It inverts the conditioning, allowing us to go from "data given hypothesis" (which we can calculate from theory) to "hypothesis given data" (which is what we actually want).</p>
+<hr />
+<h2 id="the-beetle-example-base-rates-matter">The Beetle Example: Base Rates Matter</h2>
+<p>A naturalist spots a beetle with distinctive markings. The rare species has these markings 98% of the time, while only 2% of common beetles do. However, the rare species represents only 0.1% of the population.</p>
+<p><strong>Question:</strong> Given the beetle has the markings, how likely is it to be rare?</p>
+<p><strong>Intuitive (wrong) answer:</strong> 98% (the diagnostic rate)</p>
+<p><strong>Correct answer using Bayes' theorem:</strong></p>
+<p>Let <span class="arithmatex">\(R\)</span> = "beetle is rare", <span class="arithmatex">\(M\)</span> = "beetle has markings"</p>
+<div class="arithmatex">\[P(R|M) = \frac{P(M|R)P(R)}{P(M)}\]</div>
+<p>We need to find <span class="arithmatex">\(P(M)\)</span> using the law of total probability:</p>
+<div class="arithmatex">\[P(M) = P(M|R)P(R) + P(M|\text{not }R)P(\text{not }R)$$
+$$= (0.98)(0.001) + (0.02)(0.999) = 0.00098 + 0.01998 = 0.02096\]</div>
+<p>Therefore:</p>
+<div class="arithmatex">\[P(R|M) = \frac{(0.98)(0.001)}{0.02096} = \frac{0.00098}{0.02096} \approx 0.047 = 4.7\%\]</div>
+<p><strong>Despite the markings being highly diagnostic, the base rate (prior) is so low that most marked beetles are still common species.</strong></p>
+<p>This illustrates a crucial point: <strong>priors matter</strong>. They incorporate what we know about the world before we collect data.</p>
+<hr />
+<h2 id="worked-example-the-coin-flip">Worked Example: The Coin Flip</h2>
+<p>Let's do a complete Bayesian analysis of a simple problem: estimating the bias of a coin.</p>
+<h3 id="setup">Setup</h3>
+<ul>
+<li>We have a coin with unknown probability <span class="arithmatex">\(\theta\)</span> of landing heads</li>
+<li>We flip it <span class="arithmatex">\(n\)</span> times and observe <span class="arithmatex">\(k\)</span> heads</li>
+<li>We want to infer <span class="arithmatex">\(\theta\)</span> from this data</li>
+</ul>
+<h3 id="the-prior">The Prior</h3>
+<p>Before flipping, what do we believe about <span class="arithmatex">\(\theta\)</span>? A natural choice is the <strong>Beta distribution</strong>:</p>
+<div class="arithmatex">\[P(\theta) = \text{Beta}(\theta | \alpha, \beta) = \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{B(\alpha,\beta)}\]</div>
+<p>where <span class="arithmatex">\(B(\alpha,\beta)\)</span> is the Beta function (normalization constant).</p>
+<p><strong>Why the Beta distribution?</strong>
+- It's defined on <span class="arithmatex">\([0,1]\)</span> (appropriate for a probability)
+- It's flexible (different <span class="arithmatex">\(\alpha, \beta\)</span> give different shapes)
+- It's conjugate to the Binomial (we'll see why this matters)</p>
+<p><strong>Special cases:</strong>
+- <span class="arithmatex">\(\alpha = \beta = 1\)</span>: Uniform distribution (no prior knowledge)
+- <span class="arithmatex">\(\alpha = \beta = 2\)</span>: Peaked at 0.5 (belief the coin is fair)
+- <span class="arithmatex">\(\alpha &gt; \beta\)</span>: Peaked toward 1 (belief in heads bias)</p>
+<h3 id="the-likelihood">The Likelihood</h3>
+<p>Given <span class="arithmatex">\(\theta\)</span>, the probability of observing <span class="arithmatex">\(k\)</span> heads in <span class="arithmatex">\(n\)</span> flips is the <strong>Binomial distribution</strong>:</p>
+<div class="arithmatex">\[P(k|\theta, n) = \binom{n}{k}\theta^k(1-\theta)^{n-k}\]</div>
+<p>This is our <strong>likelihood function</strong> (as a function of <span class="arithmatex">\(\theta\)</span> for fixed data <span class="arithmatex">\(k, n\)</span>).</p>
+<h3 id="the-posterior">The Posterior</h3>
+<p>Apply Bayes' theorem:</p>
+<div class="arithmatex">\[P(\theta|k,n) = \frac{P(k|\theta,n)P(\theta)}{P(k|n)}\]</div>
+<p>Substituting our prior and likelihood:</p>
+<div class="arithmatex">\[P(\theta|k,n) = \frac{\binom{n}{k}\theta^k(1-\theta)^{n-k} \cdot \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{B(\alpha,\beta)}}{P(k|n)}\]</div>
+<p>The numerator simplifies:</p>
+<div class="arithmatex">\[\propto \theta^{k+\alpha-1}(1-\theta)^{n-k+\beta-1}\]</div>
+<p><strong>This is another Beta distribution!</strong> Specifically:</p>
+<div class="arithmatex">\[\boxed{P(\theta|k,n) = \text{Beta}(\theta | \alpha + k, \beta + n - k)}\]</div>
+<p><strong>Interpretation:</strong>
+- Start with "prior" data: <span class="arithmatex">\(\alpha-1\)</span> heads, <span class="arithmatex">\(\beta-1\)</span> tails
+- Observe real data: <span class="arithmatex">\(k\)</span> heads, <span class="arithmatex">\(n-k\)</span> tails
+- Posterior has effective counts: <span class="arithmatex">\((\alpha-1)+k\)</span> heads, <span class="arithmatex">\((\beta-1)+(n-k)\)</span> tails</p>
+<p>This is called <strong>conjugacy</strong>: the posterior has the same functional form as the prior.</p>
+<h3 id="numerical-example">Numerical Example</h3>
+<p><strong>Prior:</strong> <span class="arithmatex">\(\text{Beta}(2, 2)\)</span> (weak belief in fairness)</p>
+<p><strong>Data:</strong> Flip 10 times, observe 7 heads</p>
+<p><strong>Posterior:</strong> <span class="arithmatex">\(\text{Beta}(2+7, 2+3) = \text{Beta}(9, 5)\)</span></p>
+<p>The posterior mean is:</p>
+<div class="arithmatex">\[\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \frac{9}{9+5} = \frac{9}{14} \approx 0.643\]</div>
+<p><strong>Visual:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">beta</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Prior: Beta(2, 2)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">prior</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Posterior: Beta(9, 5)</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">posterior</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prior: Beta(2,2)&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">posterior</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Posterior: Beta(9,5)&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">7</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Data proportion: 7/10&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">9</span><span class="o">/</span><span class="mi">14</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Posterior mean: 9/14&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;θ (probability of heads)&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Probability density&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Bayesian Update: Coin Flip Example&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Output:</strong></p>
+<p>The posterior is peaked near 0.7 (the observed proportion), but pulled slightly toward 0.5 by the prior. With more data, the posterior would concentrate more tightly around the true value.</p>
+<hr />
+<h2 id="key-insights">Key Insights</h2>
+<ol>
+<li><strong>Priors encode prior knowledge</strong> - they're not arbitrary, but represent what we know before the experiment</li>
+<li><strong>Data updates beliefs</strong> - the likelihood tells us how much to shift from prior to posterior</li>
+<li><strong>More data = less prior dependence</strong> - with enough data, the likelihood dominates</li>
+<li><strong>Conjugacy is beautiful</strong> - when it exists, inference can be done analytically</li>
+<li><strong>The evidence normalizes</strong> - <span class="arithmatex">\(P(D)\)</span> ensures the posterior integrates to 1</li>
+</ol>
+<hr />
+<h2 id="what-about-the-evidence">What About the Evidence?</h2>
+<p>In the coin flip example, we ignored <span class="arithmatex">\(P(k|n)\)</span> because it's just a normalizing constant for parameter inference. But for <a href="../model-comparison/">model-comparison</a>, it becomes <strong>the central quantity</strong>.</p>
+<p>The evidence is:</p>
+<div class="arithmatex">\[P(k|n) = \int_0^1 P(k|\theta,n)P(\theta) d\theta\]</div>
+<p>For our Beta-Binomial case, this can be computed analytically:</p>
+<div class="arithmatex">\[P(k|n) = \binom{n}{k}\frac{B(\alpha+k, \beta+n-k)}{B(\alpha,\beta)}\]</div>
+<p><strong>Why does this matter?</strong> Because when we compare two models (e.g., "coin is fair" vs "coin is biased"), we compare their evidences. This is the subject of <a href="../model-comparison/">model-comparison</a>.</p>
+<hr />
+<h2 id="moving-forward">Moving Forward</h2>
+<p>Now that we understand Bayes' theorem:</p>
+<ul>
+<li><a href="../analytical-update/">analytical-update</a> - Complete worked example with real rowing data</li>
+<li><a href="../bayesian-inference/">bayesian-inference</a> - Applying this framework to scientific problems</li>
+<li><a href="../evidence/">evidence</a> - Why the normalizing constant matters for model comparison</li>
+<li><a href="../model-comparison/">model-comparison</a> - Using evidence to compare theories</li>
+</ul>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Bayes1763]: Bayes, T. (1763). An Essay towards solving a Problem in the Doctrine of Chances. <em>Philosophical Transactions of the Royal Society</em>, 53, 370-418.</p>
+<p>[Jeffreys1961]: Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.</p>
+<p>[Jaynes2003]: Jaynes, E. T. (2003). <em>Probability Theory: The Logic of Science</em>. Cambridge University Press.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../conditional-probability/" class="button">← Conditional Probability</a>
+							
+							
+							<a href="../analytical-update/" class="button primary" style="float:right">Analytical Update (Rowing) →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener active">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="./" class="active">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

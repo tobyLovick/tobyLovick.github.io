@@ -1,0 +1,536 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>MCMC – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>MCMC</h1>
+						</header>
+						
+
+						<h1 id="markov-chain-monte-carlo-mcmc">Markov Chain Monte Carlo (MCMC)</h1>
+<p>← Back to <a href="../">index</a> | See also: <a href="../nested-sampling/">nested-sampling</a></p>
+<hr />
+<h2 id="sampling-the-posterior">Sampling the Posterior</h2>
+<p><a href="../bayesian-inference/">Bayesian inference</a> gives us a posterior distribution:</p>
+<div class="arithmatex">\[\mathcal{P}(\theta|d) \propto \mathcal{L}(\theta)\pi(\theta)\]</div>
+<p>For most problems, we can't compute this analytically. <strong>Markov Chain Monte Carlo</strong> (MCMC) methods generate samples from <span class="arithmatex">\(\mathcal{P}\)</span> that we can use to estimate any quantity of interest.</p>
+<hr />
+<h2 id="the-core-idea">The Core Idea</h2>
+<p>Create a <strong>Markov chain</strong>—a sequence of parameter values <span class="arithmatex">\(\theta_1, \theta_2, \theta_3, \ldots\)</span>—whose <strong>stationary distribution is the posterior</strong> <span class="arithmatex">\(\mathcal{P}(\theta)\)</span>.</p>
+<p>After a "burn-in" period, samples from the chain are (approximately) samples from <span class="arithmatex">\(\mathcal{P}\)</span>.</p>
+<p><strong>Key properties needed:</strong>
+1. <strong>Irreducible</strong>: Can reach any state from any other state
+2. <strong>Aperiodic</strong>: Doesn't cycle deterministically
+3. <strong>Positive recurrent</strong>: Returns to states infinitely often</p>
+<p>If these hold, the chain converges to a unique stationary distribution.</p>
+<hr />
+<h2 id="detailed-balance">Detailed Balance</h2>
+<p>To ensure the stationary distribution is <span class="arithmatex">\(\mathcal{P}\)</span>, we design the chain to satisfy <strong>detailed balance</strong>:</p>
+<div class="arithmatex">\[\mathcal{P}(\theta) T(\theta'|\theta) = \mathcal{P}(\theta') T(\theta|\theta')\]</div>
+<p>where <span class="arithmatex">\(T(\theta'|\theta)\)</span> is the transition probability from <span class="arithmatex">\(\theta\)</span> to <span class="arithmatex">\(\theta'\)</span>.</p>
+<p><strong>Intuition:</strong> The flow from <span class="arithmatex">\(\theta\)</span> to <span class="arithmatex">\(\theta'\)</span> equals the flow from <span class="arithmatex">\(\theta'\)</span> to <span class="arithmatex">\(\theta\)</span> at equilibrium.</p>
+<p><strong>Consequence:</strong> If detailed balance holds, <span class="arithmatex">\(\mathcal{P}\)</span> is the stationary distribution.</p>
+<hr />
+<h2 id="metropolis-hastings-algorithm">Metropolis-Hastings Algorithm</h2>
+<p>The workhorse of MCMC. Proposed by Metropolis et al. (1953)[^Metropolis1953] and generalized by Hastings (1970)[^Hastings1970].</p>
+<h3 id="the-algorithm">The Algorithm</h3>
+<p>Given current state <span class="arithmatex">\(\theta_i\)</span>:</p>
+<ol>
+<li>
+<p><strong>Propose</strong> a new state: <span class="arithmatex">\(\theta' \sim Q(\theta'|\theta_i)\)</span> (proposal distribution)</p>
+</li>
+<li>
+<p><strong>Compute acceptance probability:</strong>
+   $<span class="arithmatex">\(\alpha = \min\left(1, \frac{\mathcal{P}(\theta') Q(\theta_i|\theta')}{\mathcal{P}(\theta_i) Q(\theta'|\theta_i)}\right)\)</span>$</p>
+</li>
+<li>
+<p><strong>Accept or reject:</strong></p>
+</li>
+<li>With probability <span class="arithmatex">\(\alpha\)</span>: set <span class="arithmatex">\(\theta_{i+1} = \theta'\)</span></li>
+<li>
+<p>With probability <span class="arithmatex">\(1-\alpha\)</span>: set <span class="arithmatex">\(\theta_{i+1} = \theta_i\)</span> (stay put)</p>
+</li>
+<li>
+<p><strong>Repeat</strong></p>
+</li>
+</ol>
+<h3 id="why-this-works">Why This Works</h3>
+<p>The acceptance ratio ensures detailed balance. The key insight: we only need the <strong>ratio</strong> <span class="arithmatex">\(\mathcal{P}(\theta')/\mathcal{P}(\theta_i)\)</span>, so the normalization constant (the <a href="../evidence/">evidence</a>!) cancels out!</p>
+<div class="arithmatex">\[\alpha = \min\left(1, \frac{\mathcal{L}(\theta')\pi(\theta')}{\mathcal{L}(\theta_i)\pi(\theta_i)} \cdot \frac{Q(\theta_i|\theta')}{Q(\theta'|\theta_i)}\right)\]</div>
+<p><strong>This is why MCMC works for parameter inference without computing evidence.</strong></p>
+<h3 id="example-symmetric-proposal">Example: Symmetric Proposal</h3>
+<p>If <span class="arithmatex">\(Q\)</span> is symmetric (<span class="arithmatex">\(Q(\theta'|\theta) = Q(\theta|\theta')\)</span>), the acceptance simplifies to:</p>
+<div class="arithmatex">\[\alpha = \min\left(1, \frac{\mathcal{P}(\theta')}{\mathcal{P}(\theta_i)}\right)\]</div>
+<p><strong>Common choice:</strong> Gaussian random walk: <span class="arithmatex">\(\theta' = \theta_i + \mathcal{N}(0, \Sigma)\)</span></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">mcmc_metropolis</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">,</span> <span class="n">theta_init</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">):</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple Metropolis MCMC with Gaussian proposal&quot;&quot;&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">chain</span> <span class="o">=</span> <span class="p">[</span><span class="n">theta_init</span><span class="p">]</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">theta</span> <span class="o">=</span> <span class="n">theta_init</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">log_p</span> <span class="o">=</span> <span class="n">log_posterior</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">n_accept</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="c1"># Propose</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">theta_prime</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">theta</span><span class="p">)),</span> <span class="n">Sigma</span><span class="p">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="c1"># Evaluate</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="n">log_p_prime</span> <span class="o">=</span> <span class="n">log_posterior</span><span class="p">(</span><span class="n">theta_prime</span><span class="p">)</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="c1"># Accept/reject</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        <span class="n">log_alpha</span> <span class="o">=</span> <span class="n">log_p_prime</span> <span class="o">-</span> <span class="n">log_p</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">log_alpha</span><span class="p">:</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>            <span class="n">theta</span> <span class="o">=</span> <span class="n">theta_prime</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>            <span class="n">log_p</span> <span class="o">=</span> <span class="n">log_p_prime</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            <span class="n">n_accept</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="n">acceptance_rate</span> <span class="o">=</span> <span class="n">n_accept</span> <span class="o">/</span> <span class="n">n_steps</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">chain</span><span class="p">),</span> <span class="n">acceptance_rate</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="c1"># Run</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="n">chain</span><span class="p">,</span> <span class="n">acc_rate</span> <span class="o">=</span> <span class="n">mcmc_metropolis</span><span class="p">(</span><span class="n">log_post</span><span class="p">,</span> <span class="n">theta_init</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Acceptance rate: </span><span class="si">{</span><span class="n">acc_rate</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="c1"># Discard burn-in</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">chain</span><span class="p">[</span><span class="mi">1000</span><span class="p">:]</span>  <span class="c1"># Use last 9000 samples</span>
+</code></pre></div>
+<p><strong>Tuning:</strong> Adjust <span class="arithmatex">\(\Sigma\)</span> to get acceptance rate <span class="arithmatex">\(\sim 20-40\%\)</span>. Too high = small steps, slow exploration. Too low = proposals rarely accepted.</p>
+<hr />
+<h2 id="gibbs-sampling">Gibbs Sampling</h2>
+<p>A special case where we update <strong>one parameter at a time</strong>, conditioning on the others.</p>
+<p>For parameters <span class="arithmatex">\(\theta = (\theta_1, \theta_2, \ldots, \theta_d)\)</span>:</p>
+<ol>
+<li>Sample <span class="arithmatex">\(\theta_1^{(i+1)} \sim p(\theta_1 | \theta_2^{(i)}, \theta_3^{(i)}, \ldots, \theta_d^{(i)}, d)\)</span></li>
+<li>Sample <span class="arithmatex">\(\theta_2^{(i+1)} \sim p(\theta_2 | \theta_1^{(i+1)}, \theta_3^{(i)}, \ldots, \theta_d^{(i)}, d)\)</span></li>
+<li>...</li>
+<li>Sample <span class="arithmatex">\(\theta_d^{(i+1)} \sim p(\theta_d | \theta_1^{(i+1)}, \ldots, \theta_{d-1}^{(i+1)}, d)\)</span></li>
+</ol>
+<p><strong>Advantage:</strong> No tuning required! Each conditional distribution might be simple (e.g., conjugate prior situations).</p>
+<p><strong>Disadvantage:</strong> Can be slow if parameters are highly correlated (updates along axes, not along degeneracy directions).</p>
+<hr />
+<h2 id="hamiltonian-monte-carlo-hmc">Hamiltonian Monte Carlo (HMC)</h2>
+<p>Uses <strong>gradient information</strong> to make efficient proposals[<sup>Duane1987][</sup>Neal1996].</p>
+<h3 id="the-physics-analogy">The Physics Analogy</h3>
+<p>Imagine a particle moving in potential <span class="arithmatex">\(U(\theta) = -\log\mathcal{P}(\theta)\)</span> with momentum <span class="arithmatex">\(p\)</span>.</p>
+<p><strong>Hamilton's equations:</strong>
+$<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, \quad \frac{dp}{dt} = -\frac{\partial H}{\partial \theta}\)</span>$</p>
+<p>where <span class="arithmatex">\(H(\theta, p) = U(\theta) + K(p)\)</span> is the Hamiltonian (total energy).</p>
+<p><strong>Key insight:</strong> Trajectories along constant-<span class="arithmatex">\(H\)</span> surfaces explore parameter space efficiently, following the natural geometry of <span class="arithmatex">\(\mathcal{P}\)</span>.</p>
+<h3 id="the-algorithm_1">The Algorithm</h3>
+<ol>
+<li><strong>Sample momentum:</strong> <span class="arithmatex">\(p \sim \mathcal{N}(0, M)\)</span></li>
+<li><strong>Integrate Hamilton's equations</strong> for time <span class="arithmatex">\(T\)</span> using leapfrog steps:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>p ← p + (ε/2) ∇log P(θ)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>θ ← θ + ε M⁻¹ p
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>p ← p + (ε/2) ∇log P(θ)
+</code></pre></div></li>
+<li><strong>Accept/reject</strong> using Metropolis criterion (corrects for discretization error)</li>
+</ol>
+<p><strong>Advantage:</strong> Can take large steps while maintaining high acceptance rate. Scales well to high dimensions.</p>
+<p><strong>Disadvantage:</strong> Requires gradients <span class="arithmatex">\(\nabla\log\mathcal{P}\)</span>. Tuning <span class="arithmatex">\(\epsilon\)</span> (step size) and <span class="arithmatex">\(T\)</span> (trajectory length) can be tricky.</p>
+<h3 id="no-u-turn-sampler-nuts">No-U-Turn Sampler (NUTS)</h3>
+<p>Automatically tunes trajectory length[^Hoffman2014]. Used in Stan and PyMC.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pymc</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="c1"># Define priors</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">Omega_m</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s1">&#39;Omega_m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">H0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s1">&#39;H0&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="c1"># Define likelihood</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">mu_theory</span> <span class="o">=</span> <span class="n">distance_modulus</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">Omega_m</span><span class="p">,</span> <span class="n">H0</span><span class="p">)</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;obs&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_theory</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_obs</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">m_obs</span><span class="p">)</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="c1"># Sample with NUTS</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">pm</span><span class="o">.</span><span class="n">plot_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>NUTS is the state-of-the-art</strong> for problems where gradients are available.</p>
+<hr />
+<h2 id="convergence-diagnostics">Convergence Diagnostics</h2>
+<p>How do we know the chain has converged?</p>
+<h3 id="1-trace-plots">1. Trace Plots</h3>
+<p>Plot <span class="arithmatex">\(\theta_i\)</span> vs iteration <span class="arithmatex">\(i\)</span>. Should look like "fuzzy caterpillar"—no trends, no getting stuck.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">chain</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># First parameter</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;θ₁&#39;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Bad signs:</strong> Upward trend, oscillations, flat regions</p>
+<h3 id="2-autocorrelation">2. Autocorrelation</h3>
+<p>Chains have memory—nearby samples are correlated. Compute the <strong>integrated autocorrelation time</strong> <span class="arithmatex">\(\tau\)</span>:</p>
+<div class="arithmatex">\[\tau = 1 + 2\sum_{k=1}^\infty \rho_k\]</div>
+<p>where <span class="arithmatex">\(\rho_k\)</span> is the autocorrelation at lag <span class="arithmatex">\(k\)</span>.</p>
+<p><strong>Rule:</strong> Effective sample size <span class="arithmatex">\(N_{\text{eff}} \approx N / \tau\)</span>. Need <span class="arithmatex">\(N_{\text{eff}} &gt; 100\)</span> for reliable estimates.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">arviz</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">az</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>  <span class="c1"># Effective sample size</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">az</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>  <span class="c1"># Gelman-Rubin statistic</span>
+</code></pre></div>
+<h3 id="3-gelman-rubin-statistic-hatr">3. Gelman-Rubin Statistic (<span class="arithmatex">\(\hat{R}\)</span>)</h3>
+<p>Run <strong>multiple chains</strong> from different starting points. If they converge to the same distribution:</p>
+<div class="arithmatex">\[\hat{R} = \sqrt{\frac{B/n}{W}}\]</div>
+<p>where <span class="arithmatex">\(B\)</span> = between-chain variance, <span class="arithmatex">\(W\)</span> = within-chain variance.</p>
+<p><strong>Rule:</strong> <span class="arithmatex">\(\hat{R} &lt; 1.1\)</span> indicates convergence. <span class="arithmatex">\(\hat{R} &gt; 1.2\)</span> is bad.</p>
+<hr />
+<h2 id="burn-in">Burn-In</h2>
+<p>Early iterations explore from the initial point toward high-probability regions. These samples <strong>don't</strong> represent the posterior.</p>
+<p><strong>Solution:</strong> Discard the first <span class="arithmatex">\(N_{\text{burn}}\)</span> samples (typically 10-50% of chain).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Discard first 1000 iterations</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">chain</span><span class="p">[</span><span class="mi">1000</span><span class="p">:]</span>
+</code></pre></div>
+<p><strong>How much burn-in?</strong> Look at trace plots. Burn-in is over when the chain "settles."</p>
+<hr />
+<h2 id="mcmc-vs-nested-sampling">MCMC vs Nested Sampling</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>MCMC</th>
+<th><a href="../nested-sampling/">Nested Sampling</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Output</strong></td>
+<td>Posterior samples</td>
+<td>Evidence + posterior samples</td>
+</tr>
+<tr>
+<td><strong>Efficiency</strong></td>
+<td>High (especially HMC)</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td><strong>Dimensionality</strong></td>
+<td>Excellent (50-1000+)</td>
+<td>Good (up to ~40)</td>
+</tr>
+<tr>
+<td><strong>Multimodal?</strong></td>
+<td>Can get stuck</td>
+<td>Naturally handles</td>
+</tr>
+<tr>
+<td><strong>Gradients?</strong></td>
+<td>Optional (HMC)</td>
+<td>Not typically used</td>
+</tr>
+<tr>
+<td><strong>Burn-in?</strong></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Use case</strong></td>
+<td>Parameter inference</td>
+<td>Model comparison</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bottom line:</strong>
+- Use <strong>MCMC</strong> (especially NUTS) for parameter constraints in high dimensions
+- Use <strong>Nested Sampling</strong> when you need evidence for <a href="../model-comparison/">model-comparison</a></p>
+<hr />
+<h2 id="modern-mcmc-software">Modern MCMC Software</h2>
+<h3 id="1-emcee-python">1. emcee (Python)</h3>
+<p>Affine-invariant ensemble sampler[^emcee]. No gradient needed.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">emcee</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">6</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">sampler</span> <span class="o">=</span> <span class="n">emcee</span><span class="o">.</span><span class="n">EnsembleSampler</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">log_posterior</span><span class="p">)</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">sampler</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">initial_pos</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">get_chain</span><span class="p">(</span><span class="n">discard</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Pros:</strong> Easy to parallelize, no tuning
+<strong>Cons:</strong> Not as efficient as HMC</p>
+<h3 id="2-stan-via-pystancmdstan">2. Stan (via PyStan/CmdStan)</h3>
+<p>Automatic differentiation + NUTS.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">data</span> <span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>  <span class="kt">int</span><span class="o">&lt;</span><span class="k">lower</span><span class="p">=</span><span class="mf">0</span><span class="o">&gt;</span> <span class="n">N</span><span class="p">;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  <span class="kt">vector</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">z</span><span class="p">;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  <span class="kt">vector</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">m</span><span class="p">;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>  <span class="kt">vector</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">sigma</span><span class="p">;</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kn">parameters</span> <span class="p">{</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>  <span class="kt">real</span><span class="o">&lt;</span><span class="k">lower</span><span class="p">=</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="k">upper</span><span class="p">=</span><span class="mf">1</span><span class="o">&gt;</span> <span class="n">Omega_m</span><span class="p">;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>  <span class="kt">real</span><span class="o">&lt;</span><span class="k">lower</span><span class="p">=</span><span class="mf">50</span><span class="p">,</span><span class="w"> </span><span class="k">upper</span><span class="p">=</span><span class="mf">100</span><span class="o">&gt;</span> <span class="n">H0</span><span class="p">;</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="kn">model</span> <span class="p">{</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>  <span class="kt">vector</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">mu_th</span><span class="p">;</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="k">in</span> <span class="mf">1</span><span class="o">:</span><span class="n">N</span><span class="p">)</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>    <span class="n">mu_th</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">distance_modulus</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Omega_m</span><span class="p">,</span> <span class="n">H0</span><span class="p">);</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>  <span class="n">m</span> <span class="o">~</span><span class="w"> </span><span class="nb">normal</span><span class="p">(</span><span class="n">mu_th</span><span class="p">,</span> <span class="n">sigma</span><span class="p">);</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Pros:</strong> State-of-the-art efficiency, automatic tuning
+<strong>Cons:</strong> Learning curve for Stan language</p>
+<h3 id="3-pymc">3. PyMC</h3>
+<p>Pythonic interface to NUTS.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pymc</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">():</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="c1"># Model specification (shown earlier)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Pros:</strong> Pure Python, great ecosystem
+<strong>Cons:</strong> Can be slower than compiled Stan</p>
+<h3 id="4-numpyro">4. NumPyro</h3>
+<p>JAX-based NUTS for GPU acceleration[^Phan2019].</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpyro</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpyro.infer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">mcmc</span> <span class="o">=</span> <span class="n">MCMC</span><span class="p">(</span><span class="n">NUTS</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">num_warmup</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">mcmc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">rng_key</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Pros:</strong> GPU acceleration, very fast
+<strong>Cons:</strong> Still maturing ecosystem</p>
+<hr />
+<h2 id="practical-tips">Practical Tips</h2>
+<h3 id="1-initialize-near-posterior">1. Initialize Near Posterior</h3>
+<p>Don't start at random prior points. Use optimization to find MAP, then initialize chain nearby.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">log_posterior</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x0</span><span class="o">=</span><span class="n">prior_mean</span><span class="p">)</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">theta_init</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span>
+</code></pre></div>
+<h3 id="2-run-multiple-chains">2. Run Multiple Chains</h3>
+<p>Helps detect convergence problems. If chains don't agree, you haven't converged.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">random_init</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">rhat</span> <span class="o">=</span> <span class="n">gelman_rubin</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>  <span class="c1"># Should be &lt; 1.1</span>
+</code></pre></div>
+<h3 id="3-thin-if-necessary">3. Thin if Necessary</h3>
+<p>If storage is an issue, keep every <span class="arithmatex">\(k\)</span>-th sample to reduce autocorrelation.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">thinned</span> <span class="o">=</span> <span class="n">chain</span><span class="p">[::</span><span class="mi">10</span><span class="p">]</span>  <span class="c1"># Every 10th sample</span>
+</code></pre></div>
+<p>But often it's better to run longer and keep all samples.</p>
+<h3 id="4-check-effective-sample-size">4. Check Effective Sample Size</h3>
+<p>Not all samples are independent. Aim for <span class="arithmatex">\(N_{\text{eff}} &gt; 100\)</span> per parameter.</p>
+<hr />
+<h2 id="when-mcmc-fails">When MCMC Fails</h2>
+<h3 id="1-highly-multimodal-posteriors">1. Highly Multimodal Posteriors</h3>
+<p>MCMC can get stuck in one mode. Use:
+- Parallel tempering
+- Simulated annealing
+- <a href="../nested-sampling/">nested-sampling</a> (naturally handles multimodality)</p>
+<h3 id="2-strongly-degenerate-parameters">2. Strongly Degenerate Parameters</h3>
+<p>HMC helps, but can still struggle. Try:
+- Reparameterization
+- Non-centered parameterization
+- Gradient-based nested sampling</p>
+<h3 id="3-expensive-likelihoods">3. Expensive Likelihoods</h3>
+<p>Each step requires likelihood evaluation. Solutions:
+- Use surrogate models / emulators
+- Batch evaluations on GPU
+- See <a href="../gpu-acceleration/">gpu-acceleration</a></p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>MCMC generates samples from the posterior distribution:</strong></p>
+<p>✅ No evidence calculation (great for parameter inference)
+✅ Scales well to high dimensions (especially HMC/NUTS)
+✅ Gradients greatly improve efficiency
+✅ Mature software ecosystem
+✅ Requires burn-in and convergence checks</p>
+<p><strong>When to use:</strong>
+- Parameter constraints only (no model comparison)
+- High-dimensional problems (<span class="arithmatex">\(d &gt; 40\)</span>)
+- Gradients available → use NUTS
+- Multiple chains to verify convergence</p>
+<p><strong>For model comparison, use <a href="../nested-sampling/">nested-sampling</a> to compute the <a href="../evidence/">evidence</a>.</strong></p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../computing-evidence/">computing-evidence</a> - Methods for evidence calculation
+- <a href="../nested-sampling/">nested-sampling</a> - Alternative that gives evidence
+- <a href="../bayesian-inference/">bayesian-inference</a> - The framework</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Metropolis1953]: Metropolis, N., et al. (1953). Equation of state calculations by fast computing machines. <em>The Journal of Chemical Physics</em>, 21(6), 1087-1092.</p>
+<p>[Hastings1970]: Hastings, W. K. (1970). Monte Carlo sampling methods using Markov chains. <em>Biometrika</em>, 57(1), 97-109.</p>
+<p>[Duane1987]: Duane, S., et al. (1987). Hybrid Monte Carlo. <em>Physics Letters B</em>, 195(2), 216-222.</p>
+<p>[Neal1996]: Neal, R. M. (1996). Sampling from multimodal distributions using tempered transitions. <em>Statistics and Computing</em>, 6(4), 353-366.</p>
+<p>[Hoffman2014]: Hoffman, M. D., &amp; Gelman, A. (2014). The No-U-Turn sampler. <em>Journal of Machine Learning Research</em>, 15(1), 1593-1623.</p>
+<p>[emcee]: Foreman-Mackey, D., et al. (2013). emcee: The MCMC Hammer. <em>PASP</em>, 125(925), 306.</p>
+<p>[Phan2019]: Phan, D., et al. (2019). Composable effects for flexible and accelerated probabilistic programming in NumPyro. <em>arXiv:1912.11554</em>.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../nested-sampling/" class="button">← Nested Sampling</a>
+							
+							
+							<a href="../computing-evidence/" class="button primary" style="float:right">Computing Evidence →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="./" class="active">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

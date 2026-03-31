@@ -1,0 +1,559 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Computing Evidence – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Computing Evidence</h1>
+						</header>
+						
+
+						<h1 id="computing-the-evidence">Computing the Evidence</h1>
+<p>← Back to <a href="../">index</a> | See also: <a href="../evidence/">evidence</a>, <a href="../nested-sampling/">nested-sampling</a>, <a href="../mcmc/">mcmc</a></p>
+<hr />
+<h2 id="the-challenge">The Challenge</h2>
+<p>The <a href="../evidence/">evidence</a> is a high-dimensional integral:</p>
+<div class="arithmatex">\[\mathcal{Z} = \int \mathcal{L}(\theta)\pi(\theta) d\theta\]</div>
+<p>Unlike the posterior (which <a href="../mcmc/">MCMC</a> samples efficiently), computing <span class="arithmatex">\(\mathcal{Z}\)</span> requires exploring the <strong>entire prior volume</strong>, not just the high-probability peak.</p>
+<p>This page compares different methods for evidence calculation.</p>
+<hr />
+<h2 id="method-1-nested-sampling">Method 1: Nested Sampling</h2>
+<p><strong>Approach:</strong> Transform the multi-dimensional integral into 1D via prior mass[^Skilling2006].</p>
+<h3 id="how-it-works">How It Works</h3>
+<p>See <a href="../nested-sampling/">nested-sampling</a> for full details. Brief summary:</p>
+<ol>
+<li>Generate sequence of points with increasing likelihood</li>
+<li>Track prior volume shrinkage: <span class="arithmatex">\(X_i = t_i X_{i-1}\)</span></li>
+<li>Evidence: <span class="arithmatex">\(\mathcal{Z} = \sum w_i \mathcal{L}_i\)</span></li>
+</ol>
+<h3 id="pros">Pros</h3>
+<p>✅ <strong>Direct calculation</strong> - evidence is primary output
+✅ <strong>Robust error estimates</strong> - from prior volume stochasticity
+✅ <strong>Handles multimodal posteriors</strong> naturally
+✅ <strong>Posterior samples as byproduct</strong>
+✅ <strong>No post-processing</strong> required</p>
+<h3 id="cons">Cons</h3>
+<p>❌ <strong>Computationally expensive</strong> - scales poorly with dimension (<span class="arithmatex">\(\sim e^{d \mathcal{D}_{KL}}\)</span>)
+❌ <strong>Implementation complexity</strong> - constrained prior sampling is hard
+❌ <strong>No gradient usage</strong> (in standard implementations)</p>
+<h3 id="implementations">Implementations</h3>
+<p><strong>PolyChord</strong> (slice sampling)[^Handley2015a]:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_polychord</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolyChordSettings</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">PolyChordSettings</span><span class="p">(</span><span class="n">nDims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">nDerived</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">settings</span><span class="o">.</span><span class="n">nlive</span> <span class="o">=</span> <span class="mi">500</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">output</span> <span class="o">=</span> <span class="n">run_polychord</span><span class="p">(</span><span class="n">loglike</span><span class="p">,</span> <span class="n">nDims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">nDerived</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                       <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">prior_transform</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;log Z = </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">logZ</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">logZerr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>dynesty</strong> (dynamic nested sampling)[^Speagle2020]:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dynesty</span><span class="w"> </span><span class="kn">import</span> <span class="n">DynamicNestedSampler</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">dsampler</span> <span class="o">=</span> <span class="n">DynamicNestedSampler</span><span class="p">(</span><span class="n">loglike</span><span class="p">,</span> <span class="n">prior_transform</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">dsampler</span><span class="o">.</span><span class="n">run_nested</span><span class="p">()</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">results</span> <span class="o">=</span> <span class="n">dsampler</span><span class="o">.</span><span class="n">results</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;log Z = </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">logz</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">logzerr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>MultiNest</strong> (ellipsoidal decomposition)[^Feroz2009]:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pymultinest</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">run</span><span class="p">(</span><span class="n">loglike</span><span class="p">,</span> <span class="n">prior_transform</span><span class="p">,</span> <span class="n">n_dims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">outputfiles_basename</span><span class="o">=</span><span class="s1">&#39;chains/ns_&#39;</span><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="when-to-use">When to Use</h3>
+<ul>
+<li>✅ Need accurate evidence for <a href="../model-comparison/">model-comparison</a></li>
+<li>✅ Posterior might be multimodal</li>
+<li>✅ Moderate dimensions (<span class="arithmatex">\(d \lesssim 40\)</span>)</li>
+<li>✅ GPU available → see <a href="../gpu-acceleration/">gpu-acceleration</a></li>
+</ul>
+<hr />
+<h2 id="method-2-thermodynamic-integration">Method 2: Thermodynamic Integration</h2>
+<p><strong>Approach:</strong> Create a "ladder" of tempered distributions from prior to posterior[^Neal1996].</p>
+<h3 id="how-it-works_1">How It Works</h3>
+<p>Define a path from prior (<span class="arithmatex">\(\beta=0\)</span>) to posterior (<span class="arithmatex">\(\beta=1\)</span>):</p>
+<div class="arithmatex">\[p_\beta(\theta) = \frac{\mathcal{L}(\theta)^\beta \pi(\theta)}{Z_\beta}\]</div>
+<p>The evidence is:</p>
+<div class="arithmatex">\[\log\mathcal{Z} = \int_0^1 \left\langle \log\mathcal{L} \right\rangle_\beta d\beta\]</div>
+<p><strong>Algorithm:</strong>
+1. Run MCMC at several <span class="arithmatex">\(\beta\)</span> values: <span class="arithmatex">\(0 = \beta_0 &lt; \beta_1 &lt; \cdots &lt; \beta_K = 1\)</span>
+2. Estimate <span class="arithmatex">\(\langle \log\mathcal{L} \rangle\)</span> at each <span class="arithmatex">\(\beta_i\)</span>
+3. Integrate numerically (trapezoid rule)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">integrate</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Define beta schedule</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Run MCMC at each temperature</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">log_L_means</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">for</span> <span class="n">beta</span> <span class="ow">in</span> <span class="n">betas</span><span class="p">:</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">tempered_posterior</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="k">return</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">log_likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span> <span class="n">log_prior</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">samples</span> <span class="o">=</span> <span class="n">run_mcmc</span><span class="p">(</span><span class="n">tempered_posterior</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="n">log_L_means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">log_likelihood</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">]))</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="c1"># Integrate</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="n">log_Z</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">log_L_means</span><span class="p">,</span> <span class="n">betas</span><span class="p">)</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;log Z = </span><span class="si">{</span><span class="n">log_Z</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="pros_1">Pros</h3>
+<p>✅ <strong>Uses MCMC</strong> - can leverage efficient samplers (HMC)
+✅ <strong>Gradients help</strong> - if available
+✅ <strong>Parallelizable</strong> - run each temperature independently</p>
+<h3 id="cons_1">Cons</h3>
+<p>❌ <strong>Many MCMC runs</strong> needed (one per <span class="arithmatex">\(\beta\)</span>)
+❌ <strong>Tuning</strong> <span class="arithmatex">\(\beta\)</span> schedule is tricky
+❌ <strong>Costly</strong> - especially in high dimensions
+❌ <strong>Convergence</strong> - each chain must converge</p>
+<h3 id="when-to-use_1">When to Use</h3>
+<ul>
+<li>✅ Already using HMC/NUTS for sampling</li>
+<li>✅ High dimensions where NS struggles</li>
+<li>✅ Have computational resources for many chains</li>
+</ul>
+<hr />
+<h2 id="method-3-harmonic-mean-estimator">Method 3: Harmonic Mean Estimator</h2>
+<p><strong>Approach:</strong> Post-process MCMC posterior samples[^Newton1994].</p>
+<h3 id="the-original-unstable-version">The Original (Unstable) Version</h3>
+<p>From posterior samples <span class="arithmatex">\(\{\theta_i\}\)</span>:</p>
+<div class="arithmatex">\[\mathcal{Z} \approx \left( \frac{1}{N} \sum_{i=1}^N \frac{1}{\mathcal{L}(\theta_i)} \right)^{-1}\]</div>
+<p><strong>Why this formula?</strong> Bayes' theorem rearranged:</p>
+<div class="arithmatex">\[\frac{1}{\mathcal{Z}} = \left\langle \frac{1}{\mathcal{L}} \right\rangle_{\mathcal{P}}\]</div>
+<h3 id="why-it-fails">Why It Fails</h3>
+<p><strong>Problem:</strong> Dominated by lowest-likelihood samples in the posterior tail.</p>
+<p>Even a few samples with very low <span class="arithmatex">\(\mathcal{L}\)</span> cause huge variance. The estimator is <strong>theoretically unbiased but has infinite variance</strong>!</p>
+<p><strong>Never use the naive harmonic mean estimator.</strong></p>
+<hr />
+<h2 id="method-4-learned-harmonic-mean">Method 4: Learned Harmonic Mean</h2>
+<p><strong>Approach:</strong> Use machine learning to stabilize the harmonic mean[<sup>McEwen2021][</sup>Polanska2025].</p>
+<h3 id="how-it-works_2">How It Works</h3>
+<p>Train a normalizing flow <span class="arithmatex">\(q(\theta)\)</span> to approximate the posterior, then:</p>
+<div class="arithmatex">\[\mathcal{Z} = \left\langle \frac{p(\theta)}{q(\theta)} \right\rangle_{\mathcal{P}}\]</div>
+<p>where <span class="arithmatex">\(p(\theta) = \mathcal{L}(\theta)\pi(\theta)\)</span> (unnormalized posterior).</p>
+<p><strong>Key insight:</strong> The ratio <span class="arithmatex">\(p/q\)</span> is better behaved than <span class="arithmatex">\(1/\mathcal{L}\)</span>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">harmonic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Evidence</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Load MCMC samples</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">load_posterior_samples</span><span class="p">()</span>  <span class="c1"># Shape: (n_samples, n_dims)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Split into training and inference sets</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">train_samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.3</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">))]</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">test_samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.3</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)):]</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># Train flow on posterior samples</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">ev</span> <span class="o">=</span> <span class="n">Evidence</span><span class="p">(</span><span class="n">n_dims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s1">&#39;RealNVP&#39;</span><span class="p">)</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="n">ev</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_samples</span><span class="p">)</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="c1"># Compute evidence using test samples</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="n">log_Z</span><span class="p">,</span> <span class="n">log_Z_err</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">compute_evidence</span><span class="p">(</span><span class="n">test_samples</span><span class="p">,</span> <span class="n">log_likelihood</span><span class="p">)</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;log Z = </span><span class="si">{</span><span class="n">log_Z</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">log_Z_err</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="pros_2">Pros</h3>
+<p>✅ <strong>Post-processes MCMC</strong> - no new sampling needed
+✅ <strong>More stable</strong> than naive harmonic mean
+✅ <strong>Fast</strong> once samples available
+✅ <strong>Improving</strong> - active research area</p>
+<h3 id="cons_2">Cons</h3>
+<p>❌ <strong>Requires many samples</strong> - typically 100k+
+❌ <strong>Flow training</strong> can be finicky
+❌ <strong>Error estimates</strong> are optimistic (don't include flow training uncertainty)
+❌ <strong>Less robust</strong> than nested sampling</p>
+<h3 id="when-to-use_2">When to Use</h3>
+<ul>
+<li>✅ Already have MCMC posterior samples</li>
+<li>✅ Running nested sampling is too expensive</li>
+<li>✅ Can afford to run long chains (100k+ samples)</li>
+</ul>
+<hr />
+<h2 id="method-5-laplace-approximation">Method 5: Laplace Approximation</h2>
+<p><strong>Approach:</strong> Approximate posterior as Gaussian around the maximum a posteriori (MAP)[^Mackay2003].</p>
+<h3 id="how-it-works_3">How It Works</h3>
+<p>Taylor expand <span class="arithmatex">\(\log\mathcal{P}\)</span> around <span class="arithmatex">\(\hat{\theta}\)</span> (the MAP):</p>
+<div class="arithmatex">\[\log\mathcal{P}(\theta) \approx \log\mathcal{P}(\hat{\theta}) - \frac{1}{2}(\theta - \hat{\theta})^T H (\theta - \hat{\theta})\]</div>
+<p>where <span class="arithmatex">\(H\)</span> is the Hessian matrix.</p>
+<p>The Laplace approximation to the evidence:</p>
+<div class="arithmatex">\[\boxed{\log\mathcal{Z} \approx \log\mathcal{L}(\hat{\theta}) + \log\pi(\hat{\theta}) + \frac{d}{2}\log(2\pi) - \frac{1}{2}\log|H|}\]</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Find MAP</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">log_posterior</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x0</span><span class="o">=</span><span class="n">theta_init</span><span class="p">)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">theta_map</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">log_P_map</span> <span class="o">=</span> <span class="o">-</span><span class="n">result</span><span class="o">.</span><span class="n">fun</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="c1"># Compute Hessian (numerical)</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numdifftools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hessian</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">hessian</span> <span class="o">=</span> <span class="n">Hessian</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">log_posterior</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">H</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">theta_map</span><span class="p">)</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="c1"># Laplace evidence</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="n">d</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">theta_map</span><span class="p">)</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="n">log_Z_laplace</span> <span class="o">=</span> <span class="p">(</span><span class="n">log_P_map</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>                 <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>                 <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">H</span><span class="p">)))</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;log Z ≈ </span><span class="si">{</span><span class="n">log_Z_laplace</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> (Laplace approx)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="pros_3">Pros</h3>
+<p>✅ <strong>Extremely fast</strong> - just optimization + Hessian
+✅ <strong>No sampling</strong> required
+✅ <strong>Analytical</strong> formula</p>
+<h3 id="cons_3">Cons</h3>
+<p>❌ <strong>Only valid if posterior is Gaussian</strong> (often not true!)
+❌ <strong>Misses multimodality</strong> completely
+❌ <strong>Inaccurate</strong> for complex posteriors
+❌ <strong>Numerical Hessian</strong> can be unstable</p>
+<h3 id="when-to-use_3">When to Use</h3>
+<ul>
+<li>✅ Quick approximation / sanity check</li>
+<li>✅ Posterior is known to be nearly Gaussian (rare!)</li>
+<li>✅ Very high dimensions where nothing else is feasible</li>
+</ul>
+<p><strong>For rigorous model comparison, don't rely solely on Laplace.</strong></p>
+<hr />
+<h2 id="method-comparison">Method Comparison</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Accuracy</th>
+<th>Cost</th>
+<th>Dimensions</th>
+<th>Multimodal?</th>
+<th>Need Gradients?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[[nested-sampling|Nested Sampling]]</td>
+<td>★★★★★</td>
+<td>High</td>
+<td><span class="arithmatex">\(d \lesssim 40\)</span></td>
+<td>✅ Yes</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td>Thermodynamic Integration</td>
+<td>★★★★☆</td>
+<td>High</td>
+<td><span class="arithmatex">\(d \lesssim 100\)</span></td>
+<td>✅ Yes</td>
+<td>Optional</td>
+</tr>
+<tr>
+<td>Learned Harmonic Mean</td>
+<td>★★★☆☆</td>
+<td>Medium*</td>
+<td>Any</td>
+<td>⚠️ Maybe</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td>Laplace Approx</td>
+<td>★★☆☆☆</td>
+<td>Very Low</td>
+<td>Any</td>
+<td>❌ No</td>
+<td>Optional</td>
+</tr>
+</tbody>
+</table>
+<p>*Assumes MCMC samples already available</p>
+<h3 id="accuracy-comparison-example-problem">Accuracy Comparison (Example Problem)</h3>
+<p>Toy problem: 10D Gaussian posterior, known evidence <span class="arithmatex">\(\log\mathcal{Z}_{\text{true}} = -52.3\)</span></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Method                    Result              Error      Time
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>─────────────────────────────────────────────────────────────
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>PolyChord (NS)           -52.4 ± 0.3          ±0.3       2 min
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>dynesty (NS)             -52.5 ± 0.4          ±0.4       3 min
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>Thermodynamic Int.       -52.1 ± 0.5          ±0.5       15 min
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>Learned Harmonic         -51.8 ± 1.2          ±1.2       5 min*
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>Laplace                  -53.7 (no error)     ±1.4       10 sec
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>Naive Harmonic           -48 ± 27             Unreliable 1 sec*
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>* Post-processing only, not including MCMC sampling time
+</code></pre></div>
+<p><strong>Takeaway:</strong> Nested sampling is most reliable. Laplace is fast but biased. Naive harmonic mean is unusable.</p>
+<hr />
+<h2 id="practical-recommendations">Practical Recommendations</h2>
+<h3 id="for-cosmology-d-sim-5-40">For Cosmology (<span class="arithmatex">\(d \sim 5-40\)</span>)</h3>
+<p><strong>Primary method:</strong> <a href="../nested-sampling/">nested-sampling</a> (PolyChord or dynesty)
+- Most reliable
+- Handles multimodality
+- Worth the computational cost for rigorous model comparison</p>
+<p><strong>Cross-check:</strong> Thermodynamic integration if you have HMC chains</p>
+<h3 id="for-high-dimensions-d-50">For High Dimensions (<span class="arithmatex">\(d &gt; 50\)</span>)</h3>
+<p><strong>Primary method:</strong> Thermodynamic integration with HMC
+- Nested sampling becomes too expensive
+- HMC scales better</p>
+<p><strong>Alternative:</strong> Learned harmonic mean (but be cautious of error estimates)</p>
+<h3 id="quick-estimates">Quick Estimates</h3>
+<p><strong>Laplace approximation</strong> for order-of-magnitude
+- Sanity check before expensive calculations
+- Don't use for final publication</p>
+<h3 id="model-comparison">Model Comparison</h3>
+<p><strong>Always use nested sampling</strong> for final Bayes factors
+- Other methods' error bars often underestimate uncertainty
+- NS is the "ground truth" other methods are validated against</p>
+<hr />
+<h2 id="checking-your-evidence-calculation">Checking Your Evidence Calculation</h2>
+<h3 id="1-analytic-test-cases">1. Analytic Test Cases</h3>
+<p>Before real data, test on problems with known evidence:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Gaussian posterior with known evidence</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_gaussian</span><span class="p">():</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="c1"># Prior: Uniform on [-5, 5]^d</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="c1"># Likelihood: Gaussian, unit variance</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="c1"># Evidence (analytic): log Z = -d/2 * log(2π) + log(Vol)</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="c1"># Run your method</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="n">log_Z_computed</span> <span class="o">=</span> <span class="n">compute_evidence</span><span class="p">(</span><span class="n">gaussian_loglike</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="n">log_Z_analytic</span> <span class="o">=</span> <span class="n">compute_analytic_evidence</span><span class="p">()</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">log_Z_computed</span> <span class="o">-</span> <span class="n">log_Z_analytic</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;Test failed!&quot;</span>
+</code></pre></div>
+<h3 id="2-compare-methods">2. Compare Methods</h3>
+<p>Run 2-3 methods on the same problem. Should agree within error bars.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">log_Z_ns</span> <span class="o">=</span> <span class="n">run_nested_sampling</span><span class="p">()</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">log_Z_ti</span> <span class="o">=</span> <span class="n">run_thermodynamic_integration</span><span class="p">()</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">difference</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">log_Z_ns</span> <span class="o">-</span> <span class="n">log_Z_ti</span><span class="p">)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">combined_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">error_ns</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">error_ti</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="k">assert</span> <span class="n">difference</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">combined_error</span><span class="p">,</span> <span class="s2">&quot;Methods disagree!&quot;</span>
+</code></pre></div>
+<h3 id="3-convergence-tests">3. Convergence Tests</h3>
+<p>For nested sampling: increase <span class="arithmatex">\(N_{\text{live}}\)</span>, check evidence stabilizes.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">for</span> <span class="n">nlive</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">log_Z</span> <span class="o">=</span> <span class="n">run_ns</span><span class="p">(</span><span class="n">nlive</span><span class="o">=</span><span class="n">nlive</span><span class="p">)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;N_live=</span><span class="si">{</span><span class="n">nlive</span><span class="si">}</span><span class="s2">: log Z = </span><span class="si">{</span><span class="n">log_Z</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># Should see convergence</span>
+</code></pre></div>
+<hr />
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="my-evidence-is-106-is-that-wrong">"My evidence is -10^6, is that wrong?"</h3>
+<p><strong>No!</strong> Absolute evidence values are meaningless—they depend on prior volume. Only <strong>evidence differences</strong> matter:</p>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} = \log\mathcal{Z}_1 - \log\mathcal{Z}_2\]</div>
+<h3 id="different-methods-give-different-evidences">"Different methods give different evidences"</h3>
+<p>Small differences (<span class="arithmatex">\(&lt; 1\)</span>) are expected due to numerical precision. Large differences (<span class="arithmatex">\(&gt; 2\)</span>) indicate a problem:
+- Insufficient convergence
+- Implementation bug
+- One method is inappropriate (e.g., Laplace on multimodal posterior)</p>
+<h3 id="can-i-combine-evidence-estimates">"Can I combine evidence estimates?"</h3>
+<p><strong>No!</strong> Don't average evidences from different methods. Pick the most reliable method for your problem.</p>
+<h3 id="my-nested-sampling-error-bar-is-001-but-results-vary-by-05">"My nested sampling error bar is 0.01 but results vary by 0.5"</h3>
+<p>The reported error is only the <strong>sampling uncertainty</strong>. Systematic error from incomplete exploration can be larger. Check:
+- Increase <span class="arithmatex">\(N_{\text{live}}\)</span>
+- Verify stopping criterion wasn't too aggressive
+- Try different implementations</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>For rigorous Bayesian <a href="../model-comparison/">model-comparison</a>:</strong></p>
+<p>🥇 <strong>Nested sampling</strong> (PolyChord, dynesty) - most reliable
+🥈 <strong>Thermodynamic integration</strong> - if high-dimensional
+🥉 <strong>Learned harmonic mean</strong> - if MCMC samples already exist</p>
+<p><strong>Never use:</strong>
+❌ Naive harmonic mean estimator (infinite variance)
+❌ Laplace for final results (too approximate)</p>
+<p><strong>Always:</strong>
+✅ Test on analytic cases first
+✅ Compare multiple methods when possible
+✅ Report method and settings used
+✅ Check convergence carefully</p>
+<p><strong>Remember:</strong> Computing evidence is harder than sampling the posterior. Budget time accordingly!</p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../nested-sampling/">nested-sampling</a> - Deep dive into the recommended method
+- <a href="../model-comparison/">model-comparison</a> - Using evidence in practice
+- <a href="../gpu-acceleration/">gpu-acceleration</a> - Modern computational techniques</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Skilling2006]: Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.</p>
+<p>[Feroz2009]: Feroz, F., Hobson, M. P., &amp; Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool. <em>MNRAS</em>, 398(4), 1601-1614.</p>
+<p>[Handley2015a]: Handley, W. J., Hobson, M. P., &amp; Lasenby, A. N. (2015). POLYCHORD: next-generation nested sampling. <em>MNRAS</em>, 453(4), 4384-4398.</p>
+<p>[Speagle2020]: Speagle, J. S. (2020). dynesty: a dynamic nested sampling package. <em>MNRAS</em>, 493(3), 3132-3158.</p>
+<p>[Neal1996]: Neal, R. M. (1996). Sampling from multimodal distributions using tempered transitions. <em>Statistics and Computing</em>, 6(4), 353-366.</p>
+<p>[Newton1994]: Newton, M. A., &amp; Raftery, A. E. (1994). Approximate Bayesian inference with the weighted likelihood bootstrap. <em>Journal of the Royal Statistical Society: Series B</em>, 56(1), 3-26.</p>
+<p>[McEwen2021]: McEwen, J. D., et al. (2021). Machine learning assisted Bayesian model comparison: learnt harmonic mean estimator. <em>MNRAS</em>, 508(3), 3771-3795.</p>
+<p>[Polanska2025]: Polanska, M., et al. (2025). Further improvements to the learned harmonic mean estimator. <em>MNRAS</em>, 536(1), 851-869.</p>
+<p>[Mackay2003]: MacKay, D. J. C. (2003). <em>Information Theory, Inference, and Learning Algorithms</em>. Cambridge University Press.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../mcmc/" class="button">← MCMC</a>
+							
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="./" class="active">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Model Comparison – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Model Comparison</h1>
+						</header>
+						
+
+						<h1 id="model-comparison">Model Comparison</h1>
+<p>← Back to <a href="../">index</a> | Previous: <a href="../evidence/">evidence</a></p>
+<hr />
+<h2 id="the-question-science-asks">The Question Science Asks</h2>
+<p>"Which theory is correct?" Or more precisely: <strong>"Given the data, how much more probable is Model A than Model B?"</strong></p>
+<p>This is the domain of Bayesian model comparison, enabled by the <a href="../evidence/">evidence</a>.</p>
+<hr />
+<h2 id="the-bayes-factor">The Bayes Factor</h2>
+<p>To compare models <span class="arithmatex">\(\mathcal{M}_0\)</span> and <span class="arithmatex">\(\mathcal{M}_1\)</span>, apply <a href="../bayes-theorem/">bayes-theorem</a> at the model level:</p>
+<div class="arithmatex">\[\frac{p(\mathcal{M}_0|d)}{p(\mathcal{M}_1|d)} = \frac{p(d|\mathcal{M}_0)}{p(d|\mathcal{M}_1)} \cdot \frac{p(\mathcal{M}_0)}{p(\mathcal{M}_1)}\]</div>
+<p>If we assign <strong>equal prior probabilities</strong> to both models (no a priori reason to favor one):</p>
+<div class="arithmatex">\[\boxed{\text{Posterior odds} = \text{Bayes factor} = B_{01} = \frac{\mathcal{Z}_0}{\mathcal{Z}_1}}\]</div>
+<p>We typically work in log space: <span class="arithmatex">\(\Delta\log\mathcal{Z} = \log(\mathcal{Z}_0/\mathcal{Z}_1)\)</span>.</p>
+<p><strong>Interpretation:</strong> <span class="arithmatex">\(B_{01} = 12\)</span> means "the data favor Model 0 by odds of 12:1" or equivalently "Model 0 is 12 times more probable than Model 1 given the data."</p>
+<hr />
+<h2 id="jeffreys-scale">Jeffreys' Scale</h2>
+<p>Sir Harold Jeffreys provided an empirical scale for interpreting evidence differences[^Jeffreys1961]:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><span class="arithmatex">\(\|\Delta\log\mathcal{Z}\|\)</span></th>
+<th style="text-align: center;">Odds</th>
+<th style="text-align: center;">Posterior Probability</th>
+<th style="text-align: center;">Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(&lt; 1.0\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(\lesssim 3:1\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(&lt; 0.75\)</span></td>
+<td style="text-align: center;"><strong>Inconclusive</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(1.0\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(\sim 3:1\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(0.75\)</span></td>
+<td style="text-align: center;"><strong>Weak evidence</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(2.5\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(\sim 12:1\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(0.92\)</span></td>
+<td style="text-align: center;"><strong>Moderate evidence</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(5.0\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(\sim 150:1\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(0.99\)</span></td>
+<td style="text-align: center;"><strong>Strong evidence</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><span class="arithmatex">\(&gt; 10\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(&gt; 20,000:1\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(&gt; 0.9999\)</span></td>
+<td style="text-align: center;"><strong>Decisive evidence</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The "Posterior Probability" column shows <span class="arithmatex">\(p(\mathcal{M}_0|d)\)</span> in a 2-model comparison with equal priors—analogous to a p-value but more interpretable.</p>
+<p><strong>Important:</strong> These thresholds are empirical guidelines, not strict rules. Context matters!</p>
+<hr />
+<h2 id="real-world-examples">Real-World Examples</h2>
+<p>For a simple pedagogical example of model comparison with analytical solutions, see <a href="../analytical-update/">analytical-update</a> (the rowing lane advantage problem).</p>
+<h2 id="example-1-dark-energy-equation-of-state">Example 1: Dark Energy Equation of State</h2>
+<p><strong>Scientific question:</strong> Is dark energy a cosmological constant (<span class="arithmatex">\(w = -1\)</span>), or does it have a different equation of state?</p>
+<h3 id="the-models">The Models</h3>
+<p><strong>Model 0:</strong> Flat <span class="arithmatex">\(\Lambda\)</span>CDM
+- 6 parameters: <span class="arithmatex">\(\{\Omega_b h^2, \Omega_c h^2, H_0, A_s, n_s, \tau\}\)</span>
+- Dark energy equation of state: <span class="arithmatex">\(w = -1\)</span> (fixed)</p>
+<p><strong>Model 1:</strong> Flat <span class="arithmatex">\(w\)</span>CDM
+- 7 parameters: same as above plus <span class="arithmatex">\(w\)</span>
+- Dark energy equation of state: <span class="arithmatex">\(w\)</span> is free</p>
+<h3 id="the-data">The Data</h3>
+<p>Type Ia supernovae from Pantheon+ catalog[^Brout2022] (1701 SNe out to <span class="arithmatex">\(z \sim 2\)</span>).</p>
+<h3 id="results">Results</h3>
+<p>Running <a href="../nested-sampling/">nested-sampling</a> on both models:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Flat ΛCDM:
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  log Z₀ = 1234.5 ± 0.3
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  Best fit: Ωₘ = 0.33 ± 0.02, H₀ = 73.7 ± 1.0 km/s/Mpc
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Flat wCDM:
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  log Z₁ = 1232.3 ± 0.3
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  Best fit: Ωₘ = 0.32 ± 0.07, w = -0.97 ± 0.16, H₀ = 73.7 ± 1.0 km/s/Mpc
+</code></pre></div>
+<h3 id="evidence-comparison">Evidence Comparison</h3>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} = 1234.5 - 1232.3 = 2.2\]</div>
+<p>Using <a href="../evidence/#the-laplace-approximation">the Laplace decomposition</a>:</p>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} \approx \underbrace{\Delta\log\mathcal{L}_{\text{max}}}_{+0.5} - \underbrace{\frac{\Delta\hat{d}}{2}}_{-0.5} - \underbrace{\Delta\mathcal{D}_{\text{KL}}}_{-1.2} \approx -2.2\]</div>
+<p><strong>Interpretation:</strong>
+- <strong>Fit quality</strong>: <span class="arithmatex">\(w\)</span>CDM fits slightly better (+0.5)
+- <strong>Dimensionality penalty</strong>: Adding <span class="arithmatex">\(w\)</span> costs -0.5
+- <strong>Occam penalty</strong>: The prior on <span class="arithmatex">\(w\)</span> is wide but posterior only slightly narrower (-1.2)
+- <strong>Conclusion</strong>: <span class="arithmatex">\(\Lambda\)</span>CDM is preferred with <strong>moderate evidence</strong> (Jeffreys scale: 2.2 ≈ 9:1 odds)</p>
+<p><strong>Physical interpretation:</strong> The data are consistent with <span class="arithmatex">\(w = -1\)</span>. Adding <span class="arithmatex">\(w\)</span> as a free parameter doesn't improve the fit enough to justify the complexity. The simplest model (cosmological constant) is favored.</p>
+<hr />
+<h2 id="example-2-spatial-curvature">Example 2: Spatial Curvature</h2>
+<p><strong>Scientific question:</strong> Is the universe spatially flat, or does it have curvature?</p>
+<h3 id="the-models_1">The Models</h3>
+<p><strong>Model 0:</strong> Flat <span class="arithmatex">\(\Lambda\)</span>CDM
+- 6 parameters
+- Curvature: <span class="arithmatex">\(\Omega_k = 0\)</span> (fixed)</p>
+<p><strong>Model 1:</strong> Curved <span class="arithmatex">\(\Lambda\)</span>CDM
+- 7 parameters (adds <span class="arithmatex">\(\Omega_k\)</span>)
+- Curvature: <span class="arithmatex">\(\Omega_k\)</span> free</p>
+<h3 id="the-data_1">The Data</h3>
+<p>Planck 2018 CMB temperature and polarization power spectra[^Planck2018].</p>
+<h3 id="results_1">Results</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Flat ΛCDM:
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  log Z₀ = 87573.4 ± 0.3
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  Best fit: Ωₘ = 0.315 ± 0.007
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Curved ΛCDM:
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  log Z₁ = 87572.3 ± 0.3
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  Best fit: Ωₘ = 0.32 ± 0.05, Ωₖ = 0.03 ± 0.12
+</code></pre></div>
+<h3 id="evidence-comparison_1">Evidence Comparison</h3>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} = 87573.4 - 87572.3 = 1.1\]</div>
+<p><strong>Interpretation:</strong>
+- Flat model is weakly preferred (3:1 odds)
+- The data are consistent with <span class="arithmatex">\(\Omega_k = 0\)</span> (within 1σ)
+- Adding curvature improves fit marginally but doesn't justify the extra parameter
+- <strong>Conclusion</strong>: Universe is consistent with flatness; no evidence for curvature</p>
+<p><strong>Why does this matter?</strong> The posterior includes <span class="arithmatex">\(\Omega_k = 0\)</span> within its credible interval, so a frequentist analysis might say "we can't rule out curvature." But Bayesian evidence says "we don't <em>need</em> curvature"—a stronger statement.</p>
+<hr />
+<h2 id="example-3-non-gaussian-scatter">Example 3: Non-Gaussian Scatter</h2>
+<p><strong>Scientific question:</strong> Are the supernova residuals actually Gaussian, or do they have heavier tails?</p>
+<p>This example illustrates comparing <strong>statistical assumptions</strong>, not just physical models.</p>
+<h3 id="the-models_2">The Models</h3>
+<p>Both use Flat <span class="arithmatex">\(\Lambda\)</span>CDM cosmology, but differ in scatter model:</p>
+<p><strong>Model A:</strong> Gaussian likelihood
+$<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{1}{\sqrt{2\pi\sigma_i^2}} \exp\left(-\frac{\Delta_i^2}{2\sigma_i^2}\right)\)</span>$</p>
+<p><strong>Model B:</strong> Student's t-distribution
+$<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamma(\nu/2)\sqrt{\nu\pi\sigma_i^2}}\left(1 + \frac{\Delta_i^2}{\nu\sigma_i^2}\right)^{-(\nu+1)/2}\)</span>$</p>
+<p>where <span class="arithmatex">\(\nu\)</span> is the degrees of freedom (controls tail heaviness).</p>
+<h3 id="the-data_2">The Data</h3>
+<p>Pantheon+ supernova Hubble residuals[^Lovick2024].</p>
+<h3 id="results_2">Results</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Gaussian:
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  log Z_A = 1234.5 ± 0.3
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>Student&#39;s t:
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  log Z_B = 1237.2 ± 0.3
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  ν = 5.2 ± 1.8 (heavier tails than Gaussian)
+</code></pre></div>
+<h3 id="evidence-comparison_2">Evidence Comparison</h3>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} = 1237.2 - 1234.5 = 2.7\]</div>
+<p><strong>Interpretation:</strong>
+- Student's t is preferred with <strong>moderate evidence</strong> (~15:1 odds)
+- Best-fit <span class="arithmatex">\(\nu \approx 5\)</span> suggests heavier tails than Gaussian (<span class="arithmatex">\(\nu \to \infty\)</span>)
+- This indicates either:
+  - Underestimated uncertainties in the covariance matrix
+  - Outliers from unmodeled systematics
+  - Non-Gaussian intrinsic scatter</p>
+<p><strong>Practical impact:</strong> Using Student's t reduces uncertainty on <span class="arithmatex">\(H_0\)</span> from <span class="arithmatex">\(1.03\)</span> to <span class="arithmatex">\(0.99\)</span> km/s/Mpc by down-weighting outliers.</p>
+<p><strong>Key insight:</strong> Evidence can test <em>any</em> model assumption—not just cosmology, but also likelihoods, priors, and systematics.</p>
+<hr />
+<h2 id="the-power-of-marginalization">The Power of Marginalization</h2>
+<p>A unique feature of Bayesian evidence: <strong>you can marginalize over model uncertainties</strong>.</p>
+<p>Suppose we're uncertain about both:
+- Cosmology: <span class="arithmatex">\(\Lambda\)</span>CDM vs <span class="arithmatex">\(w\)</span>CDM
+- Scatter: Gaussian vs Student's t</p>
+<p>We can compute <strong>four evidences</strong> (2 cosmologies × 2 scatters), then marginalize:</p>
+<div class="arithmatex">\[p(d|\text{Cosmology}_i) = \sum_j p(d|\text{Cosmology}_i, \text{Scatter}_j) p(\text{Scatter}_j)\]</div>
+<p>This gives a <strong>model-averaged</strong> answer that accounts for our uncertainty about the statistical model.</p>
+<p><strong>Example result:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Marginalizing over scatter models:
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  P(ΛCDM | data) = 0.85
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  P(wCDM | data) = 0.15
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Best-fit H₀ (marginalized): 73.7 ± 1.1 km/s/Mpc
+</code></pre></div></p>
+<p>This is more honest than picking one scatter model arbitrarily!</p>
+<hr />
+<h2 id="nested-models-and-the-savage-dickey-ratio">Nested Models and the Savage-Dickey Ratio</h2>
+<p>When Model 1 is <strong>nested</strong> in Model 0 (i.e., setting one parameter <span class="arithmatex">\(\theta^* = 0\)</span> recovers Model 1), there's a clever shortcut[^TrottaDickey]:</p>
+<div class="arithmatex">\[B_{01} = \frac{\mathcal{Z}_0}{\mathcal{Z}_1} = \frac{p(\theta^* = 0|d, \mathcal{M}_0)}{p(\theta^* = 0|\mathcal{M}_0)}\]</div>
+<p><strong>In words:</strong> The Bayes factor equals the ratio of posterior to prior density at the special value.</p>
+<p><strong>Example:</strong> Testing <span class="arithmatex">\(w = -1\)</span> in <span class="arithmatex">\(w\)</span>CDM:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Run MCMC on wCDM</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">posterior_samples</span> <span class="o">=</span> <span class="n">run_mcmc</span><span class="p">(</span><span class="n">wCDM_model</span><span class="p">)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Evaluate densities at w = -1</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">posterior_density_at_minus1</span> <span class="o">=</span> <span class="n">kde</span><span class="p">(</span><span class="n">posterior_samples</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">prior_density_at_minus1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">w_max</span> <span class="o">-</span> <span class="n">w_min</span><span class="p">)</span>  <span class="c1"># Uniform prior</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1"># Bayes factor</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">B</span> <span class="o">=</span> <span class="n">posterior_density_at_minus1</span> <span class="o">/</span> <span class="n">prior_density_at_minus1</span>
+</code></pre></div>
+<p>This avoids running the simpler model entirely—you only need the more complex model's posterior!</p>
+<hr />
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<h3 id="1-my-bayes-factor-is-sensitive-to-the-prior">1. "My Bayes factor is sensitive to the prior"</h3>
+<p><strong>Yes, that's correct!</strong> Evidence <em>should</em> depend on priors—that's the point.</p>
+<p>The prior encodes your model's predictions. A model that predicts "anything is possible" (very wide prior) gets penalized via the Occam factor.</p>
+<p><strong>Solution:</strong> Use physically motivated priors. If results change dramatically with reasonable prior choices, you probably need more data.</p>
+<h3 id="2-i-got-different-evidences-from-different-methods">2. "I got different evidences from different methods"</h3>
+<p>Evidence calculation is numerically challenging. Different methods can give slightly different values:</p>
+<ul>
+<li><a href="../nested-sampling/">nested-sampling</a>: <span class="arithmatex">\(\mathcal{Z} \pm 0.5\)</span> (typical precision)</li>
+<li>Thermodynamic integration: <span class="arithmatex">\(\mathcal{Z} \pm 0.3\)</span></li>
+<li>Harmonic mean: Can be very unstable!</li>
+</ul>
+<p><strong>Solution:</strong> Use nested sampling for rigorous comparisons. Check convergence carefully. Compare methods on toy problems first.</p>
+<h3 id="3-can-i-compare-models-with-different-data">3. "Can I compare models with different data?"</h3>
+<p><strong>No!</strong> The evidence is <span class="arithmatex">\(p(d|\mathcal{M})\)</span>—the probability of <em>this specific dataset</em> under each model.</p>
+<p>If you use different data (e.g., different redshift cuts), you're computing <span class="arithmatex">\(p(d_1|\mathcal{M}_1)\)</span> vs <span class="arithmatex">\(p(d_2|\mathcal{M}_2)\)</span>, which is meaningless.</p>
+<p><strong>Solution:</strong> Use identical datasets for all models you're comparing.</p>
+<h3 id="4-bayes-factor-is-03-which-model-is-better">4. "Bayes factor is 0.3, which model is better?"</h3>
+<p><span class="arithmatex">\(\Delta\log\mathcal{Z} = 0.3\)</span> is <strong>inconclusive</strong> (&lt; 1 on Jeffreys scale).</p>
+<p>This doesn't mean "they're equally good"—it means "this dataset can't distinguish them." You need:
+- More data, or
+- Different/complementary data, or
+- To accept that both models are viable</p>
+<hr />
+<h2 id="evidence-vs-other-criteria">Evidence vs Other Criteria</h2>
+<h3 id="aic-akaike-information-criterion">AIC (Akaike Information Criterion)</h3>
+<div class="arithmatex">\[\text{AIC} = 2k - 2\log\mathcal{L}_{\text{max}}\]</div>
+<p>where <span class="arithmatex">\(k\)</span> = number of parameters.</p>
+<p><strong>Relation to evidence:</strong> AIC approximates <span class="arithmatex">\(-2\log\mathcal{Z}\)</span> in the limit of large data and weak priors.</p>
+<p><strong>Drawback:</strong> Only uses <span class="arithmatex">\(\mathcal{L}_{\text{max}}\)</span>, ignores posterior volume. Penalty is simply <span class="arithmatex">\(k\)</span>, not the Bayesian <span class="arithmatex">\(\hat{d}\)</span> (effective dimensionality).</p>
+<h3 id="bic-bayesian-information-criterion">BIC (Bayesian Information Criterion)</h3>
+<div class="arithmatex">\[\text{BIC} = k\log n - 2\log\mathcal{L}_{\text{max}}\]</div>
+<p>where <span class="arithmatex">\(n\)</span> = number of data points.</p>
+<p><strong>Relation to evidence:</strong> Better approximation to <span class="arithmatex">\(-2\log\mathcal{Z}\)</span> under more restrictive assumptions.</p>
+<p><strong>Drawback:</strong> Still only uses <span class="arithmatex">\(\mathcal{L}_{\text{max}}\)</span>. Assumes large <span class="arithmatex">\(n\)</span> limit.</p>
+<h3 id="why-use-full-bayesian-evidence">Why Use Full Bayesian Evidence?</h3>
+<ol>
+<li><strong>Accounts for full posterior volume</strong>, not just the peak</li>
+<li><strong>Natural Occam penalty</strong> through <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span></li>
+<li><strong>Exact for any sample size</strong> (no large-<span class="arithmatex">\(n\)</span> assumption)</li>
+<li><strong>Principled probability statements</strong> (odds ratios)</li>
+<li><strong>Allows marginalization</strong> over nuisance models</li>
+</ol>
+<hr />
+<h2 id="real-world-example-desi-and-evolving-dark-energy">Real-World Example: DESI and Evolving Dark Energy</h2>
+<p>In 2024, the DESI collaboration reported hints of evolving dark energy (<span class="arithmatex">\(w_0w_a\)</span> model)[^DESI2024]. The community debate centered on: <strong>Is this statistically significant?</strong></p>
+<h3 id="frequentist-analysis">Frequentist Analysis</h3>
+<ul>
+<li><span class="arithmatex">\(w_a = -0.5 \pm 0.3\)</span> (2σ from zero)</li>
+<li>PTE (probability to exceed) analysis</li>
+<li>"Moderate tension with <span class="arithmatex">\(\Lambda\)</span>CDM"</li>
+</ul>
+<p><strong>Problem:</strong> Different metrics give different answers. Is 2σ enough? What about the look-elsewhere effect?</p>
+<h3 id="bayesian-analysis-hypothetical">Bayesian Analysis (hypothetical)</h3>
+<p>Compare evidences:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ΛCDM: log Z₀ = 5432.1
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>w₀wₐCDM: log Z₁ = 5431.8
+</code></pre></div></p>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} = -0.3\]</div>
+<p><strong>Conclusion:</strong> Inconclusive (&lt; 1). The improved fit doesn't overcome the penalty for two extra parameters (<span class="arithmatex">\(w_0\)</span>, <span class="arithmatex">\(w_a\)</span>).</p>
+<p><strong>Interpretation:</strong> The data show a <em>preference</em> for <span class="arithmatex">\(w_a \neq 0\)</span>, but not enough to justify the more complex model. This is a much clearer statement than "2σ tension."</p>
+<p><em>(Note: These are illustrative numbers; full DESI Bayesian analysis would be needed.)</em></p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>Model comparison via Bayesian evidence:</strong></p>
+<p>✅ Provides direct probability statements (odds ratios)
+✅ Automatically implements Occam's razor
+✅ Works for any models (nested or not)
+✅ Allows marginalization over model uncertainties
+✅ Rigorous and principled</p>
+<p><strong>Requires:</strong>
+- Careful prior specification (affects evidence)
+- Specialized computation methods (<a href="../nested-sampling/">nested-sampling</a>)
+- Same dataset for all models compared</p>
+<p><strong>Jeffreys scale guide:</strong>
+- &lt; 1: Inconclusive
+- 1-2.5: Weak to moderate
+- 2.5-5: Moderate to strong
+- &gt; 5: Strong evidence</p>
+<p><strong>The bottom line:</strong> When you want to answer "which model is correct?", compute the evidence. It's the principled way to do model comparison.</p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../nested-sampling/">nested-sampling</a> - How to compute the evidence
+- <a href="../computing-evidence/">computing-evidence</a> - Comparing different methods
+- <a href="../cmb-analysis/">cmb-analysis</a> - Model comparison applied to CMB data</p>
+<p><strong>Related:</strong>
+- <a href="../evidence/">evidence</a> - Understanding what evidence means
+- <a href="../bayesian-inference/">bayesian-inference</a> - The general framework</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Jeffreys1961]: Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.</p>
+<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
+<p>[Brout2022]: Brout, D., et al. (2022). The Pantheon+ analysis: cosmological constraints. <em>The Astrophysical Journal</em>, 938(2), 110.</p>
+<p>[Planck2018]: Planck Collaboration (2018). Planck 2018 results. VI. Cosmological parameters. <em>Astronomy &amp; Astrophysics</em>, 641, A6.</p>
+<p>[Lovick2024]: Lovick, T., Dhawan, S., &amp; Handley, W. (2024). Non-Gaussian likelihoods for Type Ia Supernovae cosmology. <em>MNRAS</em> (submitted).</p>
+<p>[TrottaDickey]: Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.</p>
+<p>[DESI2024]: DESI Collaboration (2024). DESI 2024 VI: Cosmological constraints from the measurements of baryon acoustic oscillations. <em>arXiv:2404.03002</em>.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../prior-choice/" class="button">← Prior Choice</a>
+							
+							
+							<a href="../tension-statistics/" class="button primary" style="float:right">Quantifying Tension →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="./" class="active">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

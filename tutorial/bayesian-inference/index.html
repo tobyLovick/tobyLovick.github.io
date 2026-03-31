@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Bayesian Inference – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Bayesian Inference</h1>
+						</header>
+						
+
+						<h1 id="bayesian-inference">Bayesian Inference</h1>
+<p>← Back to <a href="../">index</a> | Previous: <a href="../bayes-theorem/">bayes-theorem</a></p>
+<hr />
+<h2 id="from-coins-to-cosmology">From Coins to Cosmology</h2>
+<p><a href="../bayes-theorem/">Bayes' theorem</a> works for any inference problem. In science, we're typically trying to infer the values of <strong>model parameters</strong> <span class="arithmatex">\(\theta\)</span> from observed <strong>data</strong> <span class="arithmatex">\(d\)</span>, within some theoretical framework (a <strong>model</strong> <span class="arithmatex">\(\mathcal{M}\)</span>).</p>
+<hr />
+<h2 id="the-framework">The Framework</h2>
+<p>Bayes' theorem for scientific inference:</p>
+<div class="arithmatex">\[\boxed{p(\theta|d,\mathcal{M}) = \frac{p(d|\theta,\mathcal{M}) \, p(\theta|\mathcal{M})}{p(d|\mathcal{M})}}\]</div>
+<p>Or in notation we'll use throughout:</p>
+<div class="arithmatex">\[\boxed{\mathcal{P} = \frac{\mathcal{L} \times \pi}{\mathcal{Z}}}\]</div>
+<p>Where:
+- <strong><span class="arithmatex">\(\pi = p(\theta|\mathcal{M})\)</span></strong> = <strong>Prior</strong>: What we believe about parameters before seeing data
+- <strong><span class="arithmatex">\(\mathcal{L} = p(d|\theta,\mathcal{M})\)</span></strong> = <strong>Likelihood</strong>: Probability of data given parameters
+- <strong><span class="arithmatex">\(\mathcal{P} = p(\theta|d,\mathcal{M})\)</span></strong> = <strong>Posterior</strong>: Updated beliefs after seeing data
+- <strong><span class="arithmatex">\(\mathcal{Z} = p(d|\mathcal{M})\)</span></strong> = <strong>Evidence</strong>: The marginalized likelihood (crucial for <a href="../model-comparison/">model-comparison</a>)</p>
+<hr />
+<h2 id="the-three-components">The Three Components</h2>
+<h3 id="1-the-prior-pitheta">1. The Prior <span class="arithmatex">\(\pi(\theta)\)</span></h3>
+<p><strong>Role:</strong> Encodes what we know about parameters <em>before</em> collecting data.</p>
+<p><strong>Examples:</strong>
+- <strong>Physical bounds</strong>: <span class="arithmatex">\(\Omega_m \in [0,1]\)</span> (matter can't be negative or exceed closure density)
+- <strong>Theoretical expectations</strong>: <span class="arithmatex">\(H_0 \in [50, 100]\)</span> km/s/Mpc (wide but excludes unphysical values)
+- <strong>Previous measurements</strong>: Use posterior from earlier experiment as prior for new one</p>
+<p><strong>Common choices:</strong>
+- <strong>Uniform</strong>: <span class="arithmatex">\(\pi(\theta) \propto 1\)</span> on some range (minimal assumption)
+- <strong>Log-uniform</strong>: <span class="arithmatex">\(\pi(\theta) \propto 1/\theta\)</span> (appropriate for scale parameters)
+- <strong>Gaussian</strong>: <span class="arithmatex">\(\pi(\theta) \propto \exp(-(\theta-\mu)^2/2\sigma^2)\)</span> (encodes previous measurement)</p>
+<p><strong>Important:</strong> For parameter estimation, results become prior-independent as data accumulates. But for <a href="../model-comparison/">model-comparison</a>, prior choice always matters—this is a feature, not a bug. See <a href="../prior-choice/">prior-choice</a> for detailed discussion of how to choose priors.</p>
+<p>For a complete worked example of Bayesian updating with analytical solutions, see <a href="../analytical-update/">analytical-update</a>.</p>
+<h3 id="2-the-likelihood-mathcalltheta">2. The Likelihood <span class="arithmatex">\(\mathcal{L}(\theta)\)</span></h3>
+<p><strong>Role:</strong> Quantifies how well parameters predict the observed data.</p>
+<p>This comes from our theoretical model. For example:</p>
+<p><strong>Gaussian likelihood</strong> (most common):
+$<span class="arithmatex">\(\mathcal{L}(\theta) = \frac{1}{\sqrt{(2\pi)^n|\mathbf{C}|}} \exp\left(-\frac{1}{2}(\mathbf{d}-\mathbf{m}(\theta))^T\mathbf{C}^{-1}(\mathbf{d}-\mathbf{m}(\theta))\right)\)</span>$</p>
+<p>where:
+- <span class="arithmatex">\(\mathbf{d}\)</span> = observed data vector
+- <span class="arithmatex">\(\mathbf{m}(\theta)\)</span> = model prediction given parameters <span class="arithmatex">\(\theta\)</span>
+- <span class="arithmatex">\(\mathbf{C}\)</span> = covariance matrix (measurement uncertainties and correlations)</p>
+<p><strong>Key point:</strong> The likelihood is a function of <span class="arithmatex">\(\theta\)</span> for fixed data <span class="arithmatex">\(d\)</span>. It is <strong>not</strong> a probability distribution over <span class="arithmatex">\(\theta\)</span> (it doesn't integrate to 1).</p>
+<h3 id="3-the-posterior-mathcalptheta">3. The Posterior <span class="arithmatex">\(\mathcal{P}(\theta)\)</span></h3>
+<p><strong>Role:</strong> Our final inference—what we've learned about parameters from data.</p>
+<p>The posterior combines prior knowledge and data:
+- If data are weak, posterior <span class="arithmatex">\(\approx\)</span> prior
+- If data are strong, posterior is concentrated near best-fit values
+- Posterior quantifies our <strong>uncertainty</strong> via its width</p>
+<p><strong>What we extract:</strong>
+- <strong>Point estimate</strong>: Maximum a posteriori (MAP) or posterior mean
+- <strong>Uncertainties</strong>: Standard deviation or credible intervals
+- <strong>Correlations</strong>: Off-diagonal structure in posterior covariance</p>
+<p><strong>Computing the posterior:</strong> Since we rarely have analytical forms, we use sampling methods:
+- <strong><a href="../mcmc/">MCMC</a></strong>: Markov Chain Monte Carlo (e.g., Metropolis-Hastings, Hamiltonian Monte Carlo)
+- <strong><a href="../nested-sampling/">nested-sampling</a></strong>: Simultaneously computes posterior samples and evidence</p>
+<hr />
+<h2 id="example-measuring-the-hubble-constant">Example: Measuring the Hubble Constant</h2>
+<p>Let's make this concrete with a cosmological example.</p>
+<p><strong>Goal:</strong> Measure <span class="arithmatex">\(H_0\)</span> (the Hubble constant) from Type Ia supernova distances.</p>
+<h3 id="setup">Setup</h3>
+<ul>
+<li><strong>Parameters</strong>: <span class="arithmatex">\(\theta = (H_0, M_B)\)</span> where <span class="arithmatex">\(M_B\)</span> is the absolute magnitude</li>
+<li><strong>Data</strong>: Observed apparent magnitudes <span class="arithmatex">\(m_i\)</span> and redshifts <span class="arithmatex">\(z_i\)</span> for <span class="arithmatex">\(n\)</span> supernovae</li>
+<li><strong>Model</strong>: <span class="arithmatex">\(\mathcal{M}\)</span> = Flat <span class="arithmatex">\(\Lambda\)</span>CDM cosmology</li>
+</ul>
+<h3 id="the-prior">The Prior</h3>
+<p>Physical reasoning gives us:
+$<span class="arithmatex">\(\pi(H_0) = \mathcal{U}(50, 100) \quad \text{km/s/Mpc}\)</span>$
+$<span class="arithmatex">\(\pi(M_B) = \mathcal{U}(-20, -18)\)</span>$</p>
+<p>These are wide enough to be "uninformative" but exclude unphysical values.</p>
+<h3 id="the-likelihood">The Likelihood</h3>
+<p>For each supernova, theory predicts:</p>
+<div class="arithmatex">\[\mu_{\text{th}}(z_i; H_0) = 5\log_{10}\left(\frac{d_L(z_i; H_0)}{10\,\text{pc}}\right)\]</div>
+<p>where <span class="arithmatex">\(d_L(z; H_0)\)</span> is the luminosity distance in Flat <span class="arithmatex">\(\Lambda\)</span>CDM:</p>
+<div class="arithmatex">\[d_L(z; H_0) = \frac{c(1+z)}{H_0}\int_0^z \frac{dz'}{\sqrt{\Omega_m(1+z')^3 + (1-\Omega_m)}}\]</div>
+<p>The data are <span class="arithmatex">\(m_i\)</span> with uncertainties <span class="arithmatex">\(\sigma_i\)</span>. Since <span class="arithmatex">\(\mu = m - M_B\)</span>:</p>
+<div class="arithmatex">\[\mathcal{L}(H_0, M_B) = \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma_i^2}} \exp\left(-\frac{(m_i - M_B - \mu_{\text{th}}(z_i; H_0))^2}{2\sigma_i^2}\right)\]</div>
+<p>In practice, we work with the log-likelihood:</p>
+<div class="arithmatex">\[\log\mathcal{L} = -\frac{1}{2}\sum_{i=1}^n \left[\frac{(m_i - M_B - \mu_{\text{th}}(z_i; H_0))^2}{\sigma_i^2} + \log(2\pi\sigma_i^2)\right]\]</div>
+<h3 id="the-posterior">The Posterior</h3>
+<p>We compute <span class="arithmatex">\(\mathcal{P}(H_0, M_B)\)</span> using <a href="../mcmc/">MCMC sampling</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">emcee</span>  <span class="c1"># MCMC sampler</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">log_prior</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">H0</span><span class="p">,</span> <span class="n">M_B</span> <span class="o">=</span> <span class="n">theta</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="k">if</span> <span class="mi">50</span> <span class="o">&lt;</span> <span class="n">H0</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">20</span> <span class="o">&lt;</span> <span class="n">M_B</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">18</span><span class="p">:</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="k">return</span> <span class="mf">0.0</span>  <span class="c1"># Uniform prior (log of constant)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>  <span class="c1"># Outside bounds</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="k">def</span><span class="w"> </span><span class="nf">log_likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">H0</span><span class="p">,</span> <span class="n">M_B</span> <span class="o">=</span> <span class="n">theta</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">z</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">data</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="c1"># Compute theoretical distance modulus for each supernova</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">mu_th</span> <span class="o">=</span> <span class="n">distance_modulus</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">H0</span><span class="p">)</span>  <span class="c1"># Function computing μ_th(z; H_0)</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="c1"># Gaussian likelihood</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">residuals</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="n">M_B</span> <span class="o">-</span> <span class="n">mu_th</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">residuals</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="k">def</span><span class="w"> </span><span class="nf">log_posterior</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">lp</span> <span class="o">=</span> <span class="n">log_prior</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">lp</span><span class="p">):</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="k">return</span> <span class="n">lp</span> <span class="o">+</span> <span class="n">log_likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="c1"># Run MCMC</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">2</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">]</span>  <span class="c1"># Initialize</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="n">sampler</span> <span class="o">=</span> <span class="n">emcee</span><span class="o">.</span><span class="n">EnsembleSampler</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">log_posterior</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="p">])</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="n">sampler</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="c1"># Extract posterior samples</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">get_chain</span><span class="p">(</span><span class="n">discard</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="n">H0_samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>H₀ = 73.5 ± 1.2 km/s/Mpc  (68% credible interval)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>M_B = -19.3 ± 0.1
+</code></pre></div></p>
+<p>The posterior gives us both the central value and quantified uncertainty.</p>
+<hr />
+<h2 id="parameter-estimation-vs-model-comparison">Parameter Estimation vs Model Comparison</h2>
+<p>So far we've focused on <strong>parameter inference</strong>: given a model <span class="arithmatex">\(\mathcal{M}\)</span>, what are the parameter values?</p>
+<p>But what if we want to compare <strong>different models</strong>?</p>
+<ul>
+<li>Model A: Flat <span class="arithmatex">\(\Lambda\)</span>CDM (<span class="arithmatex">\(\Omega_k = 0\)</span> fixed)</li>
+<li>Model B: Curved <span class="arithmatex">\(\Lambda\)</span>CDM (<span class="arithmatex">\(\Omega_k\)</span> free)</li>
+</ul>
+<p><strong>Question:</strong> Does the data justify the additional parameter <span class="arithmatex">\(\Omega_k\)</span>?</p>
+<p>For this, we need to compare the <strong><a href="../evidence/">evidence</a></strong> of each model. The posterior samples from MCMC don't directly give us this—we need specialized methods like <a href="../nested-sampling/">nested-sampling</a>.</p>
+<p><strong>This is where Bayesian inference truly shines:</strong> It provides a rigorous, principled framework for model comparison through the evidence.</p>
+<hr />
+<h2 id="the-evidence-preview">The Evidence Preview</h2>
+<p>For parameter inference, the evidence <span class="arithmatex">\(\mathcal{Z}\)</span> is just a normalizing constant:</p>
+<div class="arithmatex">\[\mathcal{Z} = \int \mathcal{L}(\theta)\pi(\theta) d\theta\]</div>
+<p>It ensures <span class="arithmatex">\(\int \mathcal{P}(\theta)d\theta = 1\)</span>, but doesn't affect the posterior shape.</p>
+<p><strong>However:</strong> For comparing models, the evidence is <strong>the</strong> key quantity. It quantifies:
+1. How well does the model fit the data? (via <span class="arithmatex">\(\langle \mathcal{L} \rangle\)</span>)
+2. How much parameter space is wasted? (via the Occam penalty)</p>
+<p><strong>Result:</strong> Models that fit well but are overly complex get penalized. This naturally implements Occam's razor.</p>
+<p>To understand why and how, continue to <a href="../evidence/">evidence</a>.</p>
+<hr />
+<h2 id="key-takeaways">Key Takeaways</h2>
+<ol>
+<li><strong>Bayesian inference</strong> applies Bayes' theorem to scientific problems</li>
+<li><strong>Priors</strong> encode physical constraints and previous knowledge</li>
+<li><strong>Likelihoods</strong> come from theoretical models and measurement uncertainties</li>
+<li><strong>Posteriors</strong> quantify what we've learned from data</li>
+<li><strong>MCMC sampling</strong> is the workhorse for computing posteriors</li>
+<li><strong>The evidence</strong> enables model comparison (next topic!)</li>
+</ol>
+<hr />
+<p><strong>Next:</strong> <a href="../evidence/">evidence</a> - Why the normalizing constant is the most important quantity</p>
+<p><strong>Related:</strong>
+- <a href="../mcmc/">mcmc</a> - How to sample the posterior
+- <a href="../model-comparison/">model-comparison</a> - Comparing theories with evidence
+- <a href="../nested-sampling/">nested-sampling</a> - Computing evidence directly</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
+<p>[Hobson2010]: Hobson, M. P., et al. (2010). Bayesian Methods in Cosmology. Cambridge University Press.</p>
+<p>[Jaynes2003]: Jaynes, E. T. (2003). <em>Probability Theory: The Logic of Science</em>. Cambridge University Press.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../analytical-update/" class="button">← Analytical Update (Rowing)</a>
+							
+							
+							<a href="../evidence/" class="button primary" style="float:right">The Bayesian Evidence →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener active">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="./" class="active">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

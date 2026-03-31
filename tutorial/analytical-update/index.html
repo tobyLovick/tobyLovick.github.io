@@ -1,0 +1,417 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Analytical Update (Rowing) – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Analytical Update (Rowing)</h1>
+						</header>
+						
+
+						<h1 id="analytical-bayesian-update-the-rowing-example">Analytical Bayesian Update: The Rowing Example</h1>
+<p>← Back to <a href="../">index</a> | Previous: <a href="../bayes-theorem/">bayes-theorem</a></p>
+<hr />
+<h2 id="a-real-problem-is-the-course-balanced">A Real Problem: Is the Course Balanced?</h2>
+<p>In the 1999s Rowbridge Reborn regatta, there were <strong>84 races</strong> on the River Cam:
+- <strong>Towside</strong> (towpath side) won <strong>54 races</strong>
+- <strong>Meadow</strong> side won <strong>30 races</strong></p>
+<p><strong>Context:</strong> Like a 400m running track, the river has a <strong>bend</strong>. To compensate, the race organizers <strong>deliberately skewed the finish line toward Meadow side</strong> to make the course fair.</p>
+<p><strong>Sides are randomly assigned</strong> to crews before each race, so this isn't about which crews are better.</p>
+<p><strong>Question:</strong> Is the finish line skew sufficient to balance the course, or does Towpath still have an advantage?</p>
+<p><strong>Frequentist answer:</strong> Hypothesis test gives p-value = 0.0043, "significant evidence that towpath side is faster."</p>
+<p><strong>The snarky comment:</strong> "Maybe the finish line being skewed in favour of meadow isn't something to complain about" — i.e., the skew was <em>supposed</em> to help Meadow, but Towpath wins anyway!</p>
+<p>Let's quantify this properly with <strong>Bayesian inference</strong>.</p>
+<hr />
+<h2 id="setting-up-the-problem">Setting Up the Problem</h2>
+<h3 id="the-parameter">The Parameter</h3>
+<p>Let <span class="arithmatex">\(\theta\)</span> = probability that Towpath side wins a race (with random crew assignment).</p>
+<ul>
+<li>If <span class="arithmatex">\(\theta = 0.5\)</span>: Course is balanced (finish line skew compensates for bend perfectly)</li>
+<li>If <span class="arithmatex">\(\theta &gt; 0.5\)</span>: Towpath has geometric advantage (finish line skew is insufficient)</li>
+<li>If <span class="arithmatex">\(\theta &lt; 0.5\)</span>: Meadow has advantage (finish line skew overcompensates)</li>
+</ul>
+<h3 id="the-data">The Data</h3>
+<p>We observed <span class="arithmatex">\(n = 84\)</span> races with <span class="arithmatex">\(k = 54\)</span> Towpath wins.</p>
+<hr />
+<h2 id="the-beta-binomial-model">The Beta-Binomial Model</h2>
+<p>This is a classic conjugate pair (same setup as the <a href="../bayes-theorem/#the-coin-flip">coin flip example</a>).</p>
+<h3 id="the-likelihood">The Likelihood</h3>
+<p>Given <span class="arithmatex">\(\theta\)</span>, the probability of observing <span class="arithmatex">\(k\)</span> wins in <span class="arithmatex">\(n\)</span> races follows the <strong>Binomial distribution</strong>:</p>
+<div class="arithmatex">\[p(k|\theta, n) = \binom{n}{k}\theta^k(1-\theta)^{n-k}\]</div>
+<p>Substituting our data (<span class="arithmatex">\(n=84\)</span>, <span class="arithmatex">\(k=54\)</span>):</p>
+<div class="arithmatex">\[\mathcal{L}(\theta) = \binom{84}{54}\theta^{54}(1-\theta)^{30}\]</div>
+<h3 id="the-prior">The Prior</h3>
+<p>We need to choose a prior <span class="arithmatex">\(\pi(\theta)\)</span> on <span class="arithmatex">\([0,1]\)</span>. The <strong>Beta distribution</strong> is the natural choice:</p>
+<div class="arithmatex">\[\pi(\theta) = \text{Beta}(\theta|\alpha, \beta) = \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{B(\alpha,\beta)}\]</div>
+<p><strong>But what values for <span class="arithmatex">\(\alpha\)</span> and <span class="arithmatex">\(\beta\)</span>?</strong> See <a href="../prior-choice/">prior-choice</a> for a detailed discussion. For now, let's try a few:</p>
+<p><strong>Option 1: Uniform prior</strong> <span class="arithmatex">\(\text{Beta}(1, 1)\)</span>
+- "I have no idea if there's an advantage"
+- Every value of <span class="arithmatex">\(\theta\)</span> is equally likely a priori</p>
+<p><strong>Option 2: Weak fairness prior</strong> <span class="arithmatex">\(\text{Beta}(2, 2)\)</span>
+- "I weakly believe the organizers set the finish line correctly (<span class="arithmatex">\(\theta \approx 0.5\)</span>)"
+- Equivalent to having seen 1 Towpath win and 1 Meadow win before</p>
+<p><strong>Option 3: Strong fairness prior</strong> <span class="arithmatex">\(\text{Beta}(10, 10)\)</span>
+- "I strongly believe the organizers measured the course carefully and balanced it"
+- Equivalent to having seen 9 wins each side in test races
+- Requires stronger data to conclude the course is imbalanced</p>
+<h4 id="what-do-these-priors-look-like">What Do These Priors Look Like?</h4>
+<p>Different Beta distributions encode different beliefs:</p>
+<p><img alt="Beta distribution shapes" src="../images/beta_prior_shapes.png" /></p>
+<p><strong>Key observations:</strong>
+- <strong>Beta(1,1)</strong> is flat — complete uncertainty
+- <strong>Symmetric Betas</strong> (α=β) are peaked at 0.5
+- <strong>Larger α+β</strong> = stronger prior (narrower distribution)
+- <strong>Asymmetric Betas</strong> (α≠β) encode bias toward one outcome</p>
+<h3 id="the-posterior">The Posterior</h3>
+<p>Using <a href="../bayes-theorem/">bayes-theorem</a>, the posterior is:</p>
+<div class="arithmatex">\[p(\theta|k,n) \propto \theta^k(1-\theta)^{n-k} \cdot \theta^{\alpha-1}(1-\theta)^{\beta-1}\]</div>
+<div class="arithmatex">\[= \theta^{k+\alpha-1}(1-\theta)^{n-k+\beta-1}\]</div>
+<p><strong>This is another Beta distribution!</strong></p>
+<div class="arithmatex">\[\boxed{p(\theta|k,n) = \text{Beta}(\theta | \alpha + k, \beta + n - k)}\]</div>
+<p><strong>Beautiful conjugacy:</strong> Prior beliefs (encoded as <span class="arithmatex">\(\alpha-1\)</span> Towpath wins, <span class="arithmatex">\(\beta-1\)</span> Meadow wins) combine additively with observed data (<span class="arithmatex">\(k\)</span> Towpath wins, <span class="arithmatex">\(n-k\)</span> Meadow wins).</p>
+<hr />
+<h2 id="computing-the-posteriors">Computing the Posteriors</h2>
+<h3 id="case-1-uniform-prior-textbeta11">Case 1: Uniform Prior <span class="arithmatex">\(\text{Beta}(1,1)\)</span></h3>
+<p><strong>Posterior:</strong> <span class="arithmatex">\(\text{Beta}(1 + 54, 1 + 30) = \text{Beta}(55, 31)\)</span></p>
+<p><strong>Posterior mean:</strong>
+$<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \frac{55}{86} \approx 0.640\)</span>$</p>
+<p><strong>95% credible interval:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">beta</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Posterior distribution</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">posterior</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Credible interval</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">posterior</span><span class="o">.</span><span class="n">ppf</span><span class="p">([</span><span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">])</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;θ = </span><span class="si">{</span><span class="n">posterior</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% CI: [</span><span class="si">{</span><span class="n">lower</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">upper</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>θ = 0.640
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>95% CI: [0.547, 0.728]
+</code></pre></div></p>
+<p><strong>Interpretation:</strong> There's a 95% probability that Towpath's win rate is between 54.7% and 72.8%. The data strongly support that <strong>the course is imbalanced</strong> — the finish line skew doesn't fully compensate for the bend.</p>
+<h3 id="case-2-weak-fairness-prior-textbeta22">Case 2: Weak Fairness Prior <span class="arithmatex">\(\text{Beta}(2,2)\)</span></h3>
+<p><strong>Posterior:</strong> <span class="arithmatex">\(\text{Beta}(56, 32)\)</span></p>
+<p><strong>Posterior mean:</strong> <span class="arithmatex">\(\frac{56}{88} \approx 0.636\)</span></p>
+<p><strong>95% CI:</strong> <span class="arithmatex">\([0.544, 0.724]\)</span></p>
+<p>Nearly identical to the uniform prior—the data dominate.</p>
+<h3 id="case-3-strong-fairness-prior-textbeta1010">Case 3: Strong Fairness Prior <span class="arithmatex">\(\text{Beta}(10,10)\)</span></h3>
+<p><strong>Posterior:</strong> <span class="arithmatex">\(\text{Beta}(64, 40)\)</span></p>
+<p><strong>Posterior mean:</strong> <span class="arithmatex">\(\frac{64}{104} \approx 0.615\)</span></p>
+<p><strong>95% CI:</strong> <span class="arithmatex">\([0.527, 0.700]\)</span></p>
+<p>Pulled slightly toward 0.5 by the stronger prior (belief that organizers measured carefully), but data still show clear geometric advantage for Towpath.</p>
+<hr />
+<h2 id="visualizing-the-update">Visualizing the Update</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">beta</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Three priors</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">prior1</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>    <span class="c1"># Uniform</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">prior2</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>    <span class="c1"># Weak fairness</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">prior3</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># Strong fairness</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="c1"># Three posteriors (after observing 54/84 Towpath wins)</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">post1</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">post2</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">56</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">post3</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="c1"># Plot each case</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="n">cases</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>    <span class="p">(</span><span class="n">prior1</span><span class="p">,</span> <span class="n">post1</span><span class="p">,</span> <span class="s2">&quot;Uniform Prior&quot;</span><span class="p">,</span> <span class="s2">&quot;Beta(1,1)&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    <span class="p">(</span><span class="n">prior2</span><span class="p">,</span> <span class="n">post2</span><span class="p">,</span> <span class="s2">&quot;Weak Fairness Prior&quot;</span><span class="p">,</span> <span class="s2">&quot;Beta(2,2)&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>    <span class="p">(</span><span class="n">prior3</span><span class="p">,</span> <span class="n">post3</span><span class="p">,</span> <span class="s2">&quot;Strong Fairness Prior&quot;</span><span class="p">,</span> <span class="s2">&quot;Beta(10,10)&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="p">]</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">prior_label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">cases</span><span class="p">):</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">prior</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="s1">&#39;b--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Prior: </span><span class="si">{</span><span class="n">prior_label</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Posterior (after 54/84)&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>               <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Balanced course&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">54</span><span class="o">/</span><span class="mi">84</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a>               <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed rate&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;θ (P(Towpath wins))&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Probability density&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a>    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a>
+<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+<p><img alt="Bayesian update for rowing data with different priors" src="../images/rowing_update.png" /></p>
+<p><strong>Key insight:</strong> With 84 races, the data overwhelm even the strong prior. All three posteriors concentrate around <span class="arithmatex">\(\theta \approx 0.63-0.64\)</span>.</p>
+<h3 id="how-much-data-is-needed">How Much Data Is Needed?</h3>
+<p>With more data, priors matter less. Here's how posteriors evolve as we collect more races:</p>
+<p><img alt="Data overwhelming prior" src="../images/data_overwhelming_prior.png" /></p>
+<p><strong>Observation:</strong> By 40+ races, even a strong fairness prior (red) converges to the same posterior as a uniform prior (blue). The data dominate!</p>
+<hr />
+<h2 id="answering-the-question">Answering the Question</h2>
+<h3 id="probability-towpath-has-advantage">Probability Towpath Has Advantage</h3>
+<p>We can directly compute: What's the probability that <span class="arithmatex">\(\theta &gt; 0.5\)</span>?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Using uniform prior posterior</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">posterior</span> <span class="o">=</span> <span class="n">beta</span><span class="p">(</span><span class="mi">55</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">prob_advantage</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">posterior</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;P(θ &gt; 0.5 | data) = </span><span class="si">{</span><span class="n">prob_advantage</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>P(θ &gt; 0.5 | data) = 0.9984
+</code></pre></div></p>
+<p><strong>Bayesian answer:</strong> There's a <strong>99.84% probability</strong> that the course is imbalanced in favor of Towpath (i.e., the finish line skew is insufficient).</p>
+<p>Compare this to the frequentist p-value of 0.0043—they're answering different questions:
+- <strong>P-value:</strong> "If course were perfectly balanced, how surprising is this data?" (0.43% chance)
+- <strong>Bayesian probability:</strong> "Given this data, how likely is the course imbalanced?" (99.84% likely)</p>
+<p>The Bayesian answer directly addresses what we care about!</p>
+<hr />
+<h2 id="going-deeper-whats-actually-happening">Going Deeper: What's Actually Happening?</h2>
+<p>We've established the course is imbalanced (<span class="arithmatex">\(\theta \approx 0.64\)</span>), but <strong>why?</strong></p>
+<h3 id="possible-physical-models">Possible Physical Models</h3>
+<p><strong>Model A:</strong> "Finish line skew is insufficient"
+- The bend gives Towpath advantage
+- Organizers tried to compensate with skewed finish
+- But they didn't skew it enough
+- <strong>Prediction:</strong> Increasing the skew toward Meadow would balance the course</p>
+<p><strong>Model B:</strong> "Multiple geometric effects"
+- Bend favors Towpath
+- Current pushes toward one side
+- Wind patterns differ by side
+- Finish line skew tries to balance all effects but fails
+- <strong>Prediction:</strong> Balance depends on conditions (wind, water level)</p>
+<p><strong>Model C:</strong> "Systematic measurement error"
+- Organizers measured the course incorrectly
+- The "compensation" is in the wrong direction or wrong magnitude
+- <strong>Prediction:</strong> Recalibrating the course geometry could balance it</p>
+<h3 id="how-to-distinguish-these">How to Distinguish These?</h3>
+<p><strong>What we'd need:</strong>
+1. <strong>Margin of victory data</strong> (not just win/loss) — close races vs blowouts
+2. <strong>Multiple regattas</strong> under different conditions (wind, water level)
+3. <strong>Surveying measurements</strong> of the actual course geometry
+4. <strong>Races with different skew angles</strong> to find the balanced point</p>
+<p><strong>Bayesian model comparison</strong> (via the <a href="../evidence/">evidence</a>) could rigorously test these competing explanations!</p>
+<p><strong>This demonstrates why parameter inference alone isn't enough.</strong> Yes, <span class="arithmatex">\(\theta = 0.64 \pm 0.05\)</span> quantifies the imbalance. But understanding the <strong>physical mechanism</strong> requires comparing models with <a href="../model-comparison/">model-comparison</a>.</p>
+<hr />
+<h2 id="the-hierarchical-extension">The Hierarchical Extension</h2>
+<p><strong>Advanced idea (future topic):</strong> We could build a richer model incorporating margin of victory:</p>
+<p><strong>Level 1:</strong> Each race <span class="arithmatex">\(i\)</span> has a margin of victory <span class="arithmatex">\(\Delta_i \sim \mathcal{N}(\mu_{\text{geom}}, \sigma^2_{\text{crew}})\)</span>
+- <span class="arithmatex">\(\mu_{\text{geom}}\)</span> = geometric advantage (in seconds) for Towpath
+- <span class="arithmatex">\(\sigma^2_{\text{crew}}\)</span> = variance in crew quality</p>
+<p><strong>Level 2:</strong> Win/loss is determined by <span class="arithmatex">\(\text{sign}(\Delta_i)\)</span></p>
+<p><strong>Level 3:</strong> Estimate both <span class="arithmatex">\(\mu_{\text{geom}}\)</span> and <span class="arithmatex">\(\sigma^2_{\text{crew}}\)</span> from data</p>
+<p>This <strong>hierarchical Bayesian model</strong> would:
+- Use margin data (more informative than just win/loss)
+- Separate geometric advantage from random crew variation
+- Quantify: "How much should we adjust the finish line to balance the course?"
+- Pool information across races to improve estimates</p>
+<p><strong>With this model, we could answer:</strong> "Move the finish line <span class="arithmatex">\(X\)</span> meters toward Meadow to achieve balance."</p>
+<p>But that's beyond the scope of this intro! See <a href="../hierarchical-models/">hierarchical-models</a> for details.</p>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ol>
+<li><strong>Beta-Binomial conjugacy</strong> allows analytical updates</li>
+<li><strong>Prior choice matters less</strong> with more data (84 races dominates even strong priors)</li>
+<li><strong>Bayesian probabilities</strong> directly answer scientific questions</li>
+<li><strong>Random assignment</strong> isolates geometric effects from crew quality</li>
+<li><strong>Real data</strong> can be richer than binary outcomes (margins, conditions, etc.)</li>
+<li><strong>Physical interpretation</strong> requires model comparison, not just parameter inference</li>
+</ol>
+<p><strong>The Bayesian workflow:</strong>
+1. Choose appropriate likelihood (Binomial for win/loss data)
+2. Choose principled prior (see <a href="../prior-choice/">prior-choice</a>)
+3. Compute posterior (analytical or via sampling)
+4. Extract quantities of interest (<span class="arithmatex">\(P(\theta &gt; 0.5)\)</span>, credible intervals)
+5. <strong>Compare models</strong> if multiple explanations exist</p>
+<p><strong>Next steps:</strong>
+- <a href="../prior-choice/">prior-choice</a> - How to choose <span class="arithmatex">\(\alpha\)</span> and <span class="arithmatex">\(\beta\)</span>
+- <a href="../model-comparison/">model-comparison</a> - Testing "Towpath faster" vs "Course biased"
+- <a href="../bayesian-inference/">bayesian-inference</a> - General framework</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Jaynes2003]: Jaynes, E. T. (2003). <em>Probability Theory: The Logic of Science</em>. Cambridge University Press.</p>
+<p>[Gelman2013]: Gelman, A., et al. (2013). <em>Bayesian Data Analysis</em> (3rd ed.). CRC Press.</p>
+<hr />
+<p><strong>Acknowledgment:</strong> Data from Rowbridge Reborn regatta, 1999s. Thanks to the rowing club for the entertaining example of frequentist vs Bayesian analysis!</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../bayes-theorem/" class="button">← Bayes' Theorem</a>
+							
+							
+							<a href="../bayesian-inference/" class="button primary" style="float:right">Bayesian Inference →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener active">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="./" class="active">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="../marginalization/">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

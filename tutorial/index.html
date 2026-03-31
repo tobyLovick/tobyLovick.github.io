@@ -1,0 +1,266 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Home – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+
+						<h1 id="bayesian-inference-a-tutorial-from-first-principles">Bayesian Inference: A Tutorial from First Principles</h1>
+<p><strong>A ground-up introduction to Bayesian inference, with emphasis on evidence and model comparison in cosmology.</strong></p>
+<hr />
+<h2 id="welcome">Welcome</h2>
+<p>This tutorial teaches Bayesian inference from conditional probability through to cutting-edge evidence calculation methods. The core philosophy: <strong>Bayesian evidence for model comparison is the pinnacle of statistical inference</strong>—more valuable than point estimates or even parameter constraints alone.</p>
+<h3 id="why-this-perspective">Why This Perspective?</h3>
+<p>In modern cosmology, we often care more about <strong>detecting new physics</strong> than precisely measuring known parameters. Bayesian evidence provides the rigorous framework to ask:</p>
+<ul>
+<li>"Is dark energy evolving, or is it a cosmological constant?"</li>
+<li>"Do we need additional parameters to explain the data?"</li>
+<li>"Which systematic model best describes our observations?"</li>
+</ul>
+<p>Evidence comparison naturally implements Occam's razor and provides direct probability statements about competing theories.</p>
+<hr />
+<h2 id="start-here">Start Here</h2>
+<p><strong>If you're completely new to Bayesian inference:</strong></p>
+<ol>
+<li><a href="conditional-probability/">conditional-probability</a> - The foundation</li>
+<li><a href="bayes-theorem/">bayes-theorem</a> - The fundamental theorem</li>
+<li><a href="bayesian-inference/">bayesian-inference</a> - Applying Bayes to science</li>
+<li><a href="evidence/">evidence</a> - The key to model comparison</li>
+</ol>
+<p><strong>If you already understand Bayes' theorem:</strong></p>
+<ul>
+<li>Start with <a href="evidence/">evidence</a> to see why it matters</li>
+<li>Jump to <a href="model-comparison/">model-comparison</a> for applications</li>
+<li>Explore <a href="computing-evidence/">computing-evidence</a> for practical methods</li>
+</ul>
+<p><strong>If you're here for cosmology applications:</strong></p>
+<ul>
+<li><a href="cmb-analysis/">cmb-analysis</a> - Cosmic Microwave Background example</li>
+<li><a href="dark-energy-models/">dark-energy-models</a> - Model comparison in action</li>
+<li><a href="gpu-acceleration/">gpu-acceleration</a> - Modern computational methods</li>
+</ul>
+<hr />
+<h2 id="the-bayesian-hierarchy">The Bayesian Hierarchy</h2>
+<p>This tutorial follows a natural progression in inference complexity:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Conditional Probability
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>        ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>   Bayes&#39; Theorem
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Parameter Inference (Posterior distributions)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Model Comparison (Evidence)
+</code></pre></div>
+<p>Each level builds on the previous, increasing in both complexity and scientific value.</p>
+<hr />
+<h2 id="navigation-tips">Navigation Tips</h2>
+<ul>
+<li>Pages are interlinked using <code>[[wiki-style]]</code> brackets</li>
+<li>Click any linked term to explore that concept</li>
+<li>Mathematical rigor increases gradually through the tutorial</li>
+<li>Code examples are provided for key methods</li>
+<li>All claims are cited to primary literature</li>
+</ul>
+<hr />
+<h2 id="about-this-tutorial">About This Tutorial</h2>
+<p>This tutorial draws from PhD research on efficient Bayesian evidence calculation for cosmological model comparison, including:</p>
+<ul>
+<li>GPU-accelerated nested sampling</li>
+<li>Non-Gaussian likelihood analysis</li>
+<li>Simulation-based inference methods</li>
+<li>Applications to CMB, supernovae, and weak lensing data</li>
+</ul>
+<p>The perspective throughout is that of a <strong>practitioner</strong>: someone who has actually implemented these methods at scale and wrestled with real data.</p>
+<hr />
+<h2 id="quick-links">Quick Links</h2>
+<p><strong>Core Concepts:</strong>
+- <a href="conditional-probability/">conditional-probability</a> - Foundation of Bayesian reasoning
+- <a href="bayes-theorem/">bayes-theorem</a> - Inverting probabilities
+- <a href="bayesian-inference/">bayesian-inference</a> - Parameter estimation framework
+- <a href="evidence/">evidence</a> - The marginalized likelihood
+- <a href="model-comparison/">model-comparison</a> - Comparing theories with Bayes factors</p>
+<p><strong>Computational Methods:</strong>
+- <a href="nested-sampling/">nested-sampling</a> - Direct evidence calculation
+- <a href="mcmc/">mcmc</a> - Markov Chain Monte Carlo sampling
+- <a href="computing-evidence/">computing-evidence</a> - Practical methods comparison</p>
+<p><strong>Applications:</strong>
+- <a href="cmb-analysis/">cmb-analysis</a> - Nearly-Gaussian posteriors
+- <a href="supernovae-analysis/">supernovae-analysis</a> - Non-linear degeneracies
+- <a href="cosmic-shear/">cosmic-shear</a> - High-dimensional problems</p>
+<p><strong>Advanced Topics:</strong>
+- <a href="gpu-acceleration/">gpu-acceleration</a> - Modern hardware utilization
+- <a href="simulation-based-inference/">simulation-based-inference</a> - When likelihoods are intractable</p>
+<hr />
+<p><strong>Let's begin:</strong> <a href="conditional-probability/">conditional-probability</a> →</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							
+							<a href="conditional-probability/" class="button primary" style="float:right">Conditional Probability →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="." class="active">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="marginalization/">Marginalization</a></li>
+										
+										<li><a href="information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="mcmc/">MCMC</a></li>
+										
+										<li><a href="computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

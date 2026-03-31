@@ -1,0 +1,375 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>Marginalization – Bayesian Inference Tutorial</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="../assets/css/tutorial-extras.css" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
+						<ul class="icons">
+							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
+						</ul>
+					</header>
+
+					<!-- Content -->
+					<section>
+						
+						<header class="main">
+							<h1>Marginalization</h1>
+						</header>
+						
+
+						<h1 id="marginalization-and-model-averaging">Marginalization and Model Averaging</h1>
+<p>← Back to <a href="../">index</a> | See also: <a href="../evidence/">evidence</a>, <a href="../model-comparison/">model-comparison</a>, <a href="../dark-energy-models/">dark-energy-models</a></p>
+<hr />
+<h2 id="the-power-of-marginalization">The Power of Marginalization</h2>
+<p>One of the most powerful features of the <a href="../evidence/">evidence</a>-based approach is the ability to <strong>marginalize over uncertainties</strong> we don't care about.</p>
+<p><strong>Key insight:</strong> If we're uncertain about auxiliary model choices (scatter models, systematics treatments, etc.), we can <strong>average over them</strong> weighted by their evidences rather than making arbitrary choices.</p>
+<hr />
+<h2 id="the-problem-nuisance-model-dependence">The Problem: Nuisance Model Dependence</h2>
+<h3 id="example-scenario">Example Scenario</h3>
+<p>You want to answer: <strong>"Is dark energy evolving?"</strong> (comparing <a href="../dark-energy-models/#model-2-wcdm-constant-dark-energy-eos">wCDM</a> vs <a href="../dark-energy-models/#model-1-flat-λcdm-cosmological-constant">ΛCDM</a>)</p>
+<p>But your answer might depend on an auxiliary choice:
+- <strong>Statistical model:</strong> Gaussian scatter vs Student's t vs rescaled covariance
+- <strong>Systematic treatment:</strong> Include peculiar velocities or not
+- <strong>Prior choice:</strong> Wide vs narrow priors on nuisance parameters</p>
+<p><strong>Question:</strong> Which auxiliary choice is "correct"?</p>
+<p><strong>Answer:</strong> We don't know—so average over them!</p>
+<hr />
+<h2 id="bayesian-model-averaging">Bayesian Model Averaging</h2>
+<h3 id="the-formulation">The Formulation</h3>
+<p>Suppose we want to compare <strong>cosmological models</strong> <span class="arithmatex">\(\mathcal{C}\)</span>, but we're uncertain about <strong>scatter models</strong> <span class="arithmatex">\(\mathcal{S}\)</span>.</p>
+<p>For each combination, we have an <a href="../evidence/">evidence</a>:
+$<span class="arithmatex">\(\mathcal{Z}(\mathcal{C}, \mathcal{S}) = p(d | \mathcal{C}, \mathcal{S})\)</span>$</p>
+<p><strong>Marginalize over scatter models:</strong></p>
+<div class="arithmatex">\[\boxed{p(d | \mathcal{C}) = \sum_{\mathcal{S}} p(d | \mathcal{C}, \mathcal{S}) \cdot p(\mathcal{S})}\]</div>
+<p>where <span class="arithmatex">\(p(\mathcal{S})\)</span> is our prior belief about scatter models.</p>
+<h3 id="equal-prior-probabilities">Equal Prior Probabilities</h3>
+<p>If we have <strong>no preference</strong> between scatter models a priori:</p>
+<div class="arithmatex">\[p(\mathcal{S}_i) = \frac{1}{N_{\text{scatter}}}\]</div>
+<p>Then:
+$<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatter}}} \sum_{i=1}^{N_{\text{scatter}}} \mathcal{Z}(\mathcal{C}, \mathcal{S}_i)\)</span>$</p>
+<p><strong>In log space</strong> (numerically stable):</p>
+<div class="arithmatex">\[\log\mathcal{Z}_{\mathcal{C}} = \log\left(\sum_i e^{\log\mathcal{Z}(\mathcal{C}, \mathcal{S}_i)}\right) - \log N_{\text{scatter}}\]</div>
+<hr />
+<h2 id="practical-implementation">Practical Implementation</h2>
+<h3 id="log-sum-exp-trick">Log-Sum-Exp Trick</h3>
+<p>Direct summation of exponentials can cause numerical overflow/underflow. Use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">log_sum_exp</span><span class="p">(</span><span class="n">log_values</span><span class="p">):</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="sd">    Numerically stable computation of log(sum(exp(log_values)))</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="sd">    Uses: log(sum(exp(x))) = max(x) + log(sum(exp(x - max(x))))</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">log_values</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">return</span> <span class="n">max_val</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_values</span> <span class="o">-</span> <span class="n">max_val</span><span class="p">)))</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Example: Marginalize over 3 scatter models</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">log_Z_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1234.5</span><span class="p">,</span> <span class="mf">1237.0</span><span class="p">,</span> <span class="mf">1236.8</span><span class="p">])</span>  <span class="c1"># ΛCDM with different scatters</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">log_Z_marginalized</span> <span class="o">=</span> <span class="n">log_sum_exp</span><span class="p">(</span><span class="n">log_Z_values</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">log_Z_values</span><span class="p">))</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Marginalized evidence: log Z = </span><span class="si">{</span><span class="n">log_Z_marginalized</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="full-example-cosmology-scatter-grid">Full Example: Cosmology × Scatter Grid</h3>
+<p>From <a href="../dark-energy-models/">dark-energy-models</a> analysis:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Evidence grid: rows = cosmology, cols = scatter model</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">#                Gaussian    Student&#39;s t    Scaled cov</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">evidences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="p">[</span><span class="mf">1234.5</span><span class="p">,</span>      <span class="mf">1237.0</span><span class="p">,</span>        <span class="mf">1236.8</span><span class="p">],</span>      <span class="c1"># ΛCDM</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="p">[</span><span class="mf">1232.0</span><span class="p">,</span>      <span class="mf">1234.3</span><span class="p">,</span>        <span class="mf">1234.1</span><span class="p">],</span>      <span class="c1"># wCDM</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="p">[</span><span class="mf">1230.8</span><span class="p">,</span>      <span class="mf">1233.1</span><span class="p">,</span>        <span class="mf">1232.9</span><span class="p">],</span>      <span class="c1"># w₀wₐCDM</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">])</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">cosmology_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ΛCDM&quot;</span><span class="p">,</span> <span class="s2">&quot;wCDM&quot;</span><span class="p">,</span> <span class="s2">&quot;w₀wₐCDM&quot;</span><span class="p">]</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">scatter_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;Student&#39;s t&quot;</span><span class="p">,</span> <span class="s2">&quot;Scaled cov&quot;</span><span class="p">]</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="c1"># Marginalize over scatter models (equal priors)</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">log_Z_cosmo</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cosmo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cosmology_names</span><span class="p">):</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="n">log_Z</span> <span class="o">=</span> <span class="n">log_sum_exp</span><span class="p">(</span><span class="n">evidences</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">evidences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="n">log_Z_cosmo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_Z</span><span class="p">)</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cosmo</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2">: log Z = </span><span class="si">{</span><span class="n">log_Z</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="c1"># Compare cosmologies (marginalized over scatter)</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Δ log Z (ΛCDM vs wCDM) = </span><span class="si">{</span><span class="n">log_Z_cosmo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">log_Z_cosmo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ΛCDM      : log Z = 1236.94
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>wCDM      : log Z = 1234.24
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>w₀wₐCDM   : log Z = 1233.04
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Δ log Z (ΛCDM vs wCDM) = 2.70
+</code></pre></div></p>
+<p><strong>Interpretation:</strong> After marginalizing over scatter model uncertainty, ΛCDM is still preferred with <span class="arithmatex">\(\Delta\log\mathcal{Z} \approx 2.7\)</span> (moderate evidence).</p>
+<hr />
+<h2 id="model-averaged-parameter-constraints">Model-Averaged Parameter Constraints</h2>
+<p>Beyond comparing models, we can <strong>average parameter estimates</strong> weighted by model evidence.</p>
+<h3 id="the-formula">The Formula</h3>
+<p>For a parameter <span class="arithmatex">\(\theta\)</span> present in multiple models:</p>
+<div class="arithmatex">\[\boxed{p(\theta | d) = \sum_{\mathcal{M}} p(\theta | d, \mathcal{M}) \cdot p(\mathcal{M} | d)}\]</div>
+<p>where <span class="arithmatex">\(p(\mathcal{M} | d) \propto \mathcal{Z}_{\mathcal{M}}\)</span> (model posterior probability).</p>
+<h3 id="example-model-averaged-h_0">Example: Model-Averaged <span class="arithmatex">\(H_0\)</span></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># H0 posteriors from each cosmological model</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># (mean, std) in km/s/Mpc</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">H0_posteriors</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">&quot;ΛCDM&quot;</span><span class="p">:</span>   <span class="p">(</span><span class="mf">73.52</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">),</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">&quot;wCDM&quot;</span><span class="p">:</span>   <span class="p">(</span><span class="mf">73.48</span><span class="p">,</span> <span class="mf">1.35</span><span class="p">),</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">&quot;w₀wₐCDM&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">73.45</span><span class="p">,</span> <span class="mf">1.58</span><span class="p">),</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># Model evidences (marginalized over scatter)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">model_evidences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">log_Z_cosmo</span><span class="p">)</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">model_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">model_evidences</span> <span class="o">-</span> <span class="n">log_sum_exp</span><span class="p">(</span><span class="n">model_evidences</span><span class="p">))</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model posterior probabilities:&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cosmology_names</span><span class="p">,</span> <span class="n">model_weights</span><span class="p">):</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="c1"># Weighted average of means</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="n">H0_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">H0_posteriors</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cosmology_names</span><span class="p">])</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="n">H0_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">H0_means</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">model_weights</span><span class="p">)</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Model-averaged H₀ = </span><span class="si">{</span><span class="n">H0_avg</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> km/s/Mpc&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Model posterior probabilities:
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  ΛCDM      : 0.908
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  wCDM      : 0.085
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>  w₀wₐCDM   : 0.007
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>Model-averaged H₀ = 73.52 km/s/Mpc
+</code></pre></div></p>
+<p><strong>Dominated by ΛCDM</strong> because it has much higher <a href="../evidence/">evidence</a>.</p>
+<h3 id="including-between-model-variance">Including Between-Model Variance</h3>
+<p>The full posterior uncertainty includes:
+- <strong>Within-model variance:</strong> Uncertainty in each model's constraint
+- <strong>Between-model variance:</strong> Disagreement between models</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Within-model variance (weighted average)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">H0_stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">H0_posteriors</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cosmology_names</span><span class="p">])</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">within_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">H0_stds</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">model_weights</span><span class="p">)</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># Between-model variance</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">between_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">((</span><span class="n">H0_means</span> <span class="o">-</span> <span class="n">H0_avg</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">model_weights</span><span class="p">)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1"># Total uncertainty</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">total_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">within_var</span> <span class="o">+</span> <span class="n">between_var</span><span class="p">)</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Within-model std:  </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">within_var</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Between-model std: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">between_var</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total std:         </span><span class="si">{</span><span class="n">total_std</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Final: H₀ = </span><span class="si">{</span><span class="n">H0_avg</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">total_std</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> km/s/Mpc&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="savage-dickey-ratio-for-nested-models">Savage-Dickey Ratio for Nested Models</h2>
+<p>Special case: When testing if a parameter <span class="arithmatex">\(\theta^* = 0\)</span> (nested models), can use the <strong>Savage-Dickey density ratio</strong>[^TrottaDickey]:</p>
+<div class="arithmatex">\[B_{01} = \frac{\mathcal{Z}_0}{\mathcal{Z}_1} = \frac{p(\theta^* = 0 | d, \mathcal{M}_1)}{p(\theta^* = 0 | \mathcal{M}_1)}\]</div>
+<p><strong>Advantage:</strong> Only need to run the more complex model once!</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_kde</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># Run nested sampling on wCDM (has free w)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">samples_w</span> <span class="o">=</span> <span class="n">run_nested_sampling</span><span class="p">(</span><span class="n">wCDM_model</span><span class="p">)[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1"># Evaluate posterior density at w = -1</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">kde_post</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">samples_w</span><span class="p">)</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">post_density_at_minus1</span> <span class="o">=</span> <span class="n">kde_post</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Prior density at w = -1 (uniform prior on w ∈ [-2.5, -0.3])</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">prior_density_at_minus1</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.5</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1"># Bayes factor for ΛCDM vs wCDM</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="n">log_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">post_density_at_minus1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prior_density_at_minus1</span><span class="p">)</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;log B (ΛCDM vs wCDM) ≈ </span><span class="si">{</span><span class="n">log_B</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="summary">Summary</h2>
+<p><strong>Marginalization via evidences:</strong></p>
+<p>✅ <strong>Average over uncertain auxiliary models</strong> weighted by their evidences
+✅ <strong>Robust comparisons</strong> independent of arbitrary choices
+✅ <strong>Model-averaged parameters</strong> include model uncertainty
+✅ <strong>Savage-Dickey ratio</strong> for nested model testing</p>
+<p><strong>Key formulas:</strong></p>
+<div class="arithmatex">\[p(d | \mathcal{C}) = \sum_{\mathcal{S}} \mathcal{Z}(\mathcal{C}, \mathcal{S}) \cdot p(\mathcal{S})\]</div>
+<div class="arithmatex">\[p(\theta | d) = \sum_{\mathcal{M}} p(\theta | d, \mathcal{M}) \cdot p(\mathcal{M} | d)\]</div>
+<p><strong>This is unique to the evidence-based framework</strong>—can't do this with <a href="../information-criteria/">AIC/BIC</a>!</p>
+<hr />
+<p><strong>Next:</strong>
+- <a href="../dark-energy-models/">dark-energy-models</a> - Application to cosmology
+- <a href="../evidence/">evidence</a> - Understanding the Bayesian evidence
+- <a href="../model-comparison/">model-comparison</a> - Comparing models rigorously</p>
+<p><strong>Related:</strong>
+- <a href="../tension-statistics/">tension-statistics</a> - Model-averaged tension
+- <a href="../nested-sampling/">nested-sampling</a> - Computing evidences</p>
+<hr />
+<p><strong>References:</strong></p>
+<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
+<p>[TrottaDickey]: Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.</p>
+<p>[Hoeting1999]: Hoeting, J. A., et al. (1999). Bayesian model averaging: a tutorial. <em>Statistical Science</em>, 14(4), 382-401.</p>
+					</section>
+
+					<!-- Prev / Next navigation -->
+					
+					<section>
+						<div class="page-nav">
+							
+							<a href="../hierarchical-models/" class="button">← Hierarchical Models</a>
+							
+							
+							<a href="../information-criteria/" class="button primary" style="float:right">Information Criteria (AIC/BIC) →</a>
+							
+						</div>
+					</section>
+					
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							
+								
+								<li><a href="..">Home</a></li>
+								
+							
+								
+								<li>
+									<span class="opener">Start Here</span>
+									<ul>
+										
+										<li><a href="../conditional-probability/">Conditional Probability</a></li>
+										
+										<li><a href="../bayes-theorem/">Bayes' Theorem</a></li>
+										
+										<li><a href="../analytical-update/">Analytical Update (Rowing)</a></li>
+										
+										<li><a href="../bayesian-inference/">Bayesian Inference</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Evidence & Model Comparison</span>
+									<ul>
+										
+										<li><a href="../evidence/">The Bayesian Evidence</a></li>
+										
+										<li><a href="../kl-divergence/">KL Divergence</a></li>
+										
+										<li><a href="../prior-choice/">Prior Choice</a></li>
+										
+										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Bayesian Tension Testing</span>
+									<ul>
+										
+										<li><a href="../tension-statistics/">Quantifying Tension</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener active">Advanced Techniques</span>
+									<ul>
+										
+										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
+										
+										<li><a href="./" class="active">Marginalization</a></li>
+										
+										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Applications</span>
+									<ul>
+										
+										<li><a href="../dark-energy-models/">Dark Energy Models</a></li>
+										
+									</ul>
+								</li>
+								
+							
+								
+								<li>
+									<span class="opener">Computational Methods</span>
+									<ul>
+										
+										<li><a href="../nested-sampling/">Nested Sampling</a></li>
+										
+										<li><a href="../mcmc/">MCMC</a></li>
+										
+										<li><a href="../computing-evidence/">Computing Evidence</a></li>
+										
+									</ul>
+								</li>
+								
+							
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
