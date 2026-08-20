@@ -28,24 +28,16 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Quantifying Tension</h1>
-						</header>
-						
-
 						<h1 id="quantifying-tension-between-datasets">Quantifying Tension Between Datasets</h1>
 <p>← Back to <a href="../">index</a></p>
 <hr />
-<p><strong>Acknowledgment:</strong> This page adapts the rigorous framework developed by Dily Ong and Will Handley in their work on cosmological tension quantification[^OngHandley2024]. The pedagogical presentation here follows their methodology while tailoring examples for this tutorial.</p>
+<p><strong>Acknowledgment:</strong> This page adapts the rigorous framework developed by Dily Ong and Will Handley in their work on cosmological tension quantification<sup id="fnref:OngHandley2024"><a class="footnote-ref" href="#fn:OngHandley2024">1</a></sup>. The pedagogical presentation here follows their methodology while tailoring examples for this tutorial.</p>
 <hr />
 <h2 id="the-problem">The Problem</h2>
 <p>Modern cosmology often involves multiple independent datasets:
@@ -61,16 +53,16 @@
 <h2 id="the-bayesian-framework-for-tension">The Bayesian Framework for Tension</h2>
 <h3 id="setup">Setup</h3>
 <p>Consider two independent datasets <span class="arithmatex">\(D_A\)</span> and <span class="arithmatex">\(D_B\)</span> analyzed under a shared model <span class="arithmatex">\(\mathcal{M}\)</span>.</p>
-<p><strong>Likelihoods combine multiplicatively:</strong>
-$<span class="arithmatex">\(\mathcal{L}_{AB}(\theta) = \mathcal{L}_A(\theta) \mathcal{L}_B(\theta)\)</span>$</p>
-<p><strong>Posteriors for each dataset:</strong>
-$<span class="arithmatex">\(\mathcal{P}_A(\theta) = \frac{\mathcal{L}_A(\theta)\pi(\theta)}{\mathcal{Z}_A}, \quad \mathcal{P}_B(\theta) = \frac{\mathcal{L}_B(\theta)\pi(\theta)}{\mathcal{Z}_B}\)</span>$</p>
-<p><strong>Joint posterior:</strong>
-$<span class="arithmatex">\(\mathcal{P}_{AB}(\theta) = \frac{\mathcal{L}_A(\theta)\mathcal{L}_B(\theta)\pi(\theta)}{\mathcal{Z}_{AB}}\)</span>$</p>
+<p><strong>Likelihoods combine multiplicatively:</strong></p>
+<div class="arithmatex">\[\mathcal{L}_{AB}(\theta) = \mathcal{L}_A(\theta) \mathcal{L}_B(\theta)\]</div>
+<p><strong>Posteriors for each dataset:</strong></p>
+<div class="arithmatex">\[\mathcal{P}_A(\theta) = \frac{\mathcal{L}_A(\theta)\pi(\theta)}{\mathcal{Z}_A}, \quad \mathcal{P}_B(\theta) = \frac{\mathcal{L}_B(\theta)\pi(\theta)}{\mathcal{Z}_B}\]</div>
+<p><strong>Joint posterior:</strong></p>
+<div class="arithmatex">\[\mathcal{P}_{AB}(\theta) = \frac{\mathcal{L}_A(\theta)\mathcal{L}_B(\theta)\pi(\theta)}{\mathcal{Z}_{AB}}\]</div>
 <p><strong>Critical assumption:</strong> We use the same prior <span class="arithmatex">\(\pi(\theta)\)</span> for shared cosmological parameters across all analyses.</p>
 <hr />
 <h2 id="five-complementary-tension-statistics">Five Complementary Tension Statistics</h2>
-<p>Following Ong &amp; Handley[^OngHandley2024], we use <strong>five complementary statistics</strong> that provide different perspectives on dataset consistency:</p>
+<p>Following Ong &amp; Handley<sup id="fnref2:OngHandley2024"><a class="footnote-ref" href="#fn:OngHandley2024">1</a></sup>, we use <strong>five complementary statistics</strong> that provide different perspectives on dataset consistency:</p>
 <ol>
 <li><strong><span class="arithmatex">\(R\)</span> statistic</strong> - Direct Bayesian consistency measure</li>
 <li><strong>Information Ratio (<span class="arithmatex">\(I\)</span>)</strong> - "Surprise of agreement"</li>
@@ -81,10 +73,10 @@ $<span class="arithmatex">\(\mathcal{P}_{AB}(\theta) = \frac{\mathcal{L}_A(\thet
 <hr />
 <h2 id="the-r-statistic">The <span class="arithmatex">\(R\)</span> Statistic</h2>
 <h3 id="definition">Definition</h3>
-<p>The <span class="arithmatex">\(R\)</span> statistic[^Marshall2006] quantifies how much our confidence in one dataset changes when we learn about the other:</p>
+<p>The <span class="arithmatex">\(R\)</span> statistic<sup id="fnref:Marshall2006"><a class="footnote-ref" href="#fn:Marshall2006">2</a></sup> quantifies how much our confidence in one dataset changes when we learn about the other:</p>
 <div class="arithmatex">\[\boxed{R = \frac{\mathcal{Z}_{AB}}{\mathcal{Z}_A \mathcal{Z}_B}}\]</div>
-<p>This can also be written as:
-$<span class="arithmatex">\(R = \frac{P(D_A, D_B)}{P(D_A)P(D_B)} = \frac{P(D_A|D_B)}{P(D_A)}\)</span>$</p>
+<p>This can also be written as:</p>
+<div class="arithmatex">\[R = \frac{P(D_A, D_B)}{P(D_A)P(D_B)} = \frac{P(D_A|D_B)}{P(D_A)}\]</div>
 <h3 id="interpretation">Interpretation</h3>
 <p><strong><span class="arithmatex">\(R \gg 1\)</span> (Concordance):</strong>
 - Knowledge of dataset <span class="arithmatex">\(B\)</span> has <strong>strengthened</strong> our confidence in dataset <span class="arithmatex">\(A\)</span>
@@ -98,9 +90,9 @@ $<span class="arithmatex">\(R = \frac{P(D_A, D_B)}{P(D_A)P(D_B)} = \frac{P(D_A|D
 - Datasets neither support nor contradict each other
 - May indicate weak constraining power</p>
 <h3 id="prior-dependence">Prior Dependence</h3>
-<p>The <span class="arithmatex">\(R\)</span> statistic can be rewritten in terms of posteriors[^HandleyLemos2019]:</p>
+<p>The <span class="arithmatex">\(R\)</span> statistic can be rewritten in terms of posteriors<sup id="fnref:HandleyLemos2019"><a class="footnote-ref" href="#fn:HandleyLemos2019">3</a></sup>:</p>
 <div class="arithmatex">\[R = \int \frac{\mathcal{P}_A(\theta) \mathcal{P}_B(\theta)}{\pi(\theta)} d\theta = \left\langle \frac{\mathcal{P}_B}{\pi} \right\rangle_{\mathcal{P}_A}\]</div>
-<p><strong>Key insight:</strong> <span class="arithmatex">\(R\)</span> is strongly prior-dependent!</p>
+<p><strong>Key insight:</strong> <span class="arithmatex">\(R\)</span> is strongly prior-dependent.</p>
 <p><strong>Effect of narrower priors:</strong>
 - Reducing prior width on constrained parameters <strong>decreases</strong> <span class="arithmatex">\(R\)</span>
 - This <strong>increases</strong> apparent tension between datasets
@@ -124,7 +116,7 @@ $<span class="arithmatex">\(R = \frac{P(D_A, D_B)}{P(D_A)P(D_B)} = \frac{P(D_A|D
 <hr />
 <h2 id="the-information-ratio">The Information Ratio</h2>
 <h3 id="definition_1">Definition</h3>
-<p>The information ratio <span class="arithmatex">\(I\)</span>[^HandleyLemos2019] measures the "surprise of agreement" using <a href="../evidence/#the-kullback-leibler-divergence">KL divergences</a>:</p>
+<p>The information ratio <span class="arithmatex">\(I\)</span><sup id="fnref2:HandleyLemos2019"><a class="footnote-ref" href="#fn:HandleyLemos2019">3</a></sup> measures the "surprise of agreement" using <a href="../kl-divergence/">KL divergences</a>:</p>
 <div class="arithmatex">\[\log I = \mathcal{D}_{\text{KL}}^A + \mathcal{D}_{\text{KL}}^B - \mathcal{D}_{\text{KL}}^{AB}\]</div>
 <p>where:
 - <span class="arithmatex">\(\mathcal{D}_{\text{KL}}^A = \int \mathcal{P}_A \log\frac{\mathcal{P}_A}{\pi} d\theta\)</span> (information gain from prior to posterior for dataset <span class="arithmatex">\(A\)</span>)
@@ -139,7 +131,7 @@ $<span class="arithmatex">\(R = \frac{P(D_A, D_B)}{P(D_A)P(D_B)} = \frac{P(D_A|D
 - Results in <strong>larger <span class="arithmatex">\(\log I\)</span></strong></p>
 <p><strong>More constraining datasets (smaller <span class="arithmatex">\(V_\mathcal{P}\)</span>):</strong>
 - If two highly constraining posteriors happen to agree, this is very surprising
-- Example: Two experiments independently measure <span class="arithmatex">\(H_0 = 73.0 \pm 0.5\)</span> km/s/Mpc → high surprise!</p>
+- Example: Two experiments independently measure <span class="arithmatex">\(H_0 = 73.0 \pm 0.5\)</span> km/s/Mpc → high surprise.</p>
 <p><strong>If datasets in tension:</strong>
 - Posteriors barely overlap
 - Joint posterior volume <span class="arithmatex">\(V_\mathcal{P}^{AB}\)</span> becomes extremely small
@@ -149,7 +141,7 @@ $<span class="arithmatex">\(R = \frac{P(D_A, D_B)}{P(D_A)P(D_B)} = \frac{P(D_A|D
 <hr />
 <h2 id="suspiciousness">Suspiciousness</h2>
 <h3 id="definition_2">Definition</h3>
-<p>While <span class="arithmatex">\(I\)</span> quantifies surprise of agreement, suspiciousness <span class="arithmatex">\(S\)</span> quantifies <strong>statistical conflict</strong> between likelihoods[^HandleyLemos2019]:</p>
+<p>While <span class="arithmatex">\(I\)</span> quantifies surprise of agreement, suspiciousness <span class="arithmatex">\(S\)</span> quantifies <strong>statistical conflict</strong> between likelihoods<sup id="fnref3:HandleyLemos2019"><a class="footnote-ref" href="#fn:HandleyLemos2019">3</a></sup>:</p>
 <div class="arithmatex">\[\boxed{S = \frac{R}{I}, \quad \log S = \log R - \log I}\]</div>
 <h3 id="prior-independence">Prior Independence</h3>
 <p>Since <span class="arithmatex">\(R\)</span> and <span class="arithmatex">\(I\)</span> transform similarly under prior volume changes, <strong><span class="arithmatex">\(S\)</span> is largely unaffected by changing prior widths</strong> (as long as change doesn't significantly alter posteriors).</p>
@@ -168,13 +160,13 @@ $<span class="arithmatex">\(R = \frac{P(D_A, D_B)}{P(D_A)P(D_B)} = \frac{P(D_A|D
 <p><strong>Example:</strong> Strong correlated constraint between two parameters can yield same <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> as two well-constrained independent parameters.</p>
 <p><strong>Need:</strong> A metric for the <strong>effective number of constrained parameters</strong>.</p>
 <h3 id="definition_3">Definition</h3>
-<p>Bayesian Model Dimensionality <span class="arithmatex">\(d\)</span>[^HandleyLemos2019] is defined as:</p>
+<p>Bayesian Model Dimensionality <span class="arithmatex">\(d\)</span><sup id="fnref4:HandleyLemos2019"><a class="footnote-ref" href="#fn:HandleyLemos2019">3</a></sup> is defined as:</p>
 <div class="arithmatex">\[\frac{d}{2} = \int \mathcal{P}(\theta) \left(\log\frac{\mathcal{P}(\theta)}{\pi(\theta)} - \mathcal{D}_{\text{KL}}\right)^2 d\theta\]</div>
-<p>Equivalently:
-$<span class="arithmatex">\(\boxed{\frac{d}{2} = \text{var}(\mathcal{I})_{\mathcal{P}}}\)</span>$</p>
+<p>Equivalently:</p>
+<div class="arithmatex">\[\boxed{\frac{d}{2} = \text{var}(\mathcal{I})_{\mathcal{P}}}\]</div>
 <p>where <span class="arithmatex">\(\mathcal{I} = \log\frac{\mathcal{P}}{\pi}\)</span> is Shannon Information.</p>
-<p>Alternative form:
-$<span class="arithmatex">\(\frac{d}{2} = \langle(\log \mathcal{L})^2\rangle_{\mathcal{P}} - \langle\log\mathcal{L}\rangle_{\mathcal{P}}^2\)</span>$</p>
+<p>Alternative form:</p>
+<div class="arithmatex">\[\frac{d}{2} = \langle(\log \mathcal{L})^2\rangle_{\mathcal{P}} - \langle\log\mathcal{L}\rangle_{\mathcal{P}}^2\]</div>
 <h3 id="properties">Properties</h3>
 <ol>
 <li><strong>Weakly prior-dependent:</strong> Evidence contributions in Shannon Information largely cancel out</li>
@@ -187,19 +179,19 @@ $<span class="arithmatex">\(\frac{d}{2} = \langle(\log \mathcal{L})^2\rangle_{\m
 <p>This <span class="arithmatex">\(d_G\)</span> (dimensionality of the <strong>shared</strong> parameter space) is what enters the tension significance calculation.</p>
 <h3 id="interpretation_2">Interpretation</h3>
 <p><strong>Simple Gaussian constraint on single parameter:</strong> <span class="arithmatex">\(d = 1\)</span></p>
-<p><strong>Tight correlated constraint between two parameters:</strong> Also <span class="arithmatex">\(d = 1\)</span> (not 2!)</p>
-<p><strong>Example:</strong> If CMB constrains 5.8 parameters and BAO constrains 2.3 parameters, but jointly they constrain 6.1 parameters, then:
-$<span class="arithmatex">\(d_G = 5.8 + 2.3 - 6.1 = 2.0\)</span>$</p>
+<p><strong>Tight correlated constraint between two parameters:</strong> Also <span class="arithmatex">\(d = 1\)</span> (not 2)</p>
+<p><strong>Example:</strong> If CMB constrains 5.8 parameters and BAO constrains 2.3 parameters, but jointly they constrain 6.1 parameters, then:</p>
+<div class="arithmatex">\[d_G = 5.8 + 2.3 - 6.1 = 2.0\]</div>
 <p>Only <strong>2 effective parameters</strong> are being jointly constrained.</p>
 <hr />
 <h2 id="tension-probability-and-significance">Tension Probability and Significance</h2>
 <h3 id="theoretical-basis">Theoretical Basis</h3>
-<p>For <strong>Gaussian likelihoods</strong>, the quantity <span class="arithmatex">\(d_G - 2\log S\)</span> follows a <span class="arithmatex">\(\chi^2\)</span> distribution with <span class="arithmatex">\(d_G\)</span> degrees of freedom[^HandleyLemos2019].</p>
+<p>For <strong>Gaussian likelihoods</strong>, the quantity <span class="arithmatex">\(d_G - 2\log S\)</span> follows a <span class="arithmatex">\(\chi^2\)</span> distribution with <span class="arithmatex">\(d_G\)</span> degrees of freedom<sup id="fnref5:HandleyLemos2019"><a class="footnote-ref" href="#fn:HandleyLemos2019">3</a></sup>.</p>
 <h3 id="tension-probability">Tension Probability</h3>
 <p><span class="arithmatex">\(p\)</span> represents the <strong>probability that discordance at least as large as observed could arise by chance</strong>:</p>
 <div class="arithmatex">\[\boxed{p = \int_{d_G-2\log S}^{\infty} \chi_{d_G}^2(x)\,dx}\]</div>
-<p>where <span class="arithmatex">\(\chi_{d_G}^2(x)\)</span> is the chi-squared PDF:
-$<span class="arithmatex">\(\chi_{d_G}^2(x) = \frac{x^{d_G/2-1}e^{-x/2}}{2^{d_G/2}\Gamma(d_G/2)}\)</span>$</p>
+<p>where <span class="arithmatex">\(\chi_{d_G}^2(x)\)</span> is the chi-squared PDF:</p>
+<div class="arithmatex">\[\chi_{d_G}^2(x) = \frac{x^{d_G/2-1}e^{-x/2}}{2^{d_G/2}\Gamma(d_G/2)}\]</div>
 <h3 id="gaussian-significance">Gaussian Significance</h3>
 <p>This <span class="arithmatex">\(p\)</span>-value is converted into equivalent significance on Gaussian scale using:</p>
 <div class="arithmatex">\[\boxed{\sigma = \sqrt{2}\,\text{Erfc}^{-1}(p)}\]</div>
@@ -232,7 +224,7 @@ $<span class="arithmatex">\(\chi_{d_G}^2(x) = \frac{x^{d_G/2-1}e^{-x/2}}{2^{d_G/
 <a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">tension_significance</span><span class="p">(</span><span class="n">log_S_H0</span><span class="p">,</span> <span class="n">d_G_H0</span><span class="p">)</span>
 <a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tension probability: p = </span><span class="si">{</span><span class="n">p</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gaussian significance: σ = </span><span class="si">{</span><span class="n">sigma</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="c1"># Output: p = 0.0013, σ = 3.0 (strong tension!)</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="c1"># Output: p = 0.0013, σ = 3.0 (strong tension)</span>
 </code></pre></div>
 <hr />
 <h2 id="the-look-elsewhere-effect">The Look-Elsewhere Effect</h2>
@@ -242,11 +234,11 @@ $<span class="arithmatex">\(\chi_{d_G}^2(x) = \frac{x^{d_G/2-1}e^{-x/2}}{2^{d_G/
 <h3 id="the-natural-threshold-approach">The Natural Threshold Approach</h3>
 <p><strong>Key insight:</strong> Under null hypothesis of no genuine tension, <span class="arithmatex">\(p\)</span>-values are uniformly distributed between 0 and 1.</p>
 <p><strong>Therefore:</strong> If performing <span class="arithmatex">\(N\)</span> independent tests, expect exactly <strong>one result to have <span class="arithmatex">\(p \leq 1/N\)</span> purely by chance</strong>.</p>
-<p><strong>Natural threshold:</strong>
-$<span class="arithmatex">\(\boxed{\sigma_{\text{threshold}} = \sqrt{2}\,\text{Erfc}^{-1}\left(\frac{1}{N}\right)}\)</span>$</p>
+<p><strong>Natural threshold:</strong></p>
+<div class="arithmatex">\[\boxed{\sigma_{\text{threshold}} = \sqrt{2}\,\text{Erfc}^{-1}\left(\frac{1}{N}\right)}\]</div>
 <h3 id="example">Example</h3>
-<p>For analysis with <span class="arithmatex">\(N = 50\)</span> pairwise dataset comparisons:
-$<span class="arithmatex">\(\sigma_{\text{threshold}} = \sqrt{2}\,\text{Erfc}^{-1}(1/50) \approx 2.58\)</span>$</p>
+<p>For analysis with <span class="arithmatex">\(N = 50\)</span> pairwise dataset comparisons:</p>
+<div class="arithmatex">\[\sigma_{\text{threshold}} = \sqrt{2}\,\text{Erfc}^{-1}(1/50) \approx 2.58\]</div>
 <p><strong>Interpretation:</strong> This threshold represents significance level at which we expect only <strong>one false positive</strong> across all 50 tests if there were no genuine tensions.</p>
 <h3 id="advantages">Advantages</h3>
 <ol>
@@ -258,7 +250,7 @@ $<span class="arithmatex">\(\sigma_{\text{threshold}} = \sqrt{2}\,\text{Erfc}^{-
 <p><strong>Note:</strong> This is <strong>NOT</strong> the Bonferroni correction (which would modify each <span class="arithmatex">\(p\)</span>-value). Individual values stay the same; only the interpretation threshold changes.</p>
 <hr />
 <h2 id="worked-example-planck-vs-pantheon">Worked Example: Planck vs Pantheon+</h2>
-<p>Let's quantify tension between CMB (Planck) and supernovae (Pantheon+) constraints on <span class="arithmatex">\(\Lambda\)</span>CDM.</p>
+<p>We can quantify tension between CMB (Planck) and supernovae (Pantheon+) constraints on <span class="arithmatex">\(\Lambda\)</span>CDM.</p>
 <h3 id="step-1-run-nested-sampling">Step 1: Run Nested Sampling</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Individual analyses</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Z_Planck</span> <span class="o">=</span> <span class="mf">87573.4</span>  <span class="c1"># From Planck 2018 analysis</span>
@@ -309,25 +301,25 @@ $<span class="arithmatex">\(\sigma_{\text{threshold}} = \sqrt{2}\,\text{Erfc}^{-
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>log S = -2.0  (tension)
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>d_G = 2.0     (2 effective shared parameters)
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>Tension probability: p = 0.018
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>Gaussian significance: σ = 2.1
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>Tension probability: p = 0.050
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>Gaussian significance: σ = 1.96
 </code></pre></div>
 <p><strong>Interpretation:</strong>
 - <strong><span class="arithmatex">\(\log R &lt; 0\)</span>:</strong> Datasets are discordant
 - <strong><span class="arithmatex">\(\log S &lt; 0\)</span>:</strong> Negative suspiciousness confirms tension
-- <strong><span class="arithmatex">\(\sigma = 2.1\)</span>:</strong> Moderate tension (~2σ)
+- <strong><span class="arithmatex">\(\sigma = 1.96\)</span>:</strong> Moderate tension (~2σ)
 - <strong><span class="arithmatex">\(d_G = 2\)</span>:</strong> Tension primarily in 2 parameters (likely <span class="arithmatex">\(H_0\)</span> and <span class="arithmatex">\(\Omega_m\)</span>)</p>
 <p><strong>Conclusion:</strong> Planck and Pantheon+ show moderate but not strong tension under <span class="arithmatex">\(\Lambda\)</span>CDM.</p>
 <hr />
 <h2 id="model-weighted-average-tension">Model-Weighted Average Tension</h2>
-<p>When uncertain about the model, compute tension statistics for multiple models and average weighted by model probability[^OngHandley2024]:</p>
+<p>When uncertain about the model, compute tension statistics for multiple models and average weighted by model probability<sup id="fnref3:OngHandley2024"><a class="footnote-ref" href="#fn:OngHandley2024">1</a></sup>:</p>
 <div class="arithmatex">\[\langle \sigma \rangle_{P(\mathcal{M})} = \sum_i P(\mathcal{M}_i|D) \times \sigma(\mathcal{M}_i)\]</div>
 <p><strong>Example:</strong> Test CMB vs SNe tension under:
 - Flat <span class="arithmatex">\(\Lambda\)</span>CDM: <span class="arithmatex">\(\sigma = 2.1\)</span>, <span class="arithmatex">\(P(\mathcal{M}|D) = 0.7\)</span>
 - Curved <span class="arithmatex">\(\Lambda\)</span>CDM: <span class="arithmatex">\(\sigma = 1.8\)</span>, <span class="arithmatex">\(P(\mathcal{M}|D) = 0.2\)</span>
 - <span class="arithmatex">\(w\)</span>CDM: <span class="arithmatex">\(\sigma = 1.5\)</span>, <span class="arithmatex">\(P(\mathcal{M}|D) = 0.1\)</span></p>
-<p>Model-averaged significance:
-$<span class="arithmatex">\(\langle \sigma \rangle = 0.7(2.1) + 0.2(1.8) + 0.1(1.5) = 1.98\)</span>$</p>
+<p>Model-averaged significance:</p>
+<div class="arithmatex">\[\langle \sigma \rangle = 0.7(2.1) + 0.2(1.8) + 0.1(1.5) = 1.98\]</div>
 <p>This accounts for model uncertainty in the tension assessment.</p>
 <hr />
 <h2 id="summary-complete-workflow">Summary: Complete Workflow</h2>
@@ -375,11 +367,26 @@ $<span class="arithmatex">\(\langle \sigma \rangle = 0.7(2.1) + 0.2(1.8) + 0.1(1
 - <a href="../computing-evidence/">computing-evidence</a> - Practical methods</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[OngHandley2024]: Ong, D., &amp; Handley, W. (2024). unimpeded: A Public Grid of Nested Sampling Chains for Cosmological Model Comparison and Tension Analysis. <em>arXiv preprint</em>.</p>
-<p>[Marshall2006]: Marshall, P., et al. (2006). Hyper-Extreme Hierarchical Bayesian Inference. <em>Proceedings of MaxEnt</em>.</p>
-<p>[HandleyLemos2019]: Handley, W. J., &amp; Lemos, P. (2019). Quantifying tensions in cosmological parameters: Interpreting the DES evidence ratio. <em>Physical Review D</em>, 100(4), 043504.</p>
-<p>[Lemos2021]: Lemos, P., et al. (2021). Quantifying suspiciousness within correlated data sets. <em>MNRAS</em>, 505(4), 6179-6192.</p>
-<p>[Skilling2006]: Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:OngHandley2024">
+<p>Ong, D., &amp; Handley, W. (2024). unimpeded: A Public Grid of Nested Sampling Chains for Cosmological Model Comparison and Tension Analysis. <em>arXiv preprint</em>.&#160;<a class="footnote-backref" href="#fnref:OngHandley2024" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:OngHandley2024" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref3:OngHandley2024" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Marshall2006">
+<p>Marshall, P., et al. (2006). Hyper-Extreme Hierarchical Bayesian Inference. <em>Proceedings of MaxEnt</em>.&#160;<a class="footnote-backref" href="#fnref:Marshall2006" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:HandleyLemos2019">
+<p>Handley, W. J., &amp; Lemos, P. (2019). Quantifying tensions in cosmological parameters: Interpreting the DES evidence ratio. <em>Physical Review D</em>, 100(4), 043504.&#160;<a class="footnote-backref" href="#fnref:HandleyLemos2019" title="Jump back to footnote 3 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:HandleyLemos2019" title="Jump back to footnote 3 in the text">&#8617;</a><a class="footnote-backref" href="#fnref3:HandleyLemos2019" title="Jump back to footnote 3 in the text">&#8617;</a><a class="footnote-backref" href="#fnref4:HandleyLemos2019" title="Jump back to footnote 3 in the text">&#8617;</a><a class="footnote-backref" href="#fnref5:HandleyLemos2019" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Lemos2021">
+<p>Lemos, P., et al. (2021). Quantifying suspiciousness within correlated data sets. <em>MNRAS</em>, 505(4), 6179-6192.&#160;<a class="footnote-backref" href="#fnref:Lemos2021" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Skilling2006">
+<p>Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.&#160;<a class="footnote-backref" href="#fnref:Skilling2006" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -387,7 +394,7 @@ $<span class="arithmatex">\(\langle \sigma \rangle = 0.7(2.1) + 0.2(1.8) + 0.1(1
 					<section>
 						<div class="page-nav">
 							
-							<a href="../model-comparison/" class="button">← Model Comparison</a>
+							<a href="../information-criteria/" class="button">← Approximate Model Comparison</a>
 							
 							
 							<a href="../hierarchical-models/" class="button primary" style="float:right">Hierarchical Models →</a>
@@ -444,6 +451,8 @@ $<span class="arithmatex">\(\langle \sigma \rangle = 0.7(2.1) + 0.2(1.8) + 0.1(1
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -467,8 +476,6 @@ $<span class="arithmatex">\(\langle \sigma \rangle = 0.7(2.1) + 0.2(1.8) + 0.1(1
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -505,6 +512,7 @@ $<span class="arithmatex">\(\langle \sigma \rangle = 0.7(2.1) + 0.2(1.8) + 0.1(1
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

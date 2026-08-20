@@ -28,25 +28,17 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>KL Divergence</h1>
-						</header>
-						
-
 						<h1 id="kullback-leibler-divergence">Kullback-Leibler Divergence</h1>
 <p>← Back to <a href="../">index</a> | See also: <a href="../evidence/">evidence</a>, <a href="../tension-statistics/">tension-statistics</a></p>
 <hr />
 <h2 id="the-information-theoretic-foundation">The Information-Theoretic Foundation</h2>
-<p>The Kullback-Leibler (KL) divergence[^KullbackLeibler1951] is a fundamental quantity in information theory that measures the "distance" between two probability distributions. In Bayesian inference, it quantifies how much we <strong>learn from data</strong>—the information gained in going from prior to posterior.</p>
+<p>The Kullback-Leibler (KL) divergence<sup id="fnref:KullbackLeibler1951"><a class="footnote-ref" href="#fn:KullbackLeibler1951">1</a></sup> is a fundamental quantity in information theory that measures the "distance" between two probability distributions. In Bayesian inference, it quantifies how much we <strong>learn from data</strong>—the information gained in going from prior to posterior.</p>
 <hr />
 <h2 id="definition">Definition</h2>
 <p>For two probability distributions <span class="arithmatex">\(P\)</span> and <span class="arithmatex">\(Q\)</span> over the same variable <span class="arithmatex">\(\theta\)</span>:</p>
@@ -57,7 +49,7 @@
 <hr />
 <h2 id="intuition-information-gain">Intuition: Information Gain</h2>
 <h3 id="the-shannon-information">The Shannon Information</h3>
-<p>Before introducing KL divergence, consider <strong>Shannon Information</strong>[^Shannon1948] at a specific parameter value:</p>
+<p>Before introducing KL divergence, consider <strong>Shannon Information</strong><sup id="fnref:Shannon1948"><a class="footnote-ref" href="#fn:Shannon1948">2</a></sup> at a specific parameter value:</p>
 <div class="arithmatex">\[\mathcal{I}(\theta) = \log\frac{\mathcal{P}(\theta)}{\pi(\theta)}\]</div>
 <p>This measures the "surprise" or information content at point <span class="arithmatex">\(\theta\)</span>:
 - If <span class="arithmatex">\(\mathcal{P}(\theta) \gg \pi(\theta)\)</span>: High information (data concentrated probability here)
@@ -71,7 +63,7 @@
 <h2 id="properties">Properties</h2>
 <h3 id="1-non-negativity">1. Non-Negativity</h3>
 <div class="arithmatex">\[\mathcal{D}_{\text{KL}} \geq 0\]</div>
-<p>with equality <strong>if and only if</strong> <span class="arithmatex">\(\mathcal{P} = \pi\)</span> (i.e., data told us nothing).</p>
+<p>with equality if and only if <span class="arithmatex">\(\mathcal{P} = \pi\)</span> (i.e. the data told us nothing).</p>
 <p><strong>Proof sketch:</strong> By Jensen's inequality applied to the convex function <span class="arithmatex">\(-\log\)</span>.</p>
 <h3 id="2-asymmetry">2. Asymmetry</h3>
 <div class="arithmatex">\[\mathcal{D}_{\text{KL}}(P||Q) \neq \mathcal{D}_{\text{KL}}(Q||P)\]</div>
@@ -86,18 +78,18 @@
 <p>The information content doesn't depend on how you parameterize the problem.</p>
 <hr />
 <h2 id="connection-to-evidence-occams-razor">Connection to Evidence: Occam's Razor</h2>
-<p>The KL divergence appears naturally in the decomposition of <a href="../evidence/">evidence</a>:</p>
+<p>The KL divergence appears naturally in the decomposition of the <a href="../evidence/#mathematical-decomposition">Bayesian evidence</a>:</p>
 <div class="arithmatex">\[\boxed{\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} - \mathcal{D}_{\text{KL}}}\]</div>
 <p><strong>Derivation:</strong></p>
-<p>Starting from Bayes' theorem:
-$<span class="arithmatex">\(\mathcal{P}(\theta) = \frac{\mathcal{L}(\theta)\pi(\theta)}{\mathcal{Z}}\)</span>$</p>
-<p>Take logarithms:
-$<span class="arithmatex">\(\log\mathcal{P}(\theta) = \log\mathcal{L}(\theta) + \log\pi(\theta) - \log\mathcal{Z}\)</span>$</p>
-<p>Average over the posterior:
-$<span class="arithmatex">\(\langle \log\mathcal{P} \rangle_{\mathcal{P}} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} + \langle \log\pi \rangle_{\mathcal{P}} - \log\mathcal{Z}\)</span>$</p>
-<p>Rearrange:
-$<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} - \left(\langle \log\mathcal{P} \rangle_{\mathcal{P}} - \langle \log\pi \rangle_{\mathcal{P}}\right)\)</span>$</p>
-<p>The term in parentheses is exactly <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span>. ∎</p>
+<p>Starting from Bayes' theorem:</p>
+<div class="arithmatex">\[\mathcal{P}(\theta) = \frac{\mathcal{L}(\theta)\pi(\theta)}{\mathcal{Z}}\]</div>
+<p>Take logarithms:</p>
+<div class="arithmatex">\[\log\mathcal{P}(\theta) = \log\mathcal{L}(\theta) + \log\pi(\theta) - \log\mathcal{Z}\]</div>
+<p>Average over the posterior:</p>
+<div class="arithmatex">\[\langle \log\mathcal{P} \rangle_{\mathcal{P}} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} + \langle \log\pi \rangle_{\mathcal{P}} - \log\mathcal{Z}\]</div>
+<p>Rearrange:</p>
+<div class="arithmatex">\[\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\mathcal{P}} - \left(\langle \log\mathcal{P} \rangle_{\mathcal{P}} - \langle \log\pi \rangle_{\mathcal{P}}\right)\]</div>
+<p>The term in parentheses is exactly <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span>.</p>
 <h3 id="interpretation-as-occam-penalty">Interpretation as Occam Penalty</h3>
 <div class="arithmatex">\[\text{log Evidence} = \underbrace{\langle \log\mathcal{L} \rangle_{\mathcal{P}}}_{\text{Goodness of fit}} - \underbrace{\mathcal{D}_{\text{KL}}}_{\text{Complexity penalty}}\]</div>
 <ul>
@@ -122,7 +114,7 @@ $<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\
 <hr />
 <h2 id="computing-kl-divergence">Computing KL Divergence</h2>
 <h3 id="from-nested-sampling">From Nested Sampling</h3>
-<p><a href="../nested-sampling/">Nested sampling</a> naturally computes <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> as a byproduct[^Skilling2006]:</p>
+<p><a href="../nested-sampling/">Nested sampling</a> naturally computes <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> as a byproduct<sup id="fnref:Skilling2006"><a class="footnote-ref" href="#fn:Skilling2006">3</a></sup>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># PolyChord output includes D_KL automatically</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_polychord</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -193,7 +185,7 @@ $<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\
 <p><strong>Interpretation:</strong> Planck CMB data provides approximately <strong>34 nats</strong> (49 bits) of information about these 6 parameters.</p>
 <hr />
 <h2 id="bayesian-model-dimensionality">Bayesian Model Dimensionality</h2>
-<p>KL divergence gives the <strong>total</strong> information, but not how it's distributed across parameters. The <strong>Bayesian Model Dimensionality</strong>[^HandleyLemos2019] measures the effective number of constrained parameters:</p>
+<p>KL divergence gives the <strong>total</strong> information, but not how it's distributed across parameters. The <strong>Bayesian Model Dimensionality</strong><sup id="fnref:HandleyLemos2019"><a class="footnote-ref" href="#fn:HandleyLemos2019">4</a></sup> measures the effective number of constrained parameters:</p>
 <div class="arithmatex">\[\boxed{\frac{d}{2} = \text{var}(\mathcal{I})_{\mathcal{P}} = \left\langle \left(\log\frac{\mathcal{P}}{\pi}\right)^2 \right\rangle_{\mathcal{P}} - \mathcal{D}_{\text{KL}}^2}\]</div>
 <p><strong>Interpretation:</strong>
 - <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span> = mean information (first moment)
@@ -232,7 +224,7 @@ $<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\
 - Number of dimensions
 - Width of prior
 - Strength of data</p>
-<p><strong>Example:</strong> 100-dimensional problem with <span class="arithmatex">\(\mathcal{D}_{\text{KL}} = 200\)</span> nats means each parameter contributes ~2 nats on average—quite reasonable!</p>
+<p><strong>Example:</strong> A 100-dimensional problem with <span class="arithmatex">\(\mathcal{D}_{\text{KL}} = 200\)</span> nats means each parameter contributes ~2 nats on average — quite reasonable.</p>
 <h3 id="kl-divergence-is-a-distance">"KL divergence is a distance"</h3>
 <p><strong>Not quite.</strong> It's asymmetric and doesn't satisfy triangle inequality. Use "divergence" not "distance."</p>
 <h3 id="i-can-compute-it-from-mcmc-samples">"I can compute it from MCMC samples"</h3>
@@ -259,12 +251,29 @@ $<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\
 - <a href="../model-comparison/">model-comparison</a> - Occam's razor in action</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[KullbackLeibler1951]: Kullback, S., &amp; Leibler, R. A. (1951). On information and sufficiency. <em>The Annals of Mathematical Statistics</em>, 22(1), 79-86.</p>
-<p>[Shannon1948]: Shannon, C. E. (1948). A mathematical theory of communication. <em>Bell System Technical Journal</em>, 27(3), 379-423.</p>
-<p>[Skilling2006]: Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.</p>
-<p>[HandleyLemos2019]: Handley, W. J., &amp; Lemos, P. (2019). Quantifying dimensionality: Bayesian cosmological model complexity. <em>Physical Review D</em>, 100(10), 103511.</p>
-<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
-<p>[Mackay2003]: MacKay, D. J. C. (2003). <em>Information Theory, Inference, and Learning Algorithms</em>. Cambridge University Press.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:KullbackLeibler1951">
+<p>Kullback, S., &amp; Leibler, R. A. (1951). On information and sufficiency. <em>The Annals of Mathematical Statistics</em>, 22(1), 79-86.&#160;<a class="footnote-backref" href="#fnref:KullbackLeibler1951" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Shannon1948">
+<p>Shannon, C. E. (1948). A mathematical theory of communication. <em>Bell System Technical Journal</em>, 27(3), 379-423.&#160;<a class="footnote-backref" href="#fnref:Shannon1948" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Skilling2006">
+<p>Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.&#160;<a class="footnote-backref" href="#fnref:Skilling2006" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:HandleyLemos2019">
+<p>Handley, W. J., &amp; Lemos, P. (2019). Quantifying dimensionality: Bayesian cosmological model complexity. <em>Physical Review D</em>, 100(10), 103511.&#160;<a class="footnote-backref" href="#fnref:HandleyLemos2019" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Trotta2008">
+<p>Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.&#160;<a class="footnote-backref" href="#fnref:Trotta2008" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Mackay2003">
+<p>MacKay, D. J. C. (2003). <em>Information Theory, Inference, and Learning Algorithms</em>. Cambridge University Press.&#160;<a class="footnote-backref" href="#fnref:Mackay2003" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -329,6 +338,8 @@ $<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -352,8 +363,6 @@ $<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -390,6 +399,7 @@ $<span class="arithmatex">\(\log\mathcal{Z} = \langle \log\mathcal{L} \rangle_{\
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

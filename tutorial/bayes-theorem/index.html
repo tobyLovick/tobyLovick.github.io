@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Bayes' Theorem</h1>
-						</header>
-						
-
 						<h1 id="bayes-theorem">Bayes' Theorem</h1>
 <p>← Back to <a href="../">index</a> | Previous: <a href="../conditional-probability/">conditional-probability</a></p>
 <hr />
@@ -50,7 +42,7 @@
 <div class="arithmatex">\[P(A \cap B) = P(A|B)P(B) = P(B|A)P(A)\]</div>
 <p>Rearranging gives us <strong>Bayes' theorem</strong>:</p>
 <div class="arithmatex">\[\boxed{P(A|B) = \frac{P(B|A)P(A)}{P(B)}}\]</div>
-<p><strong>This is the entire foundation of Bayesian inference.</strong></p>
+<p>This single relation is the foundation of Bayesian inference.</p>
 <hr />
 <h2 id="interpreting-the-terms">Interpreting the Terms</h2>
 <p>When we apply this to scientific inference with hypothesis <span class="arithmatex">\(H\)</span> and data <span class="arithmatex">\(D\)</span>:</p>
@@ -63,7 +55,7 @@
 </ul>
 <p>In words:</p>
 <div class="arithmatex">\[\boxed{\text{Posterior} = \frac{\text{Likelihood} \times \text{Prior}}{\text{Evidence}}}\]</div>
-<p><strong>The power of Bayes' theorem</strong>: It inverts the conditioning, allowing us to go from "data given hypothesis" (which we can calculate from theory) to "hypothesis given data" (which is what we actually want).</p>
+<p>Bayes' theorem inverts the conditioning, allowing us to go from "data given hypothesis" (which we can calculate from theory) to "hypothesis given data" (which is what we actually want).</p>
 <hr />
 <h2 id="the-beetle-example-base-rates-matter">The Beetle Example: Base Rates Matter</h2>
 <p>A naturalist spots a beetle with distinctive markings. The rare species has these markings 98% of the time, while only 2% of common beetles do. However, the rare species represents only 0.1% of the population.</p>
@@ -73,15 +65,15 @@
 <p>Let <span class="arithmatex">\(R\)</span> = "beetle is rare", <span class="arithmatex">\(M\)</span> = "beetle has markings"</p>
 <div class="arithmatex">\[P(R|M) = \frac{P(M|R)P(R)}{P(M)}\]</div>
 <p>We need to find <span class="arithmatex">\(P(M)\)</span> using the law of total probability:</p>
-<div class="arithmatex">\[P(M) = P(M|R)P(R) + P(M|\text{not }R)P(\text{not }R)$$
-$$= (0.98)(0.001) + (0.02)(0.999) = 0.00098 + 0.01998 = 0.02096\]</div>
+<div class="arithmatex">\[P(M) = P(M|R)P(R) + P(M|\text{not }R)P(\text{not }R)\]</div>
+<div class="arithmatex">\[= (0.98)(0.001) + (0.02)(0.999) = 0.00098 + 0.01998 = 0.02096\]</div>
 <p>Therefore:</p>
 <div class="arithmatex">\[P(R|M) = \frac{(0.98)(0.001)}{0.02096} = \frac{0.00098}{0.02096} \approx 0.047 = 4.7\%\]</div>
 <p><strong>Despite the markings being highly diagnostic, the base rate (prior) is so low that most marked beetles are still common species.</strong></p>
 <p>This illustrates a crucial point: <strong>priors matter</strong>. They incorporate what we know about the world before we collect data.</p>
 <hr />
 <h2 id="worked-example-the-coin-flip">Worked Example: The Coin Flip</h2>
-<p>Let's do a complete Bayesian analysis of a simple problem: estimating the bias of a coin.</p>
+<p>A complete Bayesian analysis of a simple problem: estimating the bias of a coin.</p>
 <h3 id="setup">Setup</h3>
 <ul>
 <li>We have a coin with unknown probability <span class="arithmatex">\(\theta\)</span> of landing heads</li>
@@ -246,6 +238,8 @@ $$= (0.98)(0.001) + (0.02)(0.999) = 0.00098 + 0.01998 = 0.02096\]</div>
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -269,8 +263,6 @@ $$= (0.98)(0.001) + (0.02)(0.999) = 0.00098 + 0.01998 = 0.02096\]</div>
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -307,6 +299,7 @@ $$= (0.98)(0.001) + (0.02)(0.999) = 0.00098 + 0.01998 = 0.02096\]</div>
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

@@ -28,27 +28,19 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Dark Energy Models</h1>
-						</header>
-						
-
 						<h1 id="dark-energy-models">Dark Energy Models</h1>
 <p>← Back to <a href="../">index</a> | See also: <a href="../model-comparison/">model-comparison</a>, <a href="../evidence/">evidence</a>, <a href="../marginalization/">marginalization</a></p>
 <hr />
-<p><strong>Note:</strong> This page draws on the Type Ia supernova analysis from Lovick, Dhawan &amp; Handley (2024)[^Lovick2024], demonstrating <a href="../model-comparison/">Bayesian model comparison</a> for dark energy scenarios.</p>
+<p><strong>Note:</strong> This page draws on the Type Ia supernova analysis from Lovick, Dhawan &amp; Handley (2024)<sup id="fnref:Lovick2024"><a class="footnote-ref" href="#fn:Lovick2024">1</a></sup>, demonstrating <a href="../model-comparison/">Bayesian model comparison</a> for dark energy scenarios.</p>
 <hr />
 <h2 id="the-dark-energy-problem">The Dark Energy Problem</h2>
-<p>In 1998, observations of distant Type Ia supernovae revealed the universe's expansion is <strong>accelerating</strong>[<sup>Riess1998][</sup>Perlmutter1999]. This requires a component with <strong>negative pressure</strong>—dubbed "dark energy."</p>
+<p>In 1998, observations of distant Type Ia supernovae revealed the universe's expansion is <strong>accelerating</strong><sup id="fnref:Riess1998"><a class="footnote-ref" href="#fn:Riess1998">2</a></sup><sup id="fnref:Perlmutter1999"><a class="footnote-ref" href="#fn:Perlmutter1999">3</a></sup>. This requires a component with <strong>negative pressure</strong>—dubbed "dark energy."</p>
 <p><strong>Key question:</strong> What is the nature of dark energy?</p>
 <p><strong>Candidates:</strong>
 - Einstein's cosmological constant <span class="arithmatex">\(\Lambda\)</span> (simplest)
@@ -78,24 +70,24 @@
 - <span class="arithmatex">\(w &lt; -1\)</span> is "phantom" dark energy
 - <span class="arithmatex">\(w &gt; -1\)</span> is quintessence-like</p>
 <p><strong>Total parameters:</strong> 7 (6 from ΛCDM + <span class="arithmatex">\(w\)</span>)</p>
-<p><strong>Prediction:</strong> Luminosity distance depends on <span class="arithmatex">\(w\)</span>:
-$<span class="arithmatex">\(H(z)^2 = H_0^2\left[\Omega_m(1+z)^3 + (1-\Omega_m)(1+z)^{3(1+w)}\right]\)</span>$</p>
+<p><strong>Prediction:</strong> Luminosity distance depends on <span class="arithmatex">\(w\)</span>:</p>
+<div class="arithmatex">\[H(z)^2 = H_0^2\left[\Omega_m(1+z)^3 + (1-\Omega_m)(1+z)^{3(1+w)}\right]\]</div>
 <p><strong>Complexity cost:</strong> One additional parameter means larger <a href="../prior-choice/">prior volume</a> and higher <a href="../kl-divergence/">KL divergence</a> penalty unless data strongly prefer <span class="arithmatex">\(w \neq -1\)</span>.</p>
 <h3 id="model-3-w0wacdm-evolving-dark-energy">Model 3: w₀wₐCDM (Evolving Dark Energy)</h3>
-<p>Also called the Chevallier-Polarski-Linder (CPL) parameterization[<sup>Chevallier2001][</sup>Linder2003]:</p>
+<p>Also called the Chevallier-Polarski-Linder (CPL) parameterization<sup id="fnref:Chevallier2001"><a class="footnote-ref" href="#fn:Chevallier2001">6</a></sup><sup id="fnref:Linder2003"><a class="footnote-ref" href="#fn:Linder2003">7</a></sup>:</p>
 <p><strong>Additional parameters (beyond ΛCDM):</strong>
 - <span class="arithmatex">\(w_0\)</span> — equation of state today
 - <span class="arithmatex">\(w_a\)</span> — rate of evolution</p>
-<p><strong>Time evolution:</strong>
-$<span class="arithmatex">\(w(z) = w_0 + w_a \frac{z}{1+z}\)</span>$</p>
+<p><strong>Time evolution:</strong></p>
+<div class="arithmatex">\[w(z) = w_0 + w_a \frac{z}{1+z}\]</div>
 <p><strong>Total parameters:</strong> 8 (6 from ΛCDM + <span class="arithmatex">\(w_0 + w_a\)</span>)</p>
 <p><strong>Complexity cost:</strong> Two additional parameters with even larger <a href="../evidence/#the-occam-penalty">Occam penalty</a>.</p>
 <hr />
 <h2 id="type-ia-supernovae-as-standard-candles">Type Ia Supernovae as Standard Candles</h2>
 <h3 id="the-phillips-relation">The Phillips Relation</h3>
-<p>Type Ia SNe aren't perfect standard candles, but they're <strong>standardizable</strong>: brighter supernovae decline more slowly (Phillips relation[^Phillips1993]).</p>
-<p><strong>Standardization:</strong>
-$<span class="arithmatex">\(m_B^* = m_B - \alpha X_1 + \beta C\)</span>$</p>
+<p>Type Ia SNe aren't perfect standard candles, but they're <strong>standardizable</strong>: brighter supernovae decline more slowly (Phillips relation<sup id="fnref:Phillips1993"><a class="footnote-ref" href="#fn:Phillips1993">8</a></sup>).</p>
+<p><strong>Standardization:</strong></p>
+<div class="arithmatex">\[m_B^* = m_B - \alpha X_1 + \beta C\]</div>
 <p>where:
 - <span class="arithmatex">\(m_B\)</span> = observed peak B-band magnitude
 - <span class="arithmatex">\(X_1\)</span> = stretch (light curve width)
@@ -104,12 +96,12 @@ $<span class="arithmatex">\(m_B^* = m_B - \alpha X_1 + \beta C\)</span>$</p>
 <h3 id="distance-modulus-and-cosmology">Distance Modulus and Cosmology</h3>
 <p>The standardized magnitude relates to cosmology via:</p>
 <div class="arithmatex">\[m_B^* = M_B + \mu(z; H_0, \Omega_m, w)\]</div>
-<p>where:
-$<span class="arithmatex">\(\mu(z) = 5\log_{10}\left(\frac{d_L(z)}{\text{Mpc}}\right) + 25\)</span>$</p>
+<p>where:</p>
+<div class="arithmatex">\[\mu(z) = 5\log_{10}\left(\frac{d_L(z)}{\text{Mpc}}\right) + 25\]</div>
 <p><strong>Key point:</strong> Supernovae constrain <em>relative</em> distances well but have poor leverage on <span class="arithmatex">\(M_B\)</span> (absolute magnitude). This creates degeneracy: <span class="arithmatex">\(H_0 \leftrightarrow M_B\)</span>.</p>
 <hr />
 <h2 id="the-pantheon-dataset">The Pantheon+ Dataset</h2>
-<p>The Pantheon+ catalog[^Brout2022] contains:
+<p>The Pantheon+ catalog<sup id="fnref:Brout2022"><a class="footnote-ref" href="#fn:Brout2022">4</a></sup> contains:
 - <strong>1701 spectroscopically confirmed Type Ia SNe</strong>
 - Redshift range: <span class="arithmatex">\(0.001 &lt; z &lt; 2.26\)</span>
 - Full covariance matrix accounting for systematics</p>
@@ -129,7 +121,7 @@ $<span class="arithmatex">\(\mu(z) = 5\log_{10}\left(\frac{d_L(z)}{\text{Mpc}}\r
 <p>where <span class="arithmatex">\(\boldsymbol{\Delta} = \mathbf{m}_{\text{obs}} - \mathbf{m}_{\text{model}}\)</span> is the residual vector.</p>
 <p><strong>Problem:</strong> Real data often have <strong>outliers</strong> not captured by Gaussian tails.</p>
 <h3 id="students-t-distribution">Student's t-Distribution</h3>
-<p>A more robust alternative[^Lovick2024]:</p>
+<p>A more robust alternative<sup id="fnref2:Lovick2024"><a class="footnote-ref" href="#fn:Lovick2024">1</a></sup>:</p>
 <div class="arithmatex">\[\mathcal{L} = \prod_{i=1}^n \frac{\Gamma((\nu+1)/2)}{\Gamma(\nu/2)\sqrt{\nu\pi\sigma_i^2}}\left(1 + \frac{\Delta_i^2}{\nu\sigma_i^2}\right)^{-(\nu+1)/2}\]</div>
 <p><strong>Key parameter:</strong> <span class="arithmatex">\(\nu\)</span> = degrees of freedom
 - <span class="arithmatex">\(\nu \to \infty\)</span>: Recovers Gaussian
@@ -137,13 +129,13 @@ $<span class="arithmatex">\(\mu(z) = 5\log_{10}\left(\frac{d_L(z)}{\text{Mpc}}\r
 - <span class="arithmatex">\(\nu &lt; 2\)</span>: Undefined variance (unphysical)</p>
 <p><strong>Prior:</strong> <span class="arithmatex">\(\nu \sim \text{Uniform}(2, 100)\)</span> or similar</p>
 <h3 id="covariance-rescaling">Covariance Rescaling</h3>
-<p>Alternative approach: add a global scale parameter[^Lovick2024]:</p>
+<p>Alternative approach: add a global scale parameter<sup id="fnref3:Lovick2024"><a class="footnote-ref" href="#fn:Lovick2024">1</a></sup>:</p>
 <div class="arithmatex">\[\mathbf{C}_{\text{scaled}} = s^2 \mathbf{C}_{\text{fid}}\]</div>
 <p>where <span class="arithmatex">\(s\)</span> is a free parameter accounting for underestimated uncertainties.</p>
 <p><strong>Interpretation:</strong> <span class="arithmatex">\(s &gt; 1\)</span> indicates covariance matrix is too optimistic.</p>
 <hr />
 <h2 id="bayesian-model-comparison-results">Bayesian Model Comparison Results</h2>
-<p>Using <a href="../nested-sampling/">nested-sampling</a> on the Pantheon+ dataset[^Lovick2024]:</p>
+<p>Using <a href="../nested-sampling/">nested-sampling</a> on the Pantheon+ dataset<sup id="fnref4:Lovick2024"><a class="footnote-ref" href="#fn:Lovick2024">1</a></sup>:</p>
 <h3 id="cosmological-model-comparison-gaussian-scatter">Cosmological Model Comparison (Gaussian Scatter)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Model         log Z        Δ log Z    Interpretation
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>─────────────────────────────────────────────────────
@@ -155,8 +147,8 @@ $<span class="arithmatex">\(\mu(z) = 5\log_{10}\left(\frac{d_L(z)}{\text{Mpc}}\r
 <p><strong>Why?</strong> Adding <span class="arithmatex">\(w\)</span> (or <span class="arithmatex">\(w_0, w_a\)</span>) improves fit marginally but incurs <a href="../evidence/#the-occam-penalty">Occam penalty</a>:
 - wCDM: <span class="arithmatex">\(\Delta\hat{d} \approx 0.8\)</span> (one parameter moderately constrained)
 - w₀wₐCDM: <span class="arithmatex">\(\Delta\hat{d} \approx 1.2\)</span> (two parameters weakly constrained)</p>
-<p><strong><a href="../evidence/#the-laplace-approximation">Evidence decomposition</a>:</strong>
-$<span class="arithmatex">\(\Delta\log\mathcal{Z} \approx \underbrace{\Delta\log\mathcal{L}_{\max}}_{+0.5} - \underbrace{\Delta\hat{d}/2}_{-0.4} - \underbrace{\Delta\mathcal{D}_{\text{KL}}}_{-2.6} \approx -2.5\)</span>$</p>
+<p><strong><a href="../evidence/#the-laplace-approximation">Evidence decomposition</a>:</strong></p>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} \approx \underbrace{\Delta\log\mathcal{L}_{\max}}_{+0.5} - \underbrace{\Delta\hat{d}/2}_{-0.4} - \underbrace{\Delta\mathcal{D}_{\text{KL}}}_{-2.6} \approx -2.5\]</div>
 <p>The data don't <strong>require</strong> <span class="arithmatex">\(w \neq -1\)</span>, so the simpler model wins.</p>
 <h3 id="scatter-model-comparison-fixed-cdm-cosmology">Scatter Model Comparison (Fixed ΛCDM Cosmology)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Scatter Model           log Z        Δ log Z    Best-fit parameter
@@ -184,16 +176,16 @@ $<span class="arithmatex">\(\Delta\log\mathcal{Z} \approx \underbrace{\Delta\log
 <hr />
 <h2 id="the-hubble-tension">The Hubble Tension</h2>
 <h3 id="planck-cmb-constraint">Planck CMB Constraint</h3>
-<p>Planck 2018[^Planck2018] measured in flat ΛCDM:
-$<span class="arithmatex">\(H_0^{\text{CMB}} = 67.4 \pm 0.5 \text{ km/s/Mpc}\)</span>$</p>
+<p>Planck 2018<sup id="fnref:Planck2018"><a class="footnote-ref" href="#fn:Planck2018">5</a></sup> measured in flat ΛCDM:</p>
+<div class="arithmatex">\[H_0^{\text{CMB}} = 67.4 \pm 0.5 \text{ km/s/Mpc}\]</div>
 <h3 id="pantheon-supernova-constraint">Pantheon+ Supernova Constraint</h3>
-<p>With Student's t scatter model[^Lovick2024]:
-$<span class="arithmatex">\(H_0^{\text{SNe}} = 73.67 \pm 0.99 \text{ km/s/Mpc}\)</span>$</p>
+<p>With Student's t scatter model<sup id="fnref5:Lovick2024"><a class="footnote-ref" href="#fn:Lovick2024">1</a></sup>:</p>
+<div class="arithmatex">\[H_0^{\text{SNe}} = 73.67 \pm 0.99 \text{ km/s/Mpc}\]</div>
 <h3 id="tension-quantification">Tension Quantification</h3>
 <p>Using <a href="../tension-statistics/">tension-statistics</a>:</p>
-<p><strong>Simple comparison:</strong>
-$<span class="arithmatex">\(\Delta H_0 = 73.67 - 67.4 = 6.27 \text{ km/s/Mpc}\)</span>$
-$<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\sigma\)</span>$</p>
+<p><strong>Simple comparison:</strong></p>
+<div class="arithmatex">\[\Delta H_0 = 73.67 - 67.4 = 6.27 \text{ km/s/Mpc}\]</div>
+<div class="arithmatex">\[\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\sigma\]</div>
 <p><strong>Full Bayesian tension analysis</strong> (using <a href="../tension-statistics/#the-r-statistic"><span class="arithmatex">\(R\)</span></a>, <a href="../tension-statistics/#the-information-ratio"><span class="arithmatex">\(I\)</span></a>, <a href="../tension-statistics/#suspiciousness"><span class="arithmatex">\(S\)</span></a> statistics) confirms ~5-6σ discordance between CMB and local measurements.</p>
 <p><strong>Possible explanations:</strong>
 1. <strong>Systematic errors</strong> in one or both measurements
@@ -203,12 +195,12 @@ $<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\si
 <h2 id="peculiar-velocity-corrections">Peculiar Velocity Corrections</h2>
 <h3 id="the-issue">The Issue</h3>
 <p>Low-redshift SNe (<span class="arithmatex">\(z &lt; 0.05\)</span>) have distances contaminated by <strong>peculiar velocities</strong>—galaxy motions relative to the Hubble flow.</p>
-<p><strong>Effect:</strong> Can bias <span class="arithmatex">\(H_0\)</span> by ~1-2 km/s/Mpc if not corrected[^Peterson2022].</p>
+<p><strong>Effect:</strong> Can bias <span class="arithmatex">\(H_0\)</span> by ~1-2 km/s/Mpc if not corrected<sup id="fnref:Peterson2022"><a class="footnote-ref" href="#fn:Peterson2022">9</a></sup>.</p>
 <h3 id="correction-methods">Correction Methods</h3>
 <p><strong>Flow model correction:</strong> Use large-scale structure surveys to model local flows, subtract predicted peculiar velocities.</p>
 <p><strong>Cut low-z sample:</strong> Remove <span class="arithmatex">\(z &lt; 0.023\)</span> SNe entirely (more conservative).</p>
 <h3 id="impact-on-model-comparison">Impact on Model Comparison</h3>
-<p>From Lovick et al. (2024)[^Lovick2024]:</p>
+<p>From Lovick et al. (2024)<sup id="fnref6:Lovick2024"><a class="footnote-ref" href="#fn:Lovick2024">1</a></sup>:</p>
 <p><strong>With peculiar velocity corrections:</strong>
 - ΛCDM strongly preferred (<span class="arithmatex">\(\Delta\log\mathcal{Z} \approx 2.5\)</span>)
 - <span class="arithmatex">\(w = -1.02 \pm 0.08\)</span> (consistent with cosmological constant)</p>
@@ -235,11 +227,13 @@ $<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\si
 <hr />
 <h2 id="summary">Summary</h2>
 <p><strong>Dark energy model comparison:</strong></p>
-<p>✅ <strong>Flat ΛCDM remains preferred</strong> over evolving dark energy (<span class="arithmatex">\(\Delta\log\mathcal{Z} \approx 2-3\)</span>)
-✅ <strong>Non-Gaussian scatter models</strong> improve fit (<span class="arithmatex">\(\Delta\log\mathcal{Z} \approx 2.5\)</span>)
-✅ <strong><a href="../marginalization/">Model averaging</a></strong> provides robust constraints independent of nuisance model choices
-✅ <strong>Hubble tension persists</strong> at ~5.7σ (CMB vs local measurements)
-✅ <strong>Systematic uncertainties</strong> (scatter, peculiar velocities) affect model preferences</p>
+<ul>
+<li><strong>Flat ΛCDM remains preferred</strong> over evolving dark energy (<span class="arithmatex">\(\Delta\log\mathcal{Z} \approx 2-3\)</span>)</li>
+<li><strong>Non-Gaussian scatter models</strong> improve fit (<span class="arithmatex">\(\Delta\log\mathcal{Z} \approx 2.5\)</span>)</li>
+<li><strong><a href="../marginalization/">Model averaging</a></strong> provides robust constraints independent of nuisance model choices</li>
+<li><strong>Hubble tension persists</strong> at ~5.7σ (CMB vs local measurements)</li>
+<li><strong>Systematic uncertainties</strong> (scatter, peculiar velocities) affect model preferences</li>
+</ul>
 <p><strong>Key techniques:</strong>
 - <strong><a href="../evidence/">evidence</a>-based comparison</strong> via <a href="../nested-sampling/">nested-sampling</a>
 - <strong><a href="../marginalization/">marginalization</a></strong> over nuisance models (scatter, systematics)
@@ -262,16 +256,41 @@ $<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\si
 - <a href="../nested-sampling/">nested-sampling</a> - Computing evidences accurately</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Lovick2024]: Lovick, T., Dhawan, S., &amp; Handley, W. (2024). Non-Gaussian likelihoods for Type Ia Supernovae cosmology. <em>arXiv:2312.02075</em>.</p>
-<p>[Riess1998]: Riess, A. G., et al. (1998). Observational evidence from supernovae for an accelerating universe. <em>The Astronomical Journal</em>, 116(3), 1009.</p>
-<p>[Perlmutter1999]: Perlmutter, S., et al. (1999). Measurements of Ω and Λ from 42 high-redshift supernovae. <em>The Astrophysical Journal</em>, 517(2), 565.</p>
-<p>[Brout2022]: Brout, D., et al. (2022). The Pantheon+ analysis: cosmological constraints. <em>The Astrophysical Journal</em>, 938(2), 110.</p>
-<p>[Planck2018]: Planck Collaboration (2018). Planck 2018 results. VI. Cosmological parameters. <em>Astronomy &amp; Astrophysics</em>, 641, A6.</p>
-<p>[Chevallier2001]: Chevallier, M., &amp; Polarski, D. (2001). Accelerating universes with scaling dark matter. <em>International Journal of Modern Physics D</em>, 10(02), 213-223.</p>
-<p>[Linder2003]: Linder, E. V. (2003). Exploring the expansion history of the universe. <em>Physical Review Letters</em>, 90(9), 091301.</p>
-<p>[Phillips1993]: Phillips, M. M. (1993). The absolute magnitudes of Type IA supernovae. <em>The Astrophysical Journal</em>, 413, L105.</p>
-<p>[Peterson2022]: Peterson, E. R., et al. (2022). A standardized analysis of 77 cosmic shear surveys. <em>Physical Review D</em>, 105(8), 083517.</p>
-<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Lovick2024">
+<p>Lovick, T., Dhawan, S., &amp; Handley, W. (2024). Non-Gaussian likelihoods for Type Ia Supernovae cosmology. <em>arXiv:2312.02075</em>.&#160;<a class="footnote-backref" href="#fnref:Lovick2024" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:Lovick2024" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref3:Lovick2024" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref4:Lovick2024" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref5:Lovick2024" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref6:Lovick2024" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Riess1998">
+<p>Riess, A. G., et al. (1998). Observational evidence from supernovae for an accelerating universe. <em>The Astronomical Journal</em>, 116(3), 1009.&#160;<a class="footnote-backref" href="#fnref:Riess1998" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Perlmutter1999">
+<p>Perlmutter, S., et al. (1999). Measurements of Ω and Λ from 42 high-redshift supernovae. <em>The Astrophysical Journal</em>, 517(2), 565.&#160;<a class="footnote-backref" href="#fnref:Perlmutter1999" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Brout2022">
+<p>Brout, D., et al. (2022). The Pantheon+ analysis: cosmological constraints. <em>The Astrophysical Journal</em>, 938(2), 110.&#160;<a class="footnote-backref" href="#fnref:Brout2022" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Planck2018">
+<p>Planck Collaboration (2018). Planck 2018 results. VI. Cosmological parameters. <em>Astronomy &amp; Astrophysics</em>, 641, A6.&#160;<a class="footnote-backref" href="#fnref:Planck2018" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Chevallier2001">
+<p>Chevallier, M., &amp; Polarski, D. (2001). Accelerating universes with scaling dark matter. <em>International Journal of Modern Physics D</em>, 10(02), 213-223.&#160;<a class="footnote-backref" href="#fnref:Chevallier2001" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Linder2003">
+<p>Linder, E. V. (2003). Exploring the expansion history of the universe. <em>Physical Review Letters</em>, 90(9), 091301.&#160;<a class="footnote-backref" href="#fnref:Linder2003" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Phillips1993">
+<p>Phillips, M. M. (1993). The absolute magnitudes of Type IA supernovae. <em>The Astrophysical Journal</em>, 413, L105.&#160;<a class="footnote-backref" href="#fnref:Phillips1993" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Peterson2022">
+<p>Peterson, E. R., et al. (2022). A standardized analysis of 77 cosmic shear surveys. <em>Physical Review D</em>, 105(8), 083517.&#160;<a class="footnote-backref" href="#fnref:Peterson2022" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Trotta2008">
+<p>Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.&#160;<a class="footnote-backref" href="#fnref:Trotta2008" title="Jump back to footnote 10 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -279,7 +298,7 @@ $<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\si
 					<section>
 						<div class="page-nav">
 							
-							<a href="../information-criteria/" class="button">← Information Criteria (AIC/BIC)</a>
+							<a href="../marginalization/" class="button">← Marginalization</a>
 							
 							
 							<a href="../nested-sampling/" class="button primary" style="float:right">Nested Sampling →</a>
@@ -336,6 +355,8 @@ $<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\si
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -359,8 +380,6 @@ $<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\si
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -397,6 +416,7 @@ $<span class="arithmatex">\(\sigma = \frac{6.27}{\sqrt{0.99^2 + 0.5^2}} = 5.7\si
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

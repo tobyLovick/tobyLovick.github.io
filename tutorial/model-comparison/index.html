@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Model Comparison</h1>
-						</header>
-						
-
 						<h1 id="model-comparison">Model Comparison</h1>
 <p>← Back to <a href="../">index</a> | Previous: <a href="../evidence/">evidence</a></p>
 <hr />
@@ -58,7 +50,7 @@
 <p><strong>Interpretation:</strong> <span class="arithmatex">\(B_{01} = 12\)</span> means "the data favor Model 0 by odds of 12:1" or equivalently "Model 0 is 12 times more probable than Model 1 given the data."</p>
 <hr />
 <h2 id="jeffreys-scale">Jeffreys' Scale</h2>
-<p>Sir Harold Jeffreys provided an empirical scale for interpreting evidence differences[^Jeffreys1961]:</p>
+<p>Sir Harold Jeffreys provided an empirical scale for interpreting evidence differences<sup id="fnref:Jeffreys1961"><a class="footnote-ref" href="#fn:Jeffreys1961">1</a></sup>:</p>
 <table>
 <thead>
 <tr>
@@ -116,7 +108,7 @@
 - 7 parameters: same as above plus <span class="arithmatex">\(w\)</span>
 - Dark energy equation of state: <span class="arithmatex">\(w\)</span> is free</p>
 <h3 id="the-data">The Data</h3>
-<p>Type Ia supernovae from Pantheon+ catalog[^Brout2022] (1701 SNe out to <span class="arithmatex">\(z \sim 2\)</span>).</p>
+<p>Type Ia supernovae from Pantheon+ catalog<sup id="fnref:Brout2022"><a class="footnote-ref" href="#fn:Brout2022">3</a></sup> (1701 SNe out to <span class="arithmatex">\(z \sim 2\)</span>).</p>
 <h3 id="results">Results</h3>
 <p>Running <a href="../nested-sampling/">nested-sampling</a> on both models:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Flat ΛCDM:
@@ -130,7 +122,7 @@
 <h3 id="evidence-comparison">Evidence Comparison</h3>
 <div class="arithmatex">\[\Delta\log\mathcal{Z} = 1234.5 - 1232.3 = 2.2\]</div>
 <p>Using <a href="../evidence/#the-laplace-approximation">the Laplace decomposition</a>:</p>
-<div class="arithmatex">\[\Delta\log\mathcal{Z} \approx \underbrace{\Delta\log\mathcal{L}_{\text{max}}}_{+0.5} - \underbrace{\frac{\Delta\hat{d}}{2}}_{-0.5} - \underbrace{\Delta\mathcal{D}_{\text{KL}}}_{-1.2} \approx -2.2\]</div>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} \approx \underbrace{\Delta\log\mathcal{L}_{\text{max}}}_{+0.5} - \underbrace{\frac{\Delta\hat{d}}{2}}_{-0.5} - \underbrace{\Delta\mathcal{D}_{\text{KL}}}_{-1.2} \approx +2.2\]</div>
 <p><strong>Interpretation:</strong>
 - <strong>Fit quality</strong>: <span class="arithmatex">\(w\)</span>CDM fits slightly better (+0.5)
 - <strong>Dimensionality penalty</strong>: Adding <span class="arithmatex">\(w\)</span> costs -0.5
@@ -148,7 +140,7 @@
 - 7 parameters (adds <span class="arithmatex">\(\Omega_k\)</span>)
 - Curvature: <span class="arithmatex">\(\Omega_k\)</span> free</p>
 <h3 id="the-data_1">The Data</h3>
-<p>Planck 2018 CMB temperature and polarization power spectra[^Planck2018].</p>
+<p>Planck 2018 CMB temperature and polarization power spectra<sup id="fnref:Planck2018"><a class="footnote-ref" href="#fn:Planck2018">4</a></sup>.</p>
 <h3 id="results_1">Results</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Flat ΛCDM:
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  log Z₀ = 87573.4 ± 0.3
@@ -172,13 +164,13 @@
 <p>This example illustrates comparing <strong>statistical assumptions</strong>, not just physical models.</p>
 <h3 id="the-models_2">The Models</h3>
 <p>Both use Flat <span class="arithmatex">\(\Lambda\)</span>CDM cosmology, but differ in scatter model:</p>
-<p><strong>Model A:</strong> Gaussian likelihood
-$<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{1}{\sqrt{2\pi\sigma_i^2}} \exp\left(-\frac{\Delta_i^2}{2\sigma_i^2}\right)\)</span>$</p>
-<p><strong>Model B:</strong> Student's t-distribution
-$<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamma(\nu/2)\sqrt{\nu\pi\sigma_i^2}}\left(1 + \frac{\Delta_i^2}{\nu\sigma_i^2}\right)^{-(\nu+1)/2}\)</span>$</p>
+<p><strong>Model A:</strong> Gaussian likelihood</p>
+<div class="arithmatex">\[\mathcal{L} = \prod_i \frac{1}{\sqrt{2\pi\sigma_i^2}} \exp\left(-\frac{\Delta_i^2}{2\sigma_i^2}\right)\]</div>
+<p><strong>Model B:</strong> Student's t-distribution</p>
+<div class="arithmatex">\[\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamma(\nu/2)\sqrt{\nu\pi\sigma_i^2}}\left(1 + \frac{\Delta_i^2}{\nu\sigma_i^2}\right)^{-(\nu+1)/2}\]</div>
 <p>where <span class="arithmatex">\(\nu\)</span> is the degrees of freedom (controls tail heaviness).</p>
 <h3 id="the-data_2">The Data</h3>
-<p>Pantheon+ supernova Hubble residuals[^Lovick2024].</p>
+<p>Pantheon+ supernova Hubble residuals<sup id="fnref:Lovick2024"><a class="footnote-ref" href="#fn:Lovick2024">5</a></sup>.</p>
 <h3 id="results_2">Results</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Gaussian:
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  log Z_A = 1234.5 ± 0.3
@@ -214,10 +206,10 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Best-fit H₀ (marginalized): 73.7 ± 1.1 km/s/Mpc
 </code></pre></div></p>
-<p>This is more honest than picking one scatter model arbitrarily!</p>
+<p>This is more honest than picking one scatter model arbitrarily.</p>
 <hr />
 <h2 id="nested-models-and-the-savage-dickey-ratio">Nested Models and the Savage-Dickey Ratio</h2>
-<p>When Model 1 is <strong>nested</strong> in Model 0 (i.e., setting one parameter <span class="arithmatex">\(\theta^* = 0\)</span> recovers Model 1), there's a clever shortcut[^TrottaDickey]:</p>
+<p>When Model 1 is <strong>nested</strong> in Model 0 (i.e., setting one parameter <span class="arithmatex">\(\theta^* = 0\)</span> recovers Model 1), there's a clever shortcut<sup id="fnref:TrottaDickey"><a class="footnote-ref" href="#fn:TrottaDickey">6</a></sup>:</p>
 <div class="arithmatex">\[B_{01} = \frac{\mathcal{Z}_0}{\mathcal{Z}_1} = \frac{p(\theta^* = 0|d, \mathcal{M}_0)}{p(\theta^* = 0|\mathcal{M}_0)}\]</div>
 <p><strong>In words:</strong> The Bayes factor equals the ratio of posterior to prior density at the special value.</p>
 <p><strong>Example:</strong> Testing <span class="arithmatex">\(w = -1\)</span> in <span class="arithmatex">\(w\)</span>CDM:</p>
@@ -231,11 +223,11 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1"># Bayes factor</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">B</span> <span class="o">=</span> <span class="n">posterior_density_at_minus1</span> <span class="o">/</span> <span class="n">prior_density_at_minus1</span>
 </code></pre></div>
-<p>This avoids running the simpler model entirely—you only need the more complex model's posterior!</p>
+<p>This avoids running the simpler model entirely — you only need the more complex model's posterior.</p>
 <hr />
 <h2 id="common-pitfalls">Common Pitfalls</h2>
 <h3 id="1-my-bayes-factor-is-sensitive-to-the-prior">1. "My Bayes factor is sensitive to the prior"</h3>
-<p><strong>Yes, that's correct!</strong> Evidence <em>should</em> depend on priors—that's the point.</p>
+<p>That's correct — evidence <em>should</em> depend on priors, that's the point.</p>
 <p>The prior encodes your model's predictions. A model that predicts "anything is possible" (very wide prior) gets penalized via the Occam factor.</p>
 <p><strong>Solution:</strong> Use physically motivated priors. If results change dramatically with reasonable prior choices, you probably need more data.</p>
 <h3 id="2-i-got-different-evidences-from-different-methods">2. "I got different evidences from different methods"</h3>
@@ -247,7 +239,7 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 </ul>
 <p><strong>Solution:</strong> Use nested sampling for rigorous comparisons. Check convergence carefully. Compare methods on toy problems first.</p>
 <h3 id="3-can-i-compare-models-with-different-data">3. "Can I compare models with different data?"</h3>
-<p><strong>No!</strong> The evidence is <span class="arithmatex">\(p(d|\mathcal{M})\)</span>—the probability of <em>this specific dataset</em> under each model.</p>
+<p>No. The evidence is <span class="arithmatex">\(p(d|\mathcal{M})\)</span>—the probability of <em>this specific dataset</em> under each model.</p>
 <p>If you use different data (e.g., different redshift cuts), you're computing <span class="arithmatex">\(p(d_1|\mathcal{M}_1)\)</span> vs <span class="arithmatex">\(p(d_2|\mathcal{M}_2)\)</span>, which is meaningless.</p>
 <p><strong>Solution:</strong> Use identical datasets for all models you're comparing.</p>
 <h3 id="4-bayes-factor-is-03-which-model-is-better">4. "Bayes factor is 0.3, which model is better?"</h3>
@@ -278,7 +270,7 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 </ol>
 <hr />
 <h2 id="real-world-example-desi-and-evolving-dark-energy">Real-World Example: DESI and Evolving Dark Energy</h2>
-<p>In 2024, the DESI collaboration reported hints of evolving dark energy (<span class="arithmatex">\(w_0w_a\)</span> model)[^DESI2024]. The community debate centered on: <strong>Is this statistically significant?</strong></p>
+<p>In 2024, the DESI collaboration reported hints of evolving dark energy (<span class="arithmatex">\(w_0w_a\)</span> model)<sup id="fnref:DESI2024"><a class="footnote-ref" href="#fn:DESI2024">7</a></sup>. The community debate centered on: <strong>Is this statistically significant?</strong></p>
 <h3 id="frequentist-analysis">Frequentist Analysis</h3>
 <ul>
 <li><span class="arithmatex">\(w_a = -0.5 \pm 0.3\)</span> (2σ from zero)</li>
@@ -298,11 +290,13 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 <hr />
 <h2 id="summary">Summary</h2>
 <p><strong>Model comparison via Bayesian evidence:</strong></p>
-<p>✅ Provides direct probability statements (odds ratios)
-✅ Automatically implements Occam's razor
-✅ Works for any models (nested or not)
-✅ Allows marginalization over model uncertainties
-✅ Rigorous and principled</p>
+<ul>
+<li>Provides direct probability statements (odds ratios)</li>
+<li>Automatically implements Occam's razor</li>
+<li>Works for any models (nested or not)</li>
+<li>Allows marginalization over model uncertainties</li>
+<li>Rigorous and principled</li>
+</ul>
 <p><strong>Requires:</strong>
 - Careful prior specification (affects evidence)
 - Specialized computation methods (<a href="../nested-sampling/">nested-sampling</a>)
@@ -312,7 +306,7 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 - 1-2.5: Weak to moderate
 - 2.5-5: Moderate to strong
 - &gt; 5: Strong evidence</p>
-<p><strong>The bottom line:</strong> When you want to answer "which model is correct?", compute the evidence. It's the principled way to do model comparison.</p>
+<p>When you want to answer "which model is correct?", compute the evidence — it's the principled way to do model comparison.</p>
 <hr />
 <p><strong>Next:</strong>
 - <a href="../nested-sampling/">nested-sampling</a> - How to compute the evidence
@@ -323,13 +317,32 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 - <a href="../bayesian-inference/">bayesian-inference</a> - The general framework</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Jeffreys1961]: Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.</p>
-<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
-<p>[Brout2022]: Brout, D., et al. (2022). The Pantheon+ analysis: cosmological constraints. <em>The Astrophysical Journal</em>, 938(2), 110.</p>
-<p>[Planck2018]: Planck Collaboration (2018). Planck 2018 results. VI. Cosmological parameters. <em>Astronomy &amp; Astrophysics</em>, 641, A6.</p>
-<p>[Lovick2024]: Lovick, T., Dhawan, S., &amp; Handley, W. (2024). Non-Gaussian likelihoods for Type Ia Supernovae cosmology. <em>MNRAS</em> (submitted).</p>
-<p>[TrottaDickey]: Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.</p>
-<p>[DESI2024]: DESI Collaboration (2024). DESI 2024 VI: Cosmological constraints from the measurements of baryon acoustic oscillations. <em>arXiv:2404.03002</em>.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Jeffreys1961">
+<p>Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.&#160;<a class="footnote-backref" href="#fnref:Jeffreys1961" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Trotta2008">
+<p>Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.&#160;<a class="footnote-backref" href="#fnref:Trotta2008" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Brout2022">
+<p>Brout, D., et al. (2022). The Pantheon+ analysis: cosmological constraints. <em>The Astrophysical Journal</em>, 938(2), 110.&#160;<a class="footnote-backref" href="#fnref:Brout2022" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Planck2018">
+<p>Planck Collaboration (2018). Planck 2018 results. VI. Cosmological parameters. <em>Astronomy &amp; Astrophysics</em>, 641, A6.&#160;<a class="footnote-backref" href="#fnref:Planck2018" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Lovick2024">
+<p>Lovick, T., Dhawan, S., &amp; Handley, W. (2024). Non-Gaussian likelihoods for Type Ia Supernovae cosmology. <em>MNRAS</em> (submitted).&#160;<a class="footnote-backref" href="#fnref:Lovick2024" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TrottaDickey">
+<p>Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.&#160;<a class="footnote-backref" href="#fnref:TrottaDickey" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:DESI2024">
+<p>DESI Collaboration (2024). DESI 2024 VI: Cosmological constraints from the measurements of baryon acoustic oscillations. <em>arXiv:2404.03002</em>.&#160;<a class="footnote-backref" href="#fnref:DESI2024" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -340,7 +353,7 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 							<a href="../prior-choice/" class="button">← Prior Choice</a>
 							
 							
-							<a href="../tension-statistics/" class="button primary" style="float:right">Quantifying Tension →</a>
+							<a href="../information-criteria/" class="button primary" style="float:right">Approximate Model Comparison →</a>
 							
 						</div>
 					</section>
@@ -394,6 +407,8 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 										
 										<li><a href="./" class="active">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -417,8 +432,6 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -455,6 +468,7 @@ $<span class="arithmatex">\(\mathcal{L} = \prod_i \frac{\Gamma((\nu+1)/2)}{\Gamm
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

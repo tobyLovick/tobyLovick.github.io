@@ -28,25 +28,17 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Nested Sampling</h1>
-						</header>
-						
-
 						<h1 id="nested-sampling">Nested Sampling</h1>
 <p>← Back to <a href="../">index</a> | Previous: <a href="../computing-evidence/">computing-evidence</a></p>
 <hr />
 <h2 id="the-algorithm-for-evidence-calculation">The Algorithm for Evidence Calculation</h2>
-<p>Nested sampling[^Skilling2006] is a Monte Carlo method specifically designed to compute the <a href="../evidence/">evidence</a> while simultaneously generating posterior samples. It's the <strong>gold standard</strong> for Bayesian model comparison.</p>
+<p>Nested sampling<sup id="fnref:Skilling2006"><a class="footnote-ref" href="#fn:Skilling2006">2</a></sup> is a Monte Carlo method specifically designed to compute the <a href="../evidence/">evidence</a> while simultaneously generating posterior samples. It's the <strong>gold standard</strong> for Bayesian model comparison.</p>
 <hr />
 <h2 id="the-problem">The Problem</h2>
 <p>Computing the evidence requires integrating over the entire prior:</p>
@@ -57,7 +49,7 @@
 <p>Standard MCMC can't compute evidence because it concentrates samples where <span class="arithmatex">\(\mathcal{L}\)</span> is large, missing the contribution from low-likelihood regions.</p>
 <hr />
 <h2 id="skillings-insight">Skilling's Insight</h2>
-<p>John Skilling's brilliant idea[<sup>Skilling2004][</sup>Skilling2006]: <strong>Transform the multi-dimensional integral into a one-dimensional integral</strong>.</p>
+<p>John Skilling's brilliant idea<sup id="fnref:Skilling2004"><a class="footnote-ref" href="#fn:Skilling2004">1</a></sup><sup id="fnref2:Skilling2006"><a class="footnote-ref" href="#fn:Skilling2006">2</a></sup>: <strong>Transform the multi-dimensional integral into a one-dimensional integral</strong>.</p>
 <h3 id="the-prior-mass">The Prior Mass</h3>
 <p>Define the <strong>prior mass</strong> <span class="arithmatex">\(X(\lambda)\)</span> as the volume of prior with likelihood greater than <span class="arithmatex">\(\lambda\)</span>:</p>
 <div class="arithmatex">\[X(\lambda) = \int_{\mathcal{L}(\theta) &gt; \lambda} \pi(\theta) d\theta\]</div>
@@ -69,7 +61,7 @@
 <h3 id="the-transformation">The Transformation</h3>
 <p>Change variables in the evidence integral from <span class="arithmatex">\(\theta\)</span> to <span class="arithmatex">\(X\)</span>:</p>
 <div class="arithmatex">\[\boxed{\mathcal{Z} = \int_0^1 \mathcal{L}(X) dX}\]</div>
-<p><strong>This is remarkable:</strong> We've converted a <span class="arithmatex">\(d\)</span>-dimensional integral (where <span class="arithmatex">\(d\)</span> might be 10, 20, 50...) into a <strong>one-dimensional integral</strong>!</p>
+<p>We've converted a <span class="arithmatex">\(d\)</span>-dimensional integral (where <span class="arithmatex">\(d\)</span> might be 10, 20, 50...) into a one-dimensional integral.</p>
 <p>Of course, we don't know <span class="arithmatex">\(\mathcal{L}(X)\)</span> explicitly—but we can sample it.</p>
 <hr />
 <h2 id="the-algorithm">The Algorithm</h2>
@@ -124,7 +116,7 @@
 <p>The dead points trace out the likelihood contours from low to high, naturally ordered.</p>
 <hr />
 <h2 id="example-2d-gaussian">Example: 2D Gaussian</h2>
-<p>Let's work through a concrete example where we can compute everything analytically.</p>
+<p>A concrete example where we can compute everything analytically.</p>
 <h3 id="setup_1">Setup</h3>
 <ul>
 <li><strong>Prior:</strong> Uniform on <span class="arithmatex">\([-5, 5]^2\)</span> (volume <span class="arithmatex">\(V = 100\)</span>)</li>
@@ -197,7 +189,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Analytical: log Z = -2.77
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Nested sampling: log Z = -2.75 ± 0.04
 </code></pre></div></p>
-<p>Perfect agreement! (The error bar comes from the stochastic <span class="arithmatex">\(X\)</span> shrinkage.)</p>
+<p>Good agreement (the error bar comes from the stochastic <span class="arithmatex">\(X\)</span> shrinkage.)</p>
 <hr />
 <h2 id="the-constrained-prior-challenge">The Constrained Prior Challenge</h2>
 <p>The hardest part of nested sampling is Step 4: <strong>sampling from the prior subject to <span class="arithmatex">\(\mathcal{L}(\theta) &gt; \mathcal{L}^*\)</span></strong>.</p>
@@ -209,14 +201,14 @@
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="k">if</span> <span class="n">likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">L_constraint</span><span class="p">:</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>            <span class="k">return</span> <span class="n">theta</span>
 </code></pre></div>
-<p><strong>Problem:</strong> Acceptance rate drops exponentially! In high dimensions, you might try <span class="arithmatex">\(10^{100}\)</span> points before finding one that works.</p>
+<p><strong>Problem:</strong> Acceptance rate drops exponentially. In high dimensions, you might try <span class="arithmatex">\(10^{100}\)</span> points before finding one that works.</p>
 <h3 id="modern-solutions">Modern Solutions</h3>
-<p><strong>1. Slice Sampling</strong>[^Neal2003]</p>
-<p>Sample along 1D slices through parameter space. PolyChord[^Handley2015a] uses this approach.</p>
+<p><strong>1. Slice Sampling</strong><sup id="fnref:Neal2003"><a class="footnote-ref" href="#fn:Neal2003">8</a></sup></p>
+<p>Sample along 1D slices through parameter space. PolyChord<sup id="fnref:Handley2015a"><a class="footnote-ref" href="#fn:Handley2015a">4</a></sup> uses this approach.</p>
 <p><strong>2. Ellipsoidal Decomposition</strong></p>
-<p>Fit ellipsoids to live points, sample from them. MultiNest[^Feroz2009] pioneered this.</p>
+<p>Fit ellipsoids to live points, sample from them. MultiNest<sup id="fnref:Feroz2009"><a class="footnote-ref" href="#fn:Feroz2009">3</a></sup> pioneered this.</p>
 <p><strong>3. Hamiltonian Monte Carlo</strong></p>
-<p>Use gradients to efficiently explore the constrained region[^Betancourt2011]. Still active research.</p>
+<p>Use gradients to efficiently explore the constrained region<sup id="fnref:Betancourt2011"><a class="footnote-ref" href="#fn:Betancourt2011">9</a></sup>. Still active research.</p>
 <hr />
 <h2 id="advantages-of-nested-sampling">Advantages of Nested Sampling</h2>
 <h3 id="1-direct-evidence-calculation">1. Direct Evidence Calculation</h3>
@@ -229,7 +221,7 @@
 <h3 id="4-posterior-samples-as-byproduct">4. Posterior Samples as Byproduct</h3>
 <p>The dead points, weighted by <span class="arithmatex">\(w_i\)</span>, are samples from the posterior:</p>
 <div class="arithmatex">\[p(\theta|d) \propto \mathcal{L}(\theta)\pi(\theta)\]</div>
-<p>So you get parameter inference <em>and</em> evidence from one run!</p>
+<p>So you get parameter inference and evidence from a single run.</p>
 <hr />
 <h2 id="disadvantages-of-nested-sampling">Disadvantages of Nested Sampling</h2>
 <h3 id="1-computational-cost">1. Computational Cost</h3>
@@ -239,11 +231,11 @@
 <h3 id="2-implementation-complexity">2. Implementation Complexity</h3>
 <p>The constrained prior sampling step requires clever algorithms. Poorly implemented NS can be inefficient or biased.</p>
 <h3 id="3-no-gradient-information">3. No Gradient Information</h3>
-<p>Standard NS doesn't use <span class="arithmatex">\(\nabla\mathcal{L}\)</span>, missing potential speed-ups. (Though gradient-augmented NS is being developed[^Cai2022].)</p>
+<p>Standard NS doesn't use <span class="arithmatex">\(\nabla\mathcal{L}\)</span>, missing potential speed-ups. (Though gradient-augmented NS is being developed<sup id="fnref:Cai2022"><a class="footnote-ref" href="#fn:Cai2022">10</a></sup>.)</p>
 <hr />
 <h2 id="modern-implementations">Modern Implementations</h2>
 <h3 id="polychord">PolyChord</h3>
-<p>Uses slice sampling for constrained prior[<sup>Handley2015a][</sup>Handley2015b]. Excellent for <span class="arithmatex">\(d \lesssim 30\)</span>.</p>
+<p>Uses slice sampling for constrained prior<sup id="fnref2:Handley2015a"><a class="footnote-ref" href="#fn:Handley2015a">4</a></sup><sup id="fnref:Handley2015b"><a class="footnote-ref" href="#fn:Handley2015b">5</a></sup>. Excellent for <span class="arithmatex">\(d \lesssim 30\)</span>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_polychord</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pypolychord.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolyChordSettings</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
@@ -257,7 +249,7 @@
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evidence: log Z = </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">logZ</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">logZerr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="dynesty">dynesty</h3>
-<p>Dynamic nested sampling—adjusts <span class="arithmatex">\(N_{\text{live}}\)</span> during the run[^Speagle2020].</p>
+<p>Dynamic nested sampling—adjusts <span class="arithmatex">\(N_{\text{live}}\)</span> during the run<sup id="fnref:Speagle2020"><a class="footnote-ref" href="#fn:Speagle2020">6</a></sup>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dynesty</span><span class="w"> </span><span class="kn">import</span> <span class="n">DynamicNestedSampler</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">sampler</span> <span class="o">=</span> <span class="n">DynamicNestedSampler</span><span class="p">(</span><span class="n">log_likelihood</span><span class="p">,</span> <span class="n">prior_transform</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
@@ -267,7 +259,7 @@
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evidence: log Z = </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">logz</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">results</span><span class="o">.</span><span class="n">logzerr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="multinest">MultiNest</h3>
-<p>Ellipsoidal decomposition, good for multimodal problems[^Feroz2009].</p>
+<p>Ellipsoidal decomposition, good for multimodal problems<sup id="fnref2:Feroz2009"><a class="footnote-ref" href="#fn:Feroz2009">3</a></sup>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pymultinest</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">run</span><span class="p">(</span><span class="n">log_likelihood</span><span class="p">,</span> <span class="n">prior_transform</span><span class="p">,</span> <span class="n">n_dims</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
@@ -275,22 +267,22 @@
 </code></pre></div>
 <hr />
 <h2 id="gpu-acceleration">GPU Acceleration</h2>
-<p>Recent work has developed GPU-accelerated nested sampling[^NSSYallup], reducing:
+<p>Recent work has developed GPU-accelerated nested sampling<sup id="fnref:NSSYallup"><a class="footnote-ref" href="#fn:NSSYallup">11</a></sup>, reducing:
 - <strong>6D CMB:</strong> 1 hour → 12 seconds (300× speedup)
 - <strong>37D cosmic shear:</strong> 8 months → 2 days (120× speedup)</p>
-<p>This makes NS competitive with gradient-based methods even in moderate-high dimensions!</p>
+<p>This makes NS competitive with gradient-based methods even in moderate-high dimensions.</p>
 <p>See <a href="../gpu-acceleration/">gpu-acceleration</a> for details.</p>
 <hr />
 <h2 id="when-to-use-nested-sampling">When to Use Nested Sampling</h2>
 <p><strong>Use NS when:</strong>
-- ✅ You need accurate evidence for <a href="../model-comparison/">model-comparison</a>
-- ✅ Posterior might be multimodal
-- ✅ Dimensionality is moderate (<span class="arithmatex">\(d \lesssim 40\)</span>)
-- ✅ Likelihood is expensive (parallelize easily)</p>
+- You need accurate evidence for <a href="../model-comparison/">model-comparison</a>
+- Posterior might be multimodal
+- Dimensionality is moderate (<span class="arithmatex">\(d \lesssim 40\)</span>)
+- Likelihood is expensive (parallelize easily)</p>
 <p><strong>Use MCMC when:</strong>
-- ✅ You only need parameter constraints (not evidence)
-- ✅ Dimensionality is high (<span class="arithmatex">\(d &gt; 50\)</span>)
-- ✅ Gradients are available (use HMC)</p>
+- You only need parameter constraints (not evidence)
+- Dimensionality is high (<span class="arithmatex">\(d &gt; 50\)</span>)
+- Gradients are available (use HMC)</p>
 <p><strong>For many cosmological problems, NS is the right choice</strong> because evidence is crucial and <span class="arithmatex">\(d \sim 10-40\)</span>.</p>
 <hr />
 <h2 id="summary">Summary</h2>
@@ -313,17 +305,44 @@
 - <a href="../mcmc/">mcmc</a> - Alternative sampling method</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Skilling2004]: Skilling, J. (2004). Nested Sampling. In <em>AIP Conference Proceedings</em> (Vol. 735, pp. 395-405).</p>
-<p>[Skilling2006]: Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.</p>
-<p>[Feroz2009]: Feroz, F., Hobson, M. P., &amp; Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool. <em>MNRAS</em>, 398(4), 1601-1614.</p>
-<p>[Handley2015a]: Handley, W. J., Hobson, M. P., &amp; Lasenby, A. N. (2015). POLYCHORD: next-generation nested sampling. <em>MNRAS</em>, 453(4), 4384-4398.</p>
-<p>[Handley2015b]: Handley, W. J., Hobson, M. P., &amp; Lasenby, A. N. (2015). PolyChord: nested sampling for cosmology. <em>MNRAS Letters</em>, 450(1), L61-L65.</p>
-<p>[Speagle2020]: Speagle, J. S. (2020). dynesty: a dynamic nested sampling package. <em>MNRAS</em>, 493(3), 3132-3158.</p>
-<p>[Ashton2022]: Ashton, G., et al. (2022). Nested sampling for physical scientists. <em>Nature Reviews Methods Primers</em>, 2(1), 39.</p>
-<p>[Neal2003]: Neal, R. M. (2003). Slice sampling. <em>The Annals of Statistics</em>, 31(3), 705-741.</p>
-<p>[Betancourt2011]: Betancourt, M. (2011). Nested sampling with constrained Hamiltonian Monte Carlo. <em>AIP Conference Proceedings</em>, 1305, 165-172.</p>
-<p>[Cai2022]: Cai, Z., et al. (2022). Accelerated nested sampling with gradient-based Hamiltonian Monte Carlo. <em>Physical Review D</em>, 105(12), 123503.</p>
-<p>[NSSYallup]: Yallup, D., et al. (2024). GPU-accelerated nested sampling for high-dimensional Bayesian inference. <em>MNRAS</em> (in prep).</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Skilling2004">
+<p>Skilling, J. (2004). Nested Sampling. In <em>AIP Conference Proceedings</em> (Vol. 735, pp. 395-405).&#160;<a class="footnote-backref" href="#fnref:Skilling2004" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Skilling2006">
+<p>Skilling, J. (2006). Nested sampling for general Bayesian computation. <em>Bayesian Analysis</em>, 1(4), 833-859.&#160;<a class="footnote-backref" href="#fnref:Skilling2006" title="Jump back to footnote 2 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:Skilling2006" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Feroz2009">
+<p>Feroz, F., Hobson, M. P., &amp; Bridges, M. (2009). MultiNest: an efficient and robust Bayesian inference tool. <em>MNRAS</em>, 398(4), 1601-1614.&#160;<a class="footnote-backref" href="#fnref:Feroz2009" title="Jump back to footnote 3 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:Feroz2009" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Handley2015a">
+<p>Handley, W. J., Hobson, M. P., &amp; Lasenby, A. N. (2015). POLYCHORD: next-generation nested sampling. <em>MNRAS</em>, 453(4), 4384-4398.&#160;<a class="footnote-backref" href="#fnref:Handley2015a" title="Jump back to footnote 4 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:Handley2015a" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Handley2015b">
+<p>Handley, W. J., Hobson, M. P., &amp; Lasenby, A. N. (2015). PolyChord: nested sampling for cosmology. <em>MNRAS Letters</em>, 450(1), L61-L65.&#160;<a class="footnote-backref" href="#fnref:Handley2015b" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Speagle2020">
+<p>Speagle, J. S. (2020). dynesty: a dynamic nested sampling package. <em>MNRAS</em>, 493(3), 3132-3158.&#160;<a class="footnote-backref" href="#fnref:Speagle2020" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Ashton2022">
+<p>Ashton, G., et al. (2022). Nested sampling for physical scientists. <em>Nature Reviews Methods Primers</em>, 2(1), 39.&#160;<a class="footnote-backref" href="#fnref:Ashton2022" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Neal2003">
+<p>Neal, R. M. (2003). Slice sampling. <em>The Annals of Statistics</em>, 31(3), 705-741.&#160;<a class="footnote-backref" href="#fnref:Neal2003" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Betancourt2011">
+<p>Betancourt, M. (2011). Nested sampling with constrained Hamiltonian Monte Carlo. <em>AIP Conference Proceedings</em>, 1305, 165-172.&#160;<a class="footnote-backref" href="#fnref:Betancourt2011" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Cai2022">
+<p>Cai, Z., et al. (2022). Accelerated nested sampling with gradient-based Hamiltonian Monte Carlo. <em>Physical Review D</em>, 105(12), 123503.&#160;<a class="footnote-backref" href="#fnref:Cai2022" title="Jump back to footnote 10 in the text">&#8617;</a></p>
+</li>
+<li id="fn:NSSYallup">
+<p>Yallup, D., et al. (2024). GPU-accelerated nested sampling for high-dimensional Bayesian inference. <em>MNRAS</em> (in prep).&#160;<a class="footnote-backref" href="#fnref:NSSYallup" title="Jump back to footnote 11 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -388,6 +407,8 @@
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -411,8 +432,6 @@
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -449,6 +468,7 @@
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

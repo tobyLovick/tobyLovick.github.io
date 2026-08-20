@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Conditional Probability</h1>
-						</header>
-						
-
 						<h1 id="conditional-probability">Conditional Probability</h1>
 <p>← Back to <a href="../">index</a></p>
 <hr />
@@ -58,7 +50,7 @@
 <div class="arithmatex">\[P(A \cap B) = P(A|B)P(B)\]</div>
 <p>By symmetry, we also have:</p>
 <div class="arithmatex">\[P(A \cap B) = P(B|A)P(A)\]</div>
-<p><strong>This symmetry is the key insight</strong>: The same joint probability can be expressed in two different ways. Equating these two expressions immediately gives us <a href="../bayes-theorem/">bayes-theorem</a>.</p>
+<p>The same joint probability can be expressed in two different ways. Equating these two expressions immediately gives us <a href="../bayes-theorem/">bayes-theorem</a>.</p>
 <hr />
 <h2 id="a-simple-example">A Simple Example</h2>
 <p>Consider drawing a card from a standard deck:</p>
@@ -67,8 +59,8 @@
 <li>Let <span class="arithmatex">\(B\)</span> = "card is a spade"</li>
 </ul>
 <p><strong>Question:</strong> What's the probability the card is an Ace, given that it's a spade?</p>
-<p><strong>Solution:</strong>
-$<span class="arithmatex">\(P(\text{Ace}|\text{Spade}) = \frac{P(\text{Ace} \cap \text{Spade})}{P(\text{Spade})} = \frac{1/52}{13/52} = \frac{1}{13}\)</span>$</p>
+<p><strong>Solution:</strong></p>
+<div class="arithmatex">\[P(\text{Ace}|\text{Spade}) = \frac{P(\text{Ace} \cap \text{Spade})}{P(\text{Spade})} = \frac{1/52}{13/52} = \frac{1}{13}\]</div>
 <p>This makes intuitive sense: if we know the card is a spade, we're looking at 13 cards, exactly one of which is an Ace.</p>
 <hr />
 <h2 id="why-this-matters-for-science">Why This Matters for Science</h2>
@@ -76,7 +68,7 @@ $<span class="arithmatex">\(P(\text{Ace}|\text{Spade}) = \frac{P(\text{Ace} \cap
 - <strong><span class="arithmatex">\(B\)</span></strong> = the data we observed
 - <strong><span class="arithmatex">\(A\)</span></strong> = a hypothesis about nature</p>
 <p>We want to know <span class="arithmatex">\(P(A|B)\)</span>: "How probable is this hypothesis, given the data?"</p>
-<p>But often we can more easily calculate <span class="arithmatex">\(P(B|A)\)</span>: "How probable is this data, given the hypothesis?" This is what our theoretical models predict!</p>
+<p>But often we can more easily calculate <span class="arithmatex">\(P(B|A)\)</span>: "How probable is this data, given the hypothesis?" This is what our theoretical models predict.</p>
 <p><strong>The problem:</strong> How do we invert the conditioning? How do we get from <span class="arithmatex">\(P(B|A)\)</span> to <span class="arithmatex">\(P(A|B)\)</span>?</p>
 <p><strong>The solution:</strong> <a href="../bayes-theorem/">bayes-theorem</a> →</p>
 <hr />
@@ -154,6 +146,8 @@ $<span class="arithmatex">\(P(\text{Ace}|\text{Spade}) = \frac{P(\text{Ace} \cap
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -177,8 +171,6 @@ $<span class="arithmatex">\(P(\text{Ace}|\text{Spade}) = \frac{P(\text{Ace} \cap
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -215,6 +207,7 @@ $<span class="arithmatex">\(P(\text{Ace}|\text{Spade}) = \frac{P(\text{Ace} \cap
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

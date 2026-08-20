@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Hierarchical Models</h1>
-						</header>
-						
-
 						<h1 id="hierarchical-bayesian-models">Hierarchical Bayesian Models</h1>
 <p>← Back to <a href="../">index</a> | See also: <a href="../analytical-update/">analytical-update</a>, <a href="../bayesian-inference/">bayesian-inference</a></p>
 <hr />
@@ -108,8 +100,9 @@
 <li><strong>Population level:</strong> These <span class="arithmatex">\(\theta_y\)</span> are drawn from a common distribution</li>
 </ol>
 <p><strong>Model:</strong></p>
-<div class="arithmatex">\[\theta_y \sim \text{Beta}(\alpha, \beta) \quad \text{(hyperprior)}\]</div>
+<div class="arithmatex">\[\theta_y \sim \text{Beta}(\alpha, \beta) \quad \text{(population-level prior, given hyperparameters $\alpha,\beta$)}\]</div>
 <div class="arithmatex">\[k_y | \theta_y \sim \text{Binomial}(n_y, \theta_y) \quad \text{(likelihood)}\]</div>
+<p>(The hyperprior proper is the prior placed on <span class="arithmatex">\(\alpha, \beta\)</span> themselves — see below.)</p>
 <p>We infer both:
 - <span class="arithmatex">\(\{\theta_y\}\)</span> for each year (individual effects)
 - <span class="arithmatex">\(\alpha, \beta\)</span> describing the population (hyperparameters)</p>
@@ -153,9 +146,9 @@
 <p>or more intuitively, reparameterize as:
 - Mean: <span class="arithmatex">\(\mu = \alpha/(\alpha + \beta)\)</span>
 - Concentration: <span class="arithmatex">\(\kappa = \alpha + \beta\)</span> (controls variance)</p>
-<p>Then:
-$<span class="arithmatex">\(\mu \sim \text{Beta}(1, 1) \quad \text{(uniform)}\)</span>$
-$<span class="arithmatex">\(\kappa \sim \text{Pareto}(1, 1.5) \quad \text{(weakly informative)}\)</span>$</p>
+<p>Then:</p>
+<div class="arithmatex">\[\mu \sim \text{Beta}(1, 1) \quad \text{(uniform)}\]</div>
+<div class="arithmatex">\[\kappa \sim \text{Pareto}(1, 1.5) \quad \text{(weakly informative)}\]</div>
 <h3 id="full-posterior">Full Posterior</h3>
 <p>The joint posterior is:</p>
 <div class="arithmatex">\[p(\{\theta_y\}, \alpha, \beta | \{k_y\}) \propto p(\alpha, \beta) \prod_y p(\theta_y | \alpha, \beta) p(k_y | \theta_y)\]</div>
@@ -250,22 +243,22 @@ $<span class="arithmatex">\(\kappa \sim \text{Pareto}(1, 1.5) \quad \text{(weakl
 <hr />
 <h2 id="when-to-use-hierarchical-models">When to Use Hierarchical Models</h2>
 <p><strong>Use hierarchical models when:</strong>
-- ✅ Data naturally grouped (schools, hospitals, years, locations, etc.)
-- ✅ Group sizes vary (some have lots of data, others sparse)
-- ✅ You believe groups share similarities but aren't identical
-- ✅ You want to make predictions for new groups</p>
+- Data naturally grouped (schools, hospitals, years, locations, etc.)
+- Group sizes vary (some have lots of data, others sparse)
+- You believe groups share similarities but aren't identical
+- You want to make predictions for new groups</p>
 <p><strong>Don't use when:</strong>
-- ❌ Groups are truly independent with no shared structure
-- ❌ You have so much data per group that pooling doesn't help
-- ❌ Computational cost of MCMC is prohibitive (though see <a href="../gpu-acceleration/">gpu-acceleration</a>)</p>
+- Groups are truly independent with no shared structure
+- You have so much data per group that pooling doesn't help
+- Computational cost of MCMC is prohibitive (though see <a href="../gpu-acceleration/">gpu-acceleration</a>)</p>
 <hr />
 <h2 id="extensions">Extensions</h2>
 <h3 id="non-conjugate-hierarchical-models">Non-Conjugate Hierarchical Models</h3>
 <p>The Beta-Binomial is special because it's conjugate. Most real problems aren't:</p>
 <p><strong>Example:</strong> Normal data with hierarchical variance:</p>
-<div class="arithmatex">\[y_{ij} \sim \mathcal{N}(\mu_i, \sigma_i^2)$$
-$$\mu_i \sim \mathcal{N}(\mu_0, \tau^2)$$
-$$\sigma_i \sim \text{HalfNormal}(\sigma_0)\]</div>
+<div class="arithmatex">\[y_{ij} \sim \mathcal{N}(\mu_i, \sigma_i^2)\]</div>
+<div class="arithmatex">\[\mu_i \sim \mathcal{N}(\mu_0, \tau^2)\]</div>
+<div class="arithmatex">\[\sigma_i \sim \text{HalfNormal}(\sigma_0)\]</div>
 <p>Requires MCMC (no analytical solution).</p>
 <h3 id="deeper-hierarchies">Deeper Hierarchies</h3>
 <p>Can have multiple levels:</p>
@@ -386,11 +379,13 @@ $$\sigma_i \sim \text{HalfNormal}(\sigma_0)\]</div>
 <hr />
 <h2 id="summary">Summary</h2>
 <p><strong>Hierarchical Bayesian models:</strong></p>
-<p>✅ Pool information across groups via shared population parameters
-✅ Exhibit shrinkage—regularizing small-sample groups toward population mean
-✅ Provide population-level inference in addition to group-level
-✅ Naturally handle unbalanced data (varying group sizes)
-✅ Enable principled predictions for new groups</p>
+<ul>
+<li>Pool information across groups via shared population parameters</li>
+<li>Exhibit shrinkage—regularizing small-sample groups toward population mean</li>
+<li>Provide population-level inference in addition to group-level</li>
+<li>Naturally handle unbalanced data (varying group sizes)</li>
+<li>Enable principled predictions for new groups</li>
+</ul>
 <p><strong>Key concepts:</strong>
 - <strong>Partial pooling</strong> = middle ground between no pooling and complete pooling
 - <strong>Shrinkage</strong> = groups borrow strength from population
@@ -482,6 +477,8 @@ $$\sigma_i \sim \text{HalfNormal}(\sigma_0)\]</div>
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -505,8 +502,6 @@ $$\sigma_i \sim \text{HalfNormal}(\sigma_0)\]</div>
 										<li><a href="./" class="active">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -543,6 +538,7 @@ $$\sigma_i \sim \text{HalfNormal}(\sigma_0)\]</div>
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

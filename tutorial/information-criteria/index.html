@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>Information Criteria (AIC/BIC) – Bayesian Inference Tutorial</title>
+		<title>Approximate Model Comparison – Bayesian Inference Tutorial</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="../assets/css/main.css" />
@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Information Criteria (AIC/BIC)</h1>
-						</header>
-						
-
 						<h1 id="information-criteria-aic-and-bic">Information Criteria: AIC and BIC</h1>
 <p>← Back to <a href="../">index</a> | See also: <a href="../evidence/">evidence</a>, <a href="../model-comparison/">model-comparison</a></p>
 <hr />
@@ -53,15 +45,15 @@
 <p><strong>Information criteria</strong> provide quick approximations to <a href="../model-comparison/">model-comparison</a> using only the <strong>maximum likelihood</strong>.</p>
 <hr />
 <h2 id="akaike-information-criterion-aic">Akaike Information Criterion (AIC)</h2>
-<p>Proposed by Hirotsugu Akaike in 1974[^Akaike1974], AIC estimates the relative quality of statistical models.</p>
+<p>Proposed by Hirotsugu Akaike in 1974<sup id="fnref:Akaike1974"><a class="footnote-ref" href="#fn:Akaike1974">1</a></sup>, AIC estimates the relative quality of statistical models.</p>
 <h3 id="definition">Definition</h3>
 <div class="arithmatex">\[\boxed{\text{AIC} = 2k - 2\log\mathcal{L}_{\max}}\]</div>
 <p>where:
 - <span class="arithmatex">\(k\)</span> = number of parameters in the model
 - <span class="arithmatex">\(\mathcal{L}_{\max}\)</span> = maximum likelihood value</p>
 <p><strong>Model comparison:</strong> Prefer the model with <strong>lower AIC</strong>.</p>
-<p><strong>Differences in AIC:</strong>
-$<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</span>$</p>
+<p><strong>Differences in AIC:</strong></p>
+<div class="arithmatex">\[\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\]</div>
 <ul>
 <li><span class="arithmatex">\(\Delta\text{AIC} &lt; 2\)</span>: Models essentially equivalent</li>
 <li><span class="arithmatex">\(2 &lt; \Delta\text{AIC} &lt; 7\)</span>: Moderate evidence for model 0</li>
@@ -73,8 +65,8 @@ $<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</sp
 - Large sample size (<span class="arithmatex">\(n \to \infty\)</span>)
 - Weak, uniform priors
 - Well-determined parameters</p>
-<p>We have approximately:
-$<span class="arithmatex">\(-2\log\mathcal{Z} \approx \text{AIC} + \text{const}\)</span>$</p>
+<p>We have approximately:</p>
+<div class="arithmatex">\[-2\log\mathcal{Z} \approx \text{AIC} + \text{const}\]</div>
 <h3 id="what-aic-measures">What AIC Measures</h3>
 <div class="arithmatex">\[\text{AIC} = \underbrace{-2\log\mathcal{L}_{\max}}_{\text{Goodness of fit}} + \underbrace{2k}_{\text{Complexity penalty}}\]</div>
 <p><strong>Interpretation:</strong>
@@ -93,7 +85,7 @@ $<span class="arithmatex">\(-2\log\mathcal{Z} \approx \text{AIC} + \text{const}\
 <p>AIC gives same penalty (2) for both, but Model B effectively has fewer constrained parameters. The <a href="../evidence/">evidence</a> (via <a href="../kl-divergence/">KL divergence</a>) correctly accounts for this.</p>
 <hr />
 <h2 id="bayesian-information-criterion-bic">Bayesian Information Criterion (BIC)</h2>
-<p>Also called the Schwarz criterion[^Schwarz1978], BIC provides a better approximation to the Bayesian evidence.</p>
+<p>Also called the Schwarz criterion<sup id="fnref:Schwarz1978"><a class="footnote-ref" href="#fn:Schwarz1978">2</a></sup>, BIC provides a better approximation to the Bayesian evidence.</p>
 <h3 id="definition_1">Definition</h3>
 <div class="arithmatex">\[\boxed{\text{BIC} = k\log n - 2\log\mathcal{L}_{\max}}\]</div>
 <p>where <span class="arithmatex">\(n\)</span> = number of data points.</p>
@@ -111,8 +103,8 @@ $<span class="arithmatex">\(-2\log\mathcal{Z} \approx \text{AIC} + \text{const}\
 <div class="arithmatex">\[\log\mathcal{Z} \approx \log\mathcal{L}_{\max} + \frac{k}{2}\log(2\pi) - \frac{1}{2}\log|\mathbf{H}|\]</div>
 <p>When the Hessian <span class="arithmatex">\(\mathbf{H}\)</span> is approximated by <span class="arithmatex">\(n \mathbf{I}\)</span> (identity matrix scaled by sample size):</p>
 <div class="arithmatex">\[\log|\mathbf{H}| \approx k\log n\]</div>
-<p>This gives:
-$<span class="arithmatex">\(-2\log\mathcal{Z} \approx -2\log\mathcal{L}_{\max} + k\log n = \text{BIC}\)</span>$</p>
+<p>This gives:</p>
+<div class="arithmatex">\[-2\log\mathcal{Z} \approx -2\log\mathcal{L}_{\max} + k\log n = \text{BIC}\]</div>
 <h3 id="limitations_1">Limitations</h3>
 <p><strong>BIC assumes:</strong>
 1. <strong>Large sample size</strong> (<span class="arithmatex">\(n \gg k\)</span>)
@@ -123,7 +115,7 @@ $<span class="arithmatex">\(-2\log\mathcal{Z} \approx -2\log\mathcal{L}_{\max} +
 - <strong>Too harsh</strong> when parameters are degenerate (penalty overestimates effective dimensionality)</p>
 <hr />
 <h2 id="worked-example-dark-energy-models">Worked Example: Dark Energy Models</h2>
-<p>Let's compare <a href="../dark-energy-models/">cosmological models</a> using Pantheon+ supernovae (<span class="arithmatex">\(n = 1701\)</span> SNe).</p>
+<p>Comparing <a href="../dark-energy-models/">cosmological models</a> using Pantheon+ supernovae (<span class="arithmatex">\(n = 1701\)</span> SNe).</p>
 <h3 id="the-models">The Models</h3>
 <p><strong>Flat ΛCDM:</strong> 6 cosmological parameters (for CMB) + 3 nuisance (<span class="arithmatex">\(M_B\)</span>, <span class="arithmatex">\(\alpha\)</span>, <span class="arithmatex">\(\beta\)</span>)
 - Total fitted to SNe: <span class="arithmatex">\(k_{\Lambda\text{CDM}} = 3\)</span> (assuming <span class="arithmatex">\(H_0\)</span>, <span class="arithmatex">\(\Omega_m\)</span> fixed by CMB)</p>
@@ -156,25 +148,25 @@ $<span class="arithmatex">\(-2\log\mathcal{Z} \approx -2\log\mathcal{L}_{\max} +
 <p><strong>Evidence (Δ = 2.5):</strong> Just right
 - Accounts for actual <a href="../kl-divergence/">posterior compression</a>
 - Includes <a href="../evidence/#the-occam-penalty">Occam penalty</a> from prior volume
-- Bayesian model dimensionality <span class="arithmatex">\(\hat{d}_w \approx 0.8\)</span> (not 1!)</p>
+- Bayesian model dimensionality <span class="arithmatex">\(\hat{d}_w \approx 0.8\)</span> (not 1)</p>
 <h3 id="decomposition">Decomposition</h3>
 <p>Using the <a href="../evidence/#the-laplace-approximation">evidence decomposition</a>:</p>
 <div class="arithmatex">\[\Delta\log\mathcal{Z} \approx \underbrace{\Delta\log\mathcal{L}_{\max}}_{+0.5} - \underbrace{\Delta\hat{d}/2}_{-0.4} - \underbrace{\Delta\mathcal{D}_{\text{KL}}}_{-2.6} \approx -2.5\]</div>
 <ul>
-<li><strong>AIC approximation:</strong> <span class="arithmatex">\(\Delta\log\mathcal{L}_{\max} - k/2 = 0.5 - 0.5 = 0\)</span> ✗ (wrong sign!)</li>
+<li><strong>AIC approximation:</strong> <span class="arithmatex">\(\Delta\log\mathcal{L}_{\max} - k/2 = 0.5 - 0.5 = 0\)</span> ✗ (wrong sign)</li>
 <li><strong>BIC approximation:</strong> Uses <span class="arithmatex">\(k\log n\)</span> not actual <span class="arithmatex">\(\hat{d}\)</span> ✗ (overestimates)</li>
 <li><strong>Nested sampling:</strong> Exact ✓</li>
 </ul>
 <hr />
 <h2 id="corrected-aic-aicc">Corrected AIC (AICc)</h2>
-<p>For small sample sizes, AIC has a <strong>finite-sample correction</strong>[^Hurvich1989]:</p>
+<p>For small sample sizes, AIC has a <strong>finite-sample correction</strong><sup id="fnref:Hurvich1989"><a class="footnote-ref" href="#fn:Hurvich1989">3</a></sup>:</p>
 <div class="arithmatex">\[\text{AICc} = \text{AIC} + \frac{2k(k+1)}{n - k - 1}\]</div>
 <p><strong>When <span class="arithmatex">\(n \gg k\)</span>:</strong> Correction term negligible, AICc ≈ AIC</p>
 <p><strong>When <span class="arithmatex">\(n \sim k\)</span>:</strong> Correction important, penalizes complexity more heavily</p>
 <p><strong>Rule of thumb:</strong> Use AICc when <span class="arithmatex">\(n/k &lt; 40\)</span>.</p>
 <hr />
 <h2 id="dic-deviance-information-criterion">DIC: Deviance Information Criterion</h2>
-<p>An alternative for Bayesian models[^Spiegelhalter2002]:</p>
+<p>An alternative for Bayesian models<sup id="fnref:Spiegelhalter2002"><a class="footnote-ref" href="#fn:Spiegelhalter2002">4</a></sup>:</p>
 <div class="arithmatex">\[\text{DIC} = \bar{D} + p_D\]</div>
 <p>where:
 - <span class="arithmatex">\(\bar{D} = \mathbb{E}[-2\log\mathcal{L}(\theta)]\)</span> averaged over posterior
@@ -184,24 +176,32 @@ $<span class="arithmatex">\(-2\log\mathcal{Z} \approx -2\log\mathcal{L}_{\max} +
 <hr />
 <h2 id="when-to-use-each-criterion">When to Use Each Criterion</h2>
 <h3 id="use-aic-when">Use AIC When:</h3>
-<p>✅ Exploratory data analysis
-✅ Prediction accuracy is the goal
-✅ Many models to screen quickly
-✅ Sample size is moderate-to-large</p>
+<ul>
+<li>Exploratory data analysis</li>
+<li>Prediction accuracy is the goal</li>
+<li>Many models to screen quickly</li>
+<li>Sample size is moderate-to-large</li>
+</ul>
 <h3 id="use-bic-when">Use BIC When:</h3>
-<p>✅ You want Bayesian-like model comparison
-✅ Sample size is large (<span class="arithmatex">\(n \gg k\)</span>)
-✅ You believe true model is in candidate set
-✅ Penalizing complexity more heavily</p>
+<ul>
+<li>You want Bayesian-like model comparison</li>
+<li>Sample size is large (<span class="arithmatex">\(n \gg k\)</span>)</li>
+<li>You believe true model is in candidate set</li>
+<li>Penalizing complexity more heavily</li>
+</ul>
 <h3 id="use-aicc-when">Use AICc When:</h3>
-<p>✅ Sample size is small (<span class="arithmatex">\(n/k &lt; 40\)</span>)
-✅ Risk of overfitting is high</p>
+<ul>
+<li>Sample size is small (<span class="arithmatex">\(n/k &lt; 40\)</span>)</li>
+<li>Risk of overfitting is high</li>
+</ul>
 <h3 id="use-full-bayesian-evidence-when">Use Full Bayesian Evidence When:</h3>
-<p>✅ Final publishable results
-✅ Priors contain important information
-✅ Parameters are correlated/degenerate
-✅ Strong model comparison claims
-✅ Computational resources available</p>
+<ul>
+<li>Final publishable results</li>
+<li>Priors contain important information</li>
+<li>Parameters are correlated/degenerate</li>
+<li>Strong model comparison claims</li>
+<li>Computational resources available</li>
+</ul>
 <hr />
 <h2 id="practical-workflow">Practical Workflow</h2>
 <p><strong>Phase 1: Rapid screening (AIC/BIC)</strong>
@@ -239,25 +239,25 @@ $<span class="arithmatex">\(-2\log\mathcal{Z} \approx -2\log\mathcal{L}_{\max} +
 </code></pre></div></p>
 <hr />
 <h2 id="common-pitfalls">Common Pitfalls</h2>
-<h3 id="my-aic-and-bic-disagree">"My AIC and BIC disagree!"</h3>
+<h3 id="my-aic-and-bic-disagree">"My AIC and BIC disagree"</h3>
 <p><strong>This is normal.</strong> BIC penalizes complexity more heavily:
 - BIC penalty: <span class="arithmatex">\(k\log n\)</span>
 - AIC penalty: <span class="arithmatex">\(2k\)</span></p>
 <p>For <span class="arithmatex">\(n &gt; 8\)</span>, we have <span class="arithmatex">\(\log n &gt; 2\)</span>, so BIC prefers simpler models than AIC.</p>
 <p><strong>What to do:</strong>
-- If they agree: Great!
+- If they agree: good, no ambiguity.
 - If they disagree: Use <a href="../nested-sampling/">nested-sampling</a> to arbitrate
 - Generally: <strong>BIC is closer to Bayesian evidence</strong> for large <span class="arithmatex">\(n\)</span></p>
 <h3 id="i-got-negative-aic">"I got negative AIC"</h3>
-<p>AIC can be negative (log-likelihood can be positive). Only <strong>differences</strong> matter:
-$<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</span>$</p>
+<p>AIC can be negative (log-likelihood can be positive). Only <strong>differences</strong> matter:</p>
+<div class="arithmatex">\[\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\]</div>
 <h3 id="should-i-use-aic-or-logevidence">"Should I use AIC or log(evidence)?"</h3>
-<p><strong>Don't mix them!</strong> They're on different scales:
+<p>They're on different scales, so don't mix them:
 - AIC ≈ <span class="arithmatex">\(-2\log\mathcal{Z} + \text{const}\)</span>
 - The constant depends on priors, sample size, etc.</p>
 <p>Use AIC to compare models <strong>within your analysis</strong>. Use evidence to make Bayesian statements.</p>
 <h3 id="my-aic-15-is-this-significant">"My ΔAIC = 1.5, is this significant?"</h3>
-<p><strong>Rules of thumb</strong> (Burnham &amp; Anderson[^Burnham2002]):
+<p><strong>Rules of thumb</strong> (Burnham &amp; Anderson<sup id="fnref:Burnham2002"><a class="footnote-ref" href="#fn:Burnham2002">5</a></sup>):
 - Δ &lt; 2: Substantial support for both models
 - 2-7: Less support for higher-AIC model
 - 7-10: Considerably less support
@@ -321,12 +321,29 @@ $<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</sp
 - <a href="../dark-energy-models/">dark-energy-models</a> - Application to cosmology</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Akaike1974]: Akaike, H. (1974). A new look at the statistical model identification. <em>IEEE Transactions on Automatic Control</em>, 19(6), 716-723.</p>
-<p>[Schwarz1978]: Schwarz, G. (1978). Estimating the dimension of a model. <em>The Annals of Statistics</em>, 6(2), 461-464.</p>
-<p>[Hurvich1989]: Hurvich, C. M., &amp; Tsai, C. L. (1989). Regression and time series model selection in small samples. <em>Biometrika</em>, 76(2), 297-307.</p>
-<p>[Spiegelhalter2002]: Spiegelhalter, D. J., et al. (2002). Bayesian measures of model complexity and fit. <em>Journal of the Royal Statistical Society: Series B</em>, 64(4), 583-639.</p>
-<p>[Burnham2002]: Burnham, K. P., &amp; Anderson, D. R. (2002). <em>Model Selection and Multimodel Inference</em> (2nd ed.). Springer.</p>
-<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Akaike1974">
+<p>Akaike, H. (1974). A new look at the statistical model identification. <em>IEEE Transactions on Automatic Control</em>, 19(6), 716-723.&#160;<a class="footnote-backref" href="#fnref:Akaike1974" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Schwarz1978">
+<p>Schwarz, G. (1978). Estimating the dimension of a model. <em>The Annals of Statistics</em>, 6(2), 461-464.&#160;<a class="footnote-backref" href="#fnref:Schwarz1978" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Hurvich1989">
+<p>Hurvich, C. M., &amp; Tsai, C. L. (1989). Regression and time series model selection in small samples. <em>Biometrika</em>, 76(2), 297-307.&#160;<a class="footnote-backref" href="#fnref:Hurvich1989" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Spiegelhalter2002">
+<p>Spiegelhalter, D. J., et al. (2002). Bayesian measures of model complexity and fit. <em>Journal of the Royal Statistical Society: Series B</em>, 64(4), 583-639.&#160;<a class="footnote-backref" href="#fnref:Spiegelhalter2002" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Burnham2002">
+<p>Burnham, K. P., &amp; Anderson, D. R. (2002). <em>Model Selection and Multimodel Inference</em> (2nd ed.). Springer.&#160;<a class="footnote-backref" href="#fnref:Burnham2002" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Trotta2008">
+<p>Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.&#160;<a class="footnote-backref" href="#fnref:Trotta2008" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -334,10 +351,10 @@ $<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</sp
 					<section>
 						<div class="page-nav">
 							
-							<a href="../marginalization/" class="button">← Marginalization</a>
+							<a href="../model-comparison/" class="button">← Model Comparison</a>
 							
 							
-							<a href="../dark-energy-models/" class="button primary" style="float:right">Dark Energy Models →</a>
+							<a href="../tension-statistics/" class="button primary" style="float:right">Quantifying Tension →</a>
 							
 						</div>
 					</section>
@@ -380,7 +397,7 @@ $<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</sp
 							
 								
 								<li>
-									<span class="opener">Evidence & Model Comparison</span>
+									<span class="opener active">Evidence & Model Comparison</span>
 									<ul>
 										
 										<li><a href="../evidence/">The Bayesian Evidence</a></li>
@@ -390,6 +407,8 @@ $<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</sp
 										<li><a href="../prior-choice/">Prior Choice</a></li>
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
+										
+										<li><a href="./" class="active">Approximate Model Comparison</a></li>
 										
 									</ul>
 								</li>
@@ -408,14 +427,12 @@ $<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</sp
 							
 								
 								<li>
-									<span class="opener active">Advanced Techniques</span>
+									<span class="opener">Advanced Techniques</span>
 									<ul>
 										
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="./" class="active">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -452,6 +469,7 @@ $<span class="arithmatex">\(\Delta\text{AIC} = \text{AIC}_1 - \text{AIC}_0\)</sp
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

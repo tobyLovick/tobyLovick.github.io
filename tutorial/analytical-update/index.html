@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Analytical Update (Rowing)</h1>
-						</header>
-						
-
 						<h1 id="analytical-bayesian-update-the-rowing-example">Analytical Bayesian Update: The Rowing Example</h1>
 <p>← Back to <a href="../">index</a> | Previous: <a href="../bayes-theorem/">bayes-theorem</a></p>
 <hr />
@@ -53,8 +45,8 @@
 <p><strong>Sides are randomly assigned</strong> to crews before each race, so this isn't about which crews are better.</p>
 <p><strong>Question:</strong> Is the finish line skew sufficient to balance the course, or does Towpath still have an advantage?</p>
 <p><strong>Frequentist answer:</strong> Hypothesis test gives p-value = 0.0043, "significant evidence that towpath side is faster."</p>
-<p><strong>The snarky comment:</strong> "Maybe the finish line being skewed in favour of meadow isn't something to complain about" — i.e., the skew was <em>supposed</em> to help Meadow, but Towpath wins anyway!</p>
-<p>Let's quantify this properly with <strong>Bayesian inference</strong>.</p>
+<p><strong>The snarky comment:</strong> "Maybe the finish line being skewed in favour of meadow isn't something to complain about" — i.e., the skew was <em>supposed</em> to help Meadow, but Towpath wins anyway.</p>
+<p>We can quantify this properly with Bayesian inference.</p>
 <hr />
 <h2 id="setting-up-the-problem">Setting Up the Problem</h2>
 <h3 id="the-parameter">The Parameter</h3>
@@ -68,7 +60,7 @@
 <p>We observed <span class="arithmatex">\(n = 84\)</span> races with <span class="arithmatex">\(k = 54\)</span> Towpath wins.</p>
 <hr />
 <h2 id="the-beta-binomial-model">The Beta-Binomial Model</h2>
-<p>This is a classic conjugate pair (same setup as the <a href="../bayes-theorem/#the-coin-flip">coin flip example</a>).</p>
+<p>This is a classic conjugate pair (same setup as the <a href="../bayes-theorem/#worked-example-the-coin-flip">coin flip example</a>).</p>
 <h3 id="the-likelihood">The Likelihood</h3>
 <p>Given <span class="arithmatex">\(\theta\)</span>, the probability of observing <span class="arithmatex">\(k\)</span> wins in <span class="arithmatex">\(n\)</span> races follows the <strong>Binomial distribution</strong>:</p>
 <div class="arithmatex">\[p(k|\theta, n) = \binom{n}{k}\theta^k(1-\theta)^{n-k}\]</div>
@@ -107,8 +99,8 @@
 <h2 id="computing-the-posteriors">Computing the Posteriors</h2>
 <h3 id="case-1-uniform-prior-textbeta11">Case 1: Uniform Prior <span class="arithmatex">\(\text{Beta}(1,1)\)</span></h3>
 <p><strong>Posterior:</strong> <span class="arithmatex">\(\text{Beta}(1 + 54, 1 + 30) = \text{Beta}(55, 31)\)</span></p>
-<p><strong>Posterior mean:</strong>
-$<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \frac{55}{86} \approx 0.640\)</span>$</p>
+<p><strong>Posterior mean:</strong></p>
+<div class="arithmatex">\[\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \frac{55}{86} \approx 0.640\]</div>
 <p><strong>95% credible interval:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">beta</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -125,7 +117,7 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>θ = 0.640
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>95% CI: [0.547, 0.728]
 </code></pre></div></p>
-<p><strong>Interpretation:</strong> There's a 95% probability that Towpath's win rate is between 54.7% and 72.8%. The data strongly support that <strong>the course is imbalanced</strong> — the finish line skew doesn't fully compensate for the bend.</p>
+<p><strong>Interpretation:</strong> There's a 95% probability that Towpath's win rate is between 54.7% and 72.8%. The data support that the course is imbalanced — the finish line skew doesn't fully compensate for the bend.</p>
 <h3 id="case-2-weak-fairness-prior-textbeta22">Case 2: Weak Fairness Prior <span class="arithmatex">\(\text{Beta}(2,2)\)</span></h3>
 <p><strong>Posterior:</strong> <span class="arithmatex">\(\text{Beta}(56, 32)\)</span></p>
 <p><strong>Posterior mean:</strong> <span class="arithmatex">\(\frac{56}{88} \approx 0.636\)</span></p>
@@ -199,11 +191,11 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 <p><strong>Output:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>P(θ &gt; 0.5 | data) = 0.9984
 </code></pre></div></p>
-<p><strong>Bayesian answer:</strong> There's a <strong>99.84% probability</strong> that the course is imbalanced in favor of Towpath (i.e., the finish line skew is insufficient).</p>
-<p>Compare this to the frequentist p-value of 0.0043—they're answering different questions:
-- <strong>P-value:</strong> "If course were perfectly balanced, how surprising is this data?" (0.43% chance)
+<p><strong>Bayesian answer:</strong> There's a 99.84% probability that the course is imbalanced in favor of Towpath (i.e., the finish line skew is insufficient).</p>
+<p>Compare this to the frequentist p-value of 0.0043 — they answer different questions:
+- <strong>P-value:</strong> "If the course were perfectly balanced, how surprising is this data?" (0.43% chance)
 - <strong>Bayesian probability:</strong> "Given this data, how likely is the course imbalanced?" (99.84% likely)</p>
-<p>The Bayesian answer directly addresses what we care about!</p>
+<p>The Bayesian answer directly addresses the question we actually care about.</p>
 <hr />
 <h2 id="going-deeper-whats-actually-happening">Going Deeper: What's Actually Happening?</h2>
 <p>We've established the course is imbalanced (<span class="arithmatex">\(\theta \approx 0.64\)</span>), but <strong>why?</strong></p>
@@ -230,7 +222,7 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 3. <strong>Surveying measurements</strong> of the actual course geometry
 4. <strong>Races with different skew angles</strong> to find the balanced point</p>
 <p><strong>Bayesian model comparison</strong> (via the <a href="../evidence/">evidence</a>) could rigorously test these competing explanations!</p>
-<p><strong>This demonstrates why parameter inference alone isn't enough.</strong> Yes, <span class="arithmatex">\(\theta = 0.64 \pm 0.05\)</span> quantifies the imbalance. But understanding the <strong>physical mechanism</strong> requires comparing models with <a href="../model-comparison/">model-comparison</a>.</p>
+<p>This demonstrates why parameter inference alone isn't enough. Yes, <span class="arithmatex">\(\theta = 0.64 \pm 0.05\)</span> quantifies the imbalance, but understanding the physical mechanism requires comparing models with <a href="../model-comparison/">model-comparison</a>.</p>
 <hr />
 <h2 id="the-hierarchical-extension">The Hierarchical Extension</h2>
 <p><strong>Advanced idea (future topic):</strong> We could build a richer model incorporating margin of victory:</p>
@@ -245,7 +237,7 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 - Quantify: "How much should we adjust the finish line to balance the course?"
 - Pool information across races to improve estimates</p>
 <p><strong>With this model, we could answer:</strong> "Move the finish line <span class="arithmatex">\(X\)</span> meters toward Meadow to achieve balance."</p>
-<p>But that's beyond the scope of this intro! See <a href="../hierarchical-models/">hierarchical-models</a> for details.</p>
+<p>But that's beyond the scope of this introduction — see <a href="../hierarchical-models/">hierarchical-models</a> for details.</p>
 <hr />
 <h2 id="summary">Summary</h2>
 <p><strong>What we learned:</strong></p>
@@ -272,7 +264,7 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 <p>[Jaynes2003]: Jaynes, E. T. (2003). <em>Probability Theory: The Logic of Science</em>. Cambridge University Press.</p>
 <p>[Gelman2013]: Gelman, A., et al. (2013). <em>Bayesian Data Analysis</em> (3rd ed.). CRC Press.</p>
 <hr />
-<p><strong>Acknowledgment:</strong> Data from Rowbridge Reborn regatta, 1999s. Thanks to the rowing club for the entertaining example of frequentist vs Bayesian analysis!</p>
+<p><strong>Acknowledgment:</strong> Data from Rowbridge Reborn regatta, 1999s. Thanks to the rowing club for the entertaining example of frequentist vs Bayesian analysis.</p>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -337,6 +329,8 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -360,8 +354,6 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -398,6 +390,7 @@ $<span class="arithmatex">\(\mathbb{E}[\theta] = \frac{\alpha}{\alpha+\beta} = \
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

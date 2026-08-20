@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>MCMC</h1>
-						</header>
-						
-
 						<h1 id="markov-chain-monte-carlo-mcmc">Markov Chain Monte Carlo (MCMC)</h1>
 <p>← Back to <a href="../">index</a> | See also: <a href="../nested-sampling/">nested-sampling</a></p>
 <hr />
@@ -67,30 +59,20 @@
 <p><strong>Consequence:</strong> If detailed balance holds, <span class="arithmatex">\(\mathcal{P}\)</span> is the stationary distribution.</p>
 <hr />
 <h2 id="metropolis-hastings-algorithm">Metropolis-Hastings Algorithm</h2>
-<p>The workhorse of MCMC. Proposed by Metropolis et al. (1953)[^Metropolis1953] and generalized by Hastings (1970)[^Hastings1970].</p>
+<p>The workhorse of MCMC. Proposed by Metropolis et al. (1953)<sup id="fnref:Metropolis1953"><a class="footnote-ref" href="#fn:Metropolis1953">1</a></sup> and generalized by Hastings (1970)<sup id="fnref:Hastings1970"><a class="footnote-ref" href="#fn:Hastings1970">2</a></sup>.</p>
 <h3 id="the-algorithm">The Algorithm</h3>
 <p>Given current state <span class="arithmatex">\(\theta_i\)</span>:</p>
-<ol>
-<li>
-<p><strong>Propose</strong> a new state: <span class="arithmatex">\(\theta' \sim Q(\theta'|\theta_i)\)</span> (proposal distribution)</p>
-</li>
-<li>
-<p><strong>Compute acceptance probability:</strong>
-   $<span class="arithmatex">\(\alpha = \min\left(1, \frac{\mathcal{P}(\theta') Q(\theta_i|\theta')}{\mathcal{P}(\theta_i) Q(\theta'|\theta_i)}\right)\)</span>$</p>
-</li>
-<li>
-<p><strong>Accept or reject:</strong></p>
-</li>
+<p><strong>Step 1 — Propose</strong> a new state: <span class="arithmatex">\(\theta' \sim Q(\theta'|\theta_i)\)</span> (proposal distribution)</p>
+<p><strong>Step 2 — Compute acceptance probability:</strong></p>
+<div class="arithmatex">\[\alpha = \min\left(1, \frac{\mathcal{P}(\theta') Q(\theta_i|\theta')}{\mathcal{P}(\theta_i) Q(\theta'|\theta_i)}\right)\]</div>
+<p><strong>Step 3 — Accept or reject:</strong></p>
+<ul>
 <li>With probability <span class="arithmatex">\(\alpha\)</span>: set <span class="arithmatex">\(\theta_{i+1} = \theta'\)</span></li>
-<li>
-<p>With probability <span class="arithmatex">\(1-\alpha\)</span>: set <span class="arithmatex">\(\theta_{i+1} = \theta_i\)</span> (stay put)</p>
-</li>
-<li>
-<p><strong>Repeat</strong></p>
-</li>
-</ol>
+<li>With probability <span class="arithmatex">\(1-\alpha\)</span>: set <span class="arithmatex">\(\theta_{i+1} = \theta_i\)</span> (stay put)</li>
+</ul>
+<p><strong>Step 4 — Repeat</strong></p>
 <h3 id="why-this-works">Why This Works</h3>
-<p>The acceptance ratio ensures detailed balance. The key insight: we only need the <strong>ratio</strong> <span class="arithmatex">\(\mathcal{P}(\theta')/\mathcal{P}(\theta_i)\)</span>, so the normalization constant (the <a href="../evidence/">evidence</a>!) cancels out!</p>
+<p>The acceptance ratio ensures detailed balance. The key insight: we only need the <strong>ratio</strong> <span class="arithmatex">\(\mathcal{P}(\theta')/\mathcal{P}(\theta_i)\)</span>, so the normalization constant (the <a href="../evidence/">evidence</a>) cancels out.</p>
 <div class="arithmatex">\[\alpha = \min\left(1, \frac{\mathcal{L}(\theta')\pi(\theta')}{\mathcal{L}(\theta_i)\pi(\theta_i)} \cdot \frac{Q(\theta_i|\theta')}{Q(\theta'|\theta_i)}\right)\]</div>
 <p><strong>This is why MCMC works for parameter inference without computing evidence.</strong></p>
 <h3 id="example-symmetric-proposal">Example: Symmetric Proposal</h3>
@@ -143,15 +125,15 @@
 <li>...</li>
 <li>Sample <span class="arithmatex">\(\theta_d^{(i+1)} \sim p(\theta_d | \theta_1^{(i+1)}, \ldots, \theta_{d-1}^{(i+1)}, d)\)</span></li>
 </ol>
-<p><strong>Advantage:</strong> No tuning required! Each conditional distribution might be simple (e.g., conjugate prior situations).</p>
+<p><strong>Advantage:</strong> No tuning required. Each conditional distribution might be simple (e.g., conjugate prior situations).</p>
 <p><strong>Disadvantage:</strong> Can be slow if parameters are highly correlated (updates along axes, not along degeneracy directions).</p>
 <hr />
 <h2 id="hamiltonian-monte-carlo-hmc">Hamiltonian Monte Carlo (HMC)</h2>
-<p>Uses <strong>gradient information</strong> to make efficient proposals[<sup>Duane1987][</sup>Neal1996].</p>
+<p>Uses <strong>gradient information</strong> to make efficient proposals<sup id="fnref:Duane1987"><a class="footnote-ref" href="#fn:Duane1987">3</a></sup><sup id="fnref:Neal1996"><a class="footnote-ref" href="#fn:Neal1996">4</a></sup>.</p>
 <h3 id="the-physics-analogy">The Physics Analogy</h3>
 <p>Imagine a particle moving in potential <span class="arithmatex">\(U(\theta) = -\log\mathcal{P}(\theta)\)</span> with momentum <span class="arithmatex">\(p\)</span>.</p>
-<p><strong>Hamilton's equations:</strong>
-$<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, \quad \frac{dp}{dt} = -\frac{\partial H}{\partial \theta}\)</span>$</p>
+<p><strong>Hamilton's equations:</strong></p>
+<div class="arithmatex">\[\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, \quad \frac{dp}{dt} = -\frac{\partial H}{\partial \theta}\]</div>
 <p>where <span class="arithmatex">\(H(\theta, p) = U(\theta) + K(p)\)</span> is the Hamiltonian (total energy).</p>
 <p><strong>Key insight:</strong> Trajectories along constant-<span class="arithmatex">\(H\)</span> surfaces explore parameter space efficiently, following the natural geometry of <span class="arithmatex">\(\mathcal{P}\)</span>.</p>
 <h3 id="the-algorithm_1">The Algorithm</h3>
@@ -167,7 +149,7 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 <p><strong>Advantage:</strong> Can take large steps while maintaining high acceptance rate. Scales well to high dimensions.</p>
 <p><strong>Disadvantage:</strong> Requires gradients <span class="arithmatex">\(\nabla\log\mathcal{P}\)</span>. Tuning <span class="arithmatex">\(\epsilon\)</span> (step size) and <span class="arithmatex">\(T\)</span> (trajectory length) can be tricky.</p>
 <h3 id="no-u-turn-sampler-nuts">No-U-Turn Sampler (NUTS)</h3>
-<p>Automatically tunes trajectory length[^Hoffman2014]. Used in Stan and PyMC.</p>
+<p>Automatically tunes trajectory length<sup id="fnref:Hoffman2014"><a class="footnote-ref" href="#fn:Hoffman2014">5</a></sup>. Used in Stan and PyMC.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pymc</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
@@ -274,7 +256,7 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 <hr />
 <h2 id="modern-mcmc-software">Modern MCMC Software</h2>
 <h3 id="1-emcee-python">1. emcee (Python)</h3>
-<p>Affine-invariant ensemble sampler[^emcee]. No gradient needed.</p>
+<p>Affine-invariant ensemble sampler<sup id="fnref:emcee"><a class="footnote-ref" href="#fn:emcee">6</a></sup>. No gradient needed.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">emcee</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">6</span>
@@ -316,7 +298,7 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 <p><strong>Pros:</strong> Pure Python, great ecosystem
 <strong>Cons:</strong> Can be slower than compiled Stan</p>
 <h3 id="4-numpyro">4. NumPyro</h3>
-<p>JAX-based NUTS for GPU acceleration[^Phan2019].</p>
+<p>JAX-based NUTS for GPU acceleration<sup id="fnref:Phan2019"><a class="footnote-ref" href="#fn:Phan2019">7</a></sup>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpyro</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpyro.infer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
@@ -367,11 +349,13 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 <hr />
 <h2 id="summary">Summary</h2>
 <p><strong>MCMC generates samples from the posterior distribution:</strong></p>
-<p>✅ No evidence calculation (great for parameter inference)
-✅ Scales well to high dimensions (especially HMC/NUTS)
-✅ Gradients greatly improve efficiency
-✅ Mature software ecosystem
-✅ Requires burn-in and convergence checks</p>
+<ul>
+<li>No evidence calculation (great for parameter inference)</li>
+<li>Scales well to high dimensions (especially HMC/NUTS)</li>
+<li>Gradients greatly improve efficiency</li>
+<li>Mature software ecosystem</li>
+<li>Requires burn-in and convergence checks</li>
+</ul>
 <p><strong>When to use:</strong>
 - Parameter constraints only (no model comparison)
 - High-dimensional problems (<span class="arithmatex">\(d &gt; 40\)</span>)
@@ -385,13 +369,32 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 - <a href="../bayesian-inference/">bayesian-inference</a> - The framework</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Metropolis1953]: Metropolis, N., et al. (1953). Equation of state calculations by fast computing machines. <em>The Journal of Chemical Physics</em>, 21(6), 1087-1092.</p>
-<p>[Hastings1970]: Hastings, W. K. (1970). Monte Carlo sampling methods using Markov chains. <em>Biometrika</em>, 57(1), 97-109.</p>
-<p>[Duane1987]: Duane, S., et al. (1987). Hybrid Monte Carlo. <em>Physics Letters B</em>, 195(2), 216-222.</p>
-<p>[Neal1996]: Neal, R. M. (1996). Sampling from multimodal distributions using tempered transitions. <em>Statistics and Computing</em>, 6(4), 353-366.</p>
-<p>[Hoffman2014]: Hoffman, M. D., &amp; Gelman, A. (2014). The No-U-Turn sampler. <em>Journal of Machine Learning Research</em>, 15(1), 1593-1623.</p>
-<p>[emcee]: Foreman-Mackey, D., et al. (2013). emcee: The MCMC Hammer. <em>PASP</em>, 125(925), 306.</p>
-<p>[Phan2019]: Phan, D., et al. (2019). Composable effects for flexible and accelerated probabilistic programming in NumPyro. <em>arXiv:1912.11554</em>.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Metropolis1953">
+<p>Metropolis, N., et al. (1953). Equation of state calculations by fast computing machines. <em>The Journal of Chemical Physics</em>, 21(6), 1087-1092.&#160;<a class="footnote-backref" href="#fnref:Metropolis1953" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Hastings1970">
+<p>Hastings, W. K. (1970). Monte Carlo sampling methods using Markov chains. <em>Biometrika</em>, 57(1), 97-109.&#160;<a class="footnote-backref" href="#fnref:Hastings1970" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Duane1987">
+<p>Duane, S., et al. (1987). Hybrid Monte Carlo. <em>Physics Letters B</em>, 195(2), 216-222.&#160;<a class="footnote-backref" href="#fnref:Duane1987" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Neal1996">
+<p>Neal, R. M. (1996). Sampling from multimodal distributions using tempered transitions. <em>Statistics and Computing</em>, 6(4), 353-366.&#160;<a class="footnote-backref" href="#fnref:Neal1996" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Hoffman2014">
+<p>Hoffman, M. D., &amp; Gelman, A. (2014). The No-U-Turn sampler. <em>Journal of Machine Learning Research</em>, 15(1), 1593-1623.&#160;<a class="footnote-backref" href="#fnref:Hoffman2014" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:emcee">
+<p>Foreman-Mackey, D., et al. (2013). emcee: The MCMC Hammer. <em>PASP</em>, 125(925), 306.&#160;<a class="footnote-backref" href="#fnref:emcee" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Phan2019">
+<p>Phan, D., et al. (2019). Composable effects for flexible and accelerated probabilistic programming in NumPyro. <em>arXiv:1912.11554</em>.&#160;<a class="footnote-backref" href="#fnref:Phan2019" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -456,6 +459,8 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -479,8 +484,6 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -517,6 +520,7 @@ $<span class="arithmatex">\(\frac{d\theta}{dt} = \frac{\partial H}{\partial p}, 
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

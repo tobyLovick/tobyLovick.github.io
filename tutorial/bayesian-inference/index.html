@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Bayesian Inference</h1>
-						</header>
-						
-
 						<h1 id="bayesian-inference">Bayesian Inference</h1>
 <p>← Back to <a href="../">index</a> | Previous: <a href="../bayes-theorem/">bayes-theorem</a></p>
 <hr />
@@ -75,8 +67,8 @@
 <h3 id="2-the-likelihood-mathcalltheta">2. The Likelihood <span class="arithmatex">\(\mathcal{L}(\theta)\)</span></h3>
 <p><strong>Role:</strong> Quantifies how well parameters predict the observed data.</p>
 <p>This comes from our theoretical model. For example:</p>
-<p><strong>Gaussian likelihood</strong> (most common):
-$<span class="arithmatex">\(\mathcal{L}(\theta) = \frac{1}{\sqrt{(2\pi)^n|\mathbf{C}|}} \exp\left(-\frac{1}{2}(\mathbf{d}-\mathbf{m}(\theta))^T\mathbf{C}^{-1}(\mathbf{d}-\mathbf{m}(\theta))\right)\)</span>$</p>
+<p><strong>Gaussian likelihood</strong> (most common):</p>
+<div class="arithmatex">\[\mathcal{L}(\theta) = \frac{1}{\sqrt{(2\pi)^n|\mathbf{C}|}} \exp\left(-\frac{1}{2}(\mathbf{d}-\mathbf{m}(\theta))^T\mathbf{C}^{-1}(\mathbf{d}-\mathbf{m}(\theta))\right)\]</div>
 <p>where:
 - <span class="arithmatex">\(\mathbf{d}\)</span> = observed data vector
 - <span class="arithmatex">\(\mathbf{m}(\theta)\)</span> = model prediction given parameters <span class="arithmatex">\(\theta\)</span>
@@ -97,7 +89,7 @@ $<span class="arithmatex">\(\mathcal{L}(\theta) = \frac{1}{\sqrt{(2\pi)^n|\mathb
 - <strong><a href="../nested-sampling/">nested-sampling</a></strong>: Simultaneously computes posterior samples and evidence</p>
 <hr />
 <h2 id="example-measuring-the-hubble-constant">Example: Measuring the Hubble Constant</h2>
-<p>Let's make this concrete with a cosmological example.</p>
+<p>Here's a concrete cosmological example.</p>
 <p><strong>Goal:</strong> Measure <span class="arithmatex">\(H_0\)</span> (the Hubble constant) from Type Ia supernova distances.</p>
 <h3 id="setup">Setup</h3>
 <ul>
@@ -106,9 +98,9 @@ $<span class="arithmatex">\(\mathcal{L}(\theta) = \frac{1}{\sqrt{(2\pi)^n|\mathb
 <li><strong>Model</strong>: <span class="arithmatex">\(\mathcal{M}\)</span> = Flat <span class="arithmatex">\(\Lambda\)</span>CDM cosmology</li>
 </ul>
 <h3 id="the-prior">The Prior</h3>
-<p>Physical reasoning gives us:
-$<span class="arithmatex">\(\pi(H_0) = \mathcal{U}(50, 100) \quad \text{km/s/Mpc}\)</span>$
-$<span class="arithmatex">\(\pi(M_B) = \mathcal{U}(-20, -18)\)</span>$</p>
+<p>Physical reasoning gives us:</p>
+<div class="arithmatex">\[\pi(H_0) = \mathcal{U}(50, 100) \quad \text{km/s/Mpc}\]</div>
+<div class="arithmatex">\[\pi(M_B) = \mathcal{U}(-20, -18)\]</div>
 <p>These are wide enough to be "uninformative" but exclude unphysical values.</p>
 <h3 id="the-likelihood">The Likelihood</h3>
 <p>For each supernova, theory predicts:</p>
@@ -172,7 +164,7 @@ $<span class="arithmatex">\(\pi(M_B) = \mathcal{U}(-20, -18)\)</span>$</p>
 </ul>
 <p><strong>Question:</strong> Does the data justify the additional parameter <span class="arithmatex">\(\Omega_k\)</span>?</p>
 <p>For this, we need to compare the <strong><a href="../evidence/">evidence</a></strong> of each model. The posterior samples from MCMC don't directly give us this—we need specialized methods like <a href="../nested-sampling/">nested-sampling</a>.</p>
-<p><strong>This is where Bayesian inference truly shines:</strong> It provides a rigorous, principled framework for model comparison through the evidence.</p>
+<p>This is where Bayesian inference offers something frequentist methods don't: a rigorous, principled framework for model comparison through the evidence.</p>
 <hr />
 <h2 id="the-evidence-preview">The Evidence Preview</h2>
 <p>For parameter inference, the evidence <span class="arithmatex">\(\mathcal{Z}\)</span> is just a normalizing constant:</p>
@@ -181,7 +173,7 @@ $<span class="arithmatex">\(\pi(M_B) = \mathcal{U}(-20, -18)\)</span>$</p>
 <p><strong>However:</strong> For comparing models, the evidence is <strong>the</strong> key quantity. It quantifies:
 1. How well does the model fit the data? (via <span class="arithmatex">\(\langle \mathcal{L} \rangle\)</span>)
 2. How much parameter space is wasted? (via the Occam penalty)</p>
-<p><strong>Result:</strong> Models that fit well but are overly complex get penalized. This naturally implements Occam's razor.</p>
+<p>Models that fit well but are overly complex get penalized — this naturally implements Occam's razor.</p>
 <p>To understand why and how, continue to <a href="../evidence/">evidence</a>.</p>
 <hr />
 <h2 id="key-takeaways">Key Takeaways</h2>
@@ -268,6 +260,8 @@ $<span class="arithmatex">\(\pi(M_B) = \mathcal{U}(-20, -18)\)</span>$</p>
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -291,8 +285,6 @@ $<span class="arithmatex">\(\pi(M_B) = \mathcal{U}(-20, -18)\)</span>$</p>
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -329,6 +321,7 @@ $<span class="arithmatex">\(\pi(M_B) = \mathcal{U}(-20, -18)\)</span>$</p>
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

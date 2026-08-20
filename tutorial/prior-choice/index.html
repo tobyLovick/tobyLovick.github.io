@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Prior Choice</h1>
-						</header>
-						
-
 						<h1 id="prior-choice">Prior Choice</h1>
 <p>← Back to <a href="../">index</a> | See also: <a href="../analytical-update/">analytical-update</a>, <a href="../bayesian-inference/">bayesian-inference</a></p>
 <hr />
@@ -74,7 +66,7 @@
 <div class="arithmatex">\[\pi(n_s) = \mathcal{N}(0.96, 0.02^2)\]</div>
 <p>But be careful: this can bias against discovering new physics!</p>
 <h3 id="5-maximum-entropy-uninformative">5. Maximum Entropy (Uninformative)</h3>
-<p><strong>When you truly have no information, maximize entropy subject to constraints.</strong>[^Jaynes1957]</p>
+<p><strong>When you truly have no information, maximize entropy subject to constraints.</strong><sup id="fnref:Jaynes1957"><a class="footnote-ref" href="#fn:Jaynes1957">1</a></sup></p>
 <p><strong>Example:</strong> For <span class="arithmatex">\(\theta \in [0,1]\)</span> with no other information:</p>
 <div class="arithmatex">\[\pi(\theta) = \mathcal{U}(0,1)\]</div>
 <p>This is the "most uncertain" distribution on <span class="arithmatex">\([0,1]\)</span>.</p>
@@ -121,7 +113,7 @@
 <h2 id="special-cases-of-the-beta-distribution">Special Cases of the Beta Distribution</h2>
 <h3 id="textbeta1-1-uniform"><span class="arithmatex">\(\text{Beta}(1, 1)\)</span> - Uniform</h3>
 <div class="arithmatex">\[\pi(\theta) = 1\]</div>
-<p>All values equally likely. <strong>Jeffreys prior</strong> for Binomial likelihood[^Jeffreys1961].</p>
+<p>All values equally likely. <strong>Jeffreys prior</strong> for Binomial likelihood<sup id="fnref:Jeffreys1961"><a class="footnote-ref" href="#fn:Jeffreys1961">2</a></sup>.</p>
 <p><strong>When to use:</strong> True ignorance about <span class="arithmatex">\(\theta\)</span>.</p>
 <h3 id="textbeta05-05-jeffreys-prior"><span class="arithmatex">\(\text{Beta}(0.5, 0.5)\)</span> - Jeffreys Prior</h3>
 <div class="arithmatex">\[\pi(\theta) \propto \theta^{-1/2}(1-\theta)^{-1/2}\]</div>
@@ -180,25 +172,33 @@
 <p>The Bayes factor depends on the prior:</p>
 <p><strong>Wide prior</strong> (e.g., <span class="arithmatex">\(\text{Beta}(1, 1)\)</span>): Model B wastes prior volume → penalized
 <strong>Narrow prior</strong> (e.g., <span class="arithmatex">\(\text{Beta}(50, 50)\)</span>): Model B concentrates near data → favored</p>
-<p><strong>This is a feature, not a bug!</strong> The prior encodes the model's predictions:
+<p>This is a feature, not a bug: the prior encodes the model's predictions.
 - Wide prior = "model predicts anything could happen" (vague)
 - Narrow prior = "model makes specific prediction" (bold)</p>
-<p>See <a href="../model-comparison/#the-occam-penalty">Occam penalty</a> for why this is desirable.</p>
+<p>See <a href="../evidence/#the-occam-penalty">Occam penalty</a> for why this is desirable.</p>
 <hr />
 <h2 id="practical-guidelines">Practical Guidelines</h2>
 <h3 id="for-parameter-inference">For Parameter Inference</h3>
-<p>✅ <strong>Use informative priors</strong> when you have genuine prior knowledge
-✅ <strong>Use weakly informative priors</strong> when uncertain (e.g., <span class="arithmatex">\(\text{Beta}(2,2)\)</span> instead of <span class="arithmatex">\(\text{Beta}(1,1)\)</span>)
-✅ <strong>Run sensitivity analysis</strong> with multiple priors
-✅ <strong>Report your prior choice</strong> and justify it</p>
-<p>❌ Don't use priors that exclude the truth
-❌ Don't cherry-pick priors to get desired results
-❌ Don't claim priors "don't matter" without checking</p>
+<ul>
+<li><strong>Use informative priors</strong> when you have genuine prior knowledge</li>
+<li><strong>Use weakly informative priors</strong> when uncertain (e.g., <span class="arithmatex">\(\text{Beta}(2,2)\)</span> instead of <span class="arithmatex">\(\text{Beta}(1,1)\)</span>)</li>
+<li><strong>Run sensitivity analysis</strong> with multiple priors</li>
+<li>
+<p><strong>Report your prior choice</strong> and justify it</p>
+</li>
+<li>
+<p>Don't use priors that exclude the truth</p>
+</li>
+<li>Don't cherry-pick priors to get desired results</li>
+<li>Don't claim priors "don't matter" without checking</li>
+</ul>
 <h3 id="for-model-comparison">For Model Comparison</h3>
-<p>✅ <strong>Priors encode model predictions</strong> - choose them carefully
-✅ <strong>Use same prior philosophy</strong> for all models (e.g., all weakly informative)
-✅ <strong>Document prior rationale</strong> - why these values?
-✅ <strong>Consider prior predictive checks</strong> - does the prior predict reasonable data?</p>
+<ul>
+<li><strong>Priors encode model predictions</strong> - choose them carefully</li>
+<li><strong>Use same prior philosophy</strong> for all models (e.g., all weakly informative)</li>
+<li><strong>Document prior rationale</strong> - why these values?</li>
+<li><strong>Consider prior predictive checks</strong> - does the prior predict reasonable data?</li>
+</ul>
 <p>See <a href="../computing-evidence/#common-pitfalls">common pitfalls</a> for evidence-specific prior issues.</p>
 <hr />
 <h2 id="examples-from-cosmology">Examples from Cosmology</h2>
@@ -220,15 +220,15 @@
 <hr />
 <h2 id="the-objective-bayes-debate">The "Objective Bayes" Debate</h2>
 <p><strong>Question:</strong> Can we choose priors "objectively" without subjective judgment?</p>
-<p><strong>Jeffreys approach:</strong> Use invariance principles (e.g., scale-invariance) to derive "objective" priors[^Jeffreys1961].</p>
-<p><strong>Berger-Bernardo:</strong> Maximize expected information gain[^BergerBernardo1992].</p>
-<p><strong>Maximum entropy:</strong> Choose the "most uncertain" prior subject to constraints[^Jaynes1957].</p>
+<p><strong>Jeffreys approach:</strong> Use invariance principles (e.g., scale-invariance) to derive "objective" priors<sup id="fnref2:Jeffreys1961"><a class="footnote-ref" href="#fn:Jeffreys1961">2</a></sup>.</p>
+<p><strong>Berger-Bernardo:</strong> Maximize expected information gain<sup id="fnref:BergerBernardo1992"><a class="footnote-ref" href="#fn:BergerBernardo1992">3</a></sup>.</p>
+<p><strong>Maximum entropy:</strong> Choose the "most uncertain" prior subject to constraints<sup id="fnref2:Jaynes1957"><a class="footnote-ref" href="#fn:Jaynes1957">1</a></sup>.</p>
 <p><strong>Pragmatic view:</strong> There's no single "objective" prior. Instead:
 1. Be <strong>transparent</strong> about your choice
 2. <strong>Justify</strong> it with physical reasoning
 3. Check <strong>sensitivity</strong> to reasonable alternatives
 4. Use <strong>weakly informative</strong> priors when uncertain</p>
-<p><strong>Remember:</strong> Bayesian inference is honest about incorporating prior knowledge. Pretending we have no priors doesn't make them go away—it just makes them implicit!</p>
+<p>Bayesian inference is honest about incorporating prior knowledge. Pretending we have no priors doesn't make them go away — it just makes them implicit.</p>
 <hr />
 <h2 id="summary">Summary</h2>
 <p><strong>Prior choice guidelines:</strong></p>
@@ -252,11 +252,26 @@
 - <a href="../bayesian-inference/">bayesian-inference</a> - The general framework</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Jaynes1957]: Jaynes, E. T. (1957). Information theory and statistical mechanics. <em>Physical Review</em>, 106(4), 620.</p>
-<p>[Jeffreys1961]: Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.</p>
-<p>[BergerBernardo1992]: Berger, J. O., &amp; Bernardo, J. M. (1992). On the development of reference priors. <em>Bayesian Statistics</em>, 4, 35-60.</p>
-<p>[Gelman2013]: Gelman, A., et al. (2013). <em>Bayesian Data Analysis</em> (3rd ed.). CRC Press.</p>
-<p>[Robert2007]: Robert, C. P. (2007). <em>The Bayesian Choice</em> (2nd ed.). Springer.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Jaynes1957">
+<p>Jaynes, E. T. (1957). Information theory and statistical mechanics. <em>Physical Review</em>, 106(4), 620.&#160;<a class="footnote-backref" href="#fnref:Jaynes1957" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:Jaynes1957" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Jeffreys1961">
+<p>Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.&#160;<a class="footnote-backref" href="#fnref:Jeffreys1961" title="Jump back to footnote 2 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:Jeffreys1961" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:BergerBernardo1992">
+<p>Berger, J. O., &amp; Bernardo, J. M. (1992). On the development of reference priors. <em>Bayesian Statistics</em>, 4, 35-60.&#160;<a class="footnote-backref" href="#fnref:BergerBernardo1992" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Gelman2013">
+<p>Gelman, A., et al. (2013). <em>Bayesian Data Analysis</em> (3rd ed.). CRC Press.&#160;<a class="footnote-backref" href="#fnref:Gelman2013" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Robert2007">
+<p>Robert, C. P. (2007). <em>The Bayesian Choice</em> (2nd ed.). Springer.&#160;<a class="footnote-backref" href="#fnref:Robert2007" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -321,6 +336,8 @@
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -344,8 +361,6 @@
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -382,6 +397,7 @@
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

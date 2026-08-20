@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>The Bayesian Evidence</h1>
-						</header>
-						
-
 						<h1 id="the-bayesian-evidence">The Bayesian Evidence</h1>
 <p>← Back to <a href="../">index</a> | Previous: <a href="../bayesian-inference/">bayesian-inference</a></p>
 <hr />
@@ -90,7 +82,7 @@
 <p>Model B spreads its prior over a wider range but the data only fall in a small region of that space. This "wasted" volume penalizes the evidence.</p>
 <hr />
 <h2 id="mathematical-decomposition">Mathematical Decomposition</h2>
-<p>The evidence can be beautifully decomposed using the <strong>Kullback-Leibler divergence</strong>[^Trotta2008]:</p>
+<p>The evidence can be decomposed using the <strong>Kullback-Leibler divergence</strong><sup id="fnref:Trotta2008"><a class="footnote-ref" href="#fn:Trotta2008">1</a></sup>:</p>
 <div class="arithmatex">\[\mathcal{D}_{\text{KL}} = \int \mathcal{P}(\theta) \log\frac{\mathcal{P}(\theta)}{\pi(\theta)} d\theta\]</div>
 <p>This measures the <strong>information gain</strong> from prior to posterior.</p>
 <p>Rearranging gives:</p>
@@ -104,9 +96,9 @@
 <p>Models that require <strong>large compression</strong> (high <span class="arithmatex">\(\mathcal{D}_{\text{KL}}\)</span>) are penalized.</p>
 <hr />
 <h2 id="the-laplace-approximation">The Laplace Approximation</h2>
-<p>For a likelihood that's approximately Gaussian near the posterior peak (many cosmological problems!), we can further decompose[^Trotta2008]:</p>
+<p>For a likelihood that's approximately Gaussian near the posterior peak (many cosmological problems!), we can further decompose<sup id="fnref2:Trotta2008"><a class="footnote-ref" href="#fn:Trotta2008">1</a></sup>:</p>
 <div class="arithmatex">\[\langle \log\mathcal{L} \rangle_{\mathcal{P}} \approx \log\mathcal{L}_{\text{max}} - \frac{\hat{d}}{2}\]</div>
-<p>where <span class="arithmatex">\(\hat{d}\)</span> is the <strong>Bayesian model dimensionality</strong>[^Handley2019]—the effective number of constrained parameters.</p>
+<p>where <span class="arithmatex">\(\hat{d}\)</span> is the <strong>Bayesian model dimensionality</strong><sup id="fnref:HandleyLemos2019"><a class="footnote-ref" href="#fn:HandleyLemos2019">3</a></sup>—the effective number of constrained parameters.</p>
 <p>Substituting into the previous equation:</p>
 <div class="arithmatex">\[\boxed{\Delta\log\mathcal{Z} \approx \Delta\log\mathcal{L}_{\text{max}} - \frac{\Delta\hat{d}}{2} - \Delta\mathcal{D}_{\text{KL}}}\]</div>
 <p><strong>This is the fundamental equation of model comparison.</strong></p>
@@ -129,8 +121,8 @@
 - <span class="arithmatex">\(\Delta\hat{d} \approx 1\)</span> (curvature is somewhat constrained)
 - Measured: <span class="arithmatex">\(\Omega_k = 0.03 \pm 0.12\)</span> (consistent with zero)</p>
 <p><strong>Evidence comparison:</strong></p>
-<div class="arithmatex">\[\Delta\log\mathcal{Z} \approx (87573.7 - 87573.4) - \frac{1}{2} - \Delta\mathcal{D}_{\text{KL}}$$
-$$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
+<div class="arithmatex">\[\Delta\log\mathcal{Z} \approx (87573.7 - 87573.4) - \frac{1}{2} - \Delta\mathcal{D}_{\text{KL}}\]</div>
+<div class="arithmatex">\[\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 <p><strong>Conclusion:</strong> The flat model is (weakly) preferred. The improved fit from freeing curvature doesn't justify the additional parameter.</p>
 <p><strong>This is Occam's razor in action</strong>: Even though the data are <em>consistent</em> with small curvature, they don't <em>require</em> it, so the simpler model wins.</p>
 <hr />
@@ -159,7 +151,7 @@ $$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 <li><strong><a href="../nested-sampling/">nested-sampling</a></strong>: Transforms the integral to 1D, directly computes <span class="arithmatex">\(\mathcal{Z}\)</span></li>
 <li><strong>Thermodynamic integration</strong>: Chains between prior and posterior</li>
 <li><strong>Harmonic mean estimator</strong>: Post-processes MCMC samples (can be unstable)</li>
-<li><strong>Learned harmonic mean</strong>: Uses machine learning for more stable estimation[^McEwen2021]</li>
+<li><strong>Learned harmonic mean</strong>: Uses machine learning for more stable estimation<sup id="fnref:McEwen2021"><a class="footnote-ref" href="#fn:McEwen2021">4</a></sup></li>
 </ol>
 <p>For rigorous model comparison, <a href="../nested-sampling/">nested-sampling</a> is the gold standard—it's specifically designed to compute evidence accurately.</p>
 <hr />
@@ -212,7 +204,7 @@ $$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 <div class="arithmatex">\[\mathcal{Z}_{ij} = p(d|\text{Cosmology}_i, \text{Scatter}_j)\]</div>
 <p>Then marginalize to compare cosmologies <strong>independent of scatter choice</strong>:</p>
 <div class="arithmatex">\[p(d|\text{Cosmology}_i) = \sum_j p(d|\text{Cosmology}_i, \text{Scatter}_j)p(\text{Scatter}_j)\]</div>
-<p><strong>This is unique to the Bayesian framework</strong>: You can rigorously separate physical and statistical model assumptions.</p>
+<p>This factorization is unique to the Bayesian framework: you can rigorously separate physical and statistical model assumptions.</p>
 <hr />
 <h2 id="key-insights">Key Insights</h2>
 <ol>
@@ -231,7 +223,7 @@ $$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 <li><strong>Parameter constraints</strong> (Posterior): <span class="arithmatex">\(\theta \pm \sigma\)</span></li>
 <li><strong>Model comparison</strong> (Evidence): <span class="arithmatex">\(\mathcal{M}_0\)</span> vs <span class="arithmatex">\(\mathcal{M}_1\)</span></li>
 </ol>
-<p><strong>Each level is more computationally expensive, but more scientifically valuable.</strong></p>
+<p>Each level is more computationally expensive, but more scientifically valuable.</p>
 <p>In cosmology, we often care more about detecting new physics (model comparison) than precisely measuring known parameters. The evidence is how we do this rigorously.</p>
 <hr />
 <p><strong>Next:</strong>
@@ -243,11 +235,26 @@ $$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 - <a href="../kl-divergence/">kl-divergence</a> - Understanding the complexity penalty</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
-<p>[Jeffreys1961]: Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.</p>
-<p>[Handley2019]: Handley, W. J., &amp; Lemos, P. (2019). Quantifying dimensionality: Bayesian cosmological model complexity. <em>Physical Review D</em>, 100(10), 103511.</p>
-<p>[McEwen2021]: McEwen, J. D., et al. (2021). Machine learning assisted Bayesian model comparison: learnt harmonic mean estimator. <em>MNRAS</em>, 508(3), 3771-3795.</p>
-<p>[Trotta2007]: Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Trotta2008">
+<p>Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.&#160;<a class="footnote-backref" href="#fnref:Trotta2008" title="Jump back to footnote 1 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:Trotta2008" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Jeffreys1961">
+<p>Jeffreys, H. (1961). <em>Theory of Probability</em> (3rd ed.). Oxford University Press.&#160;<a class="footnote-backref" href="#fnref:Jeffreys1961" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:HandleyLemos2019">
+<p>Handley, W. J., &amp; Lemos, P. (2019). Quantifying dimensionality: Bayesian cosmological model complexity. <em>Physical Review D</em>, 100(10), 103511.&#160;<a class="footnote-backref" href="#fnref:HandleyLemos2019" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:McEwen2021">
+<p>McEwen, J. D., et al. (2021). Machine learning assisted Bayesian model comparison: learnt harmonic mean estimator. <em>MNRAS</em>, 508(3), 3771-3795.&#160;<a class="footnote-backref" href="#fnref:McEwen2021" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Trotta2007">
+<p>Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.&#160;<a class="footnote-backref" href="#fnref:Trotta2007" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -312,6 +319,8 @@ $$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -335,8 +344,6 @@ $$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="../marginalization/">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -373,6 +380,7 @@ $$\approx 0.3 - 0.5 - 0.3 \approx -0.5\]</div>
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 

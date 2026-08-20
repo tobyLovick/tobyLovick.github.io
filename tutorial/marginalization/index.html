@@ -28,20 +28,12 @@
 
 					<!-- Header -->
 					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
 						<a href="../index.html" class="logo"><strong>Bayesian Inference Tutorial</strong></a>
-						<ul class="icons">
-							<li><a href="https://tobylovick.github.io" title="Main site">← tobylovick.github.io</a></li>
-						</ul>
 					</header>
 
 					<!-- Content -->
 					<section>
-						
-						<header class="main">
-							<h1>Marginalization</h1>
-						</header>
-						
-
 						<h1 id="marginalization-and-model-averaging">Marginalization and Model Averaging</h1>
 <p>← Back to <a href="../">index</a> | See also: <a href="../evidence/">evidence</a>, <a href="../model-comparison/">model-comparison</a>, <a href="../dark-energy-models/">dark-energy-models</a></p>
 <hr />
@@ -51,27 +43,27 @@
 <hr />
 <h2 id="the-problem-nuisance-model-dependence">The Problem: Nuisance Model Dependence</h2>
 <h3 id="example-scenario">Example Scenario</h3>
-<p>You want to answer: <strong>"Is dark energy evolving?"</strong> (comparing <a href="../dark-energy-models/#model-2-wcdm-constant-dark-energy-eos">wCDM</a> vs <a href="../dark-energy-models/#model-1-flat-λcdm-cosmological-constant">ΛCDM</a>)</p>
+<p>You want to answer: <strong>"Is dark energy evolving?"</strong> (comparing <a href="../dark-energy-models/#model-2-wcdm-constant-dark-energy-eos">wCDM</a> vs <a href="../dark-energy-models/#model-1-flat-cdm-cosmological-constant">ΛCDM</a>)</p>
 <p>But your answer might depend on an auxiliary choice:
 - <strong>Statistical model:</strong> Gaussian scatter vs Student's t vs rescaled covariance
 - <strong>Systematic treatment:</strong> Include peculiar velocities or not
 - <strong>Prior choice:</strong> Wide vs narrow priors on nuisance parameters</p>
 <p><strong>Question:</strong> Which auxiliary choice is "correct"?</p>
-<p><strong>Answer:</strong> We don't know—so average over them!</p>
+<p><strong>Answer:</strong> We don't know, so average over them.</p>
 <hr />
 <h2 id="bayesian-model-averaging">Bayesian Model Averaging</h2>
 <h3 id="the-formulation">The Formulation</h3>
 <p>Suppose we want to compare <strong>cosmological models</strong> <span class="arithmatex">\(\mathcal{C}\)</span>, but we're uncertain about <strong>scatter models</strong> <span class="arithmatex">\(\mathcal{S}\)</span>.</p>
-<p>For each combination, we have an <a href="../evidence/">evidence</a>:
-$<span class="arithmatex">\(\mathcal{Z}(\mathcal{C}, \mathcal{S}) = p(d | \mathcal{C}, \mathcal{S})\)</span>$</p>
+<p>For each combination, we have an <a href="../evidence/">evidence</a>:</p>
+<div class="arithmatex">\[\mathcal{Z}(\mathcal{C}, \mathcal{S}) = p(d | \mathcal{C}, \mathcal{S})\]</div>
 <p><strong>Marginalize over scatter models:</strong></p>
 <div class="arithmatex">\[\boxed{p(d | \mathcal{C}) = \sum_{\mathcal{S}} p(d | \mathcal{C}, \mathcal{S}) \cdot p(\mathcal{S})}\]</div>
 <p>where <span class="arithmatex">\(p(\mathcal{S})\)</span> is our prior belief about scatter models.</p>
 <h3 id="equal-prior-probabilities">Equal Prior Probabilities</h3>
 <p>If we have <strong>no preference</strong> between scatter models a priori:</p>
 <div class="arithmatex">\[p(\mathcal{S}_i) = \frac{1}{N_{\text{scatter}}}\]</div>
-<p>Then:
-$<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatter}}} \sum_{i=1}^{N_{\text{scatter}}} \mathcal{Z}(\mathcal{C}, \mathcal{S}_i)\)</span>$</p>
+<p>Then:</p>
+<div class="arithmatex">\[\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatter}}} \sum_{i=1}^{N_{\text{scatter}}} \mathcal{Z}(\mathcal{C}, \mathcal{S}_i)\]</div>
 <p><strong>In log space</strong> (numerically stable):</p>
 <div class="arithmatex">\[\log\mathcal{Z}_{\mathcal{C}} = \log\left(\sum_i e^{\log\mathcal{Z}(\mathcal{C}, \mathcal{S}_i)}\right) - \log N_{\text{scatter}}\]</div>
 <hr />
@@ -188,9 +180,9 @@ $<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatte
 </code></pre></div>
 <hr />
 <h2 id="savage-dickey-ratio-for-nested-models">Savage-Dickey Ratio for Nested Models</h2>
-<p>Special case: When testing if a parameter <span class="arithmatex">\(\theta^* = 0\)</span> (nested models), can use the <strong>Savage-Dickey density ratio</strong>[^TrottaDickey]:</p>
+<p>Special case: When testing if a parameter <span class="arithmatex">\(\theta^* = 0\)</span> (nested models), can use the <strong>Savage-Dickey density ratio</strong><sup id="fnref:TrottaDickey"><a class="footnote-ref" href="#fn:TrottaDickey">2</a></sup>:</p>
 <div class="arithmatex">\[B_{01} = \frac{\mathcal{Z}_0}{\mathcal{Z}_1} = \frac{p(\theta^* = 0 | d, \mathcal{M}_1)}{p(\theta^* = 0 | \mathcal{M}_1)}\]</div>
-<p><strong>Advantage:</strong> Only need to run the more complex model once!</p>
+<p><strong>Advantage:</strong> Only need to run the more complex model once.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_kde</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># Run nested sampling on wCDM (has free w)</span>
@@ -210,14 +202,16 @@ $<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatte
 <hr />
 <h2 id="summary">Summary</h2>
 <p><strong>Marginalization via evidences:</strong></p>
-<p>✅ <strong>Average over uncertain auxiliary models</strong> weighted by their evidences
-✅ <strong>Robust comparisons</strong> independent of arbitrary choices
-✅ <strong>Model-averaged parameters</strong> include model uncertainty
-✅ <strong>Savage-Dickey ratio</strong> for nested model testing</p>
+<ul>
+<li><strong>Average over uncertain auxiliary models</strong> weighted by their evidences</li>
+<li><strong>Robust comparisons</strong> independent of arbitrary choices</li>
+<li><strong>Model-averaged parameters</strong> include model uncertainty</li>
+<li><strong>Savage-Dickey ratio</strong> for nested model testing</li>
+</ul>
 <p><strong>Key formulas:</strong></p>
 <div class="arithmatex">\[p(d | \mathcal{C}) = \sum_{\mathcal{S}} \mathcal{Z}(\mathcal{C}, \mathcal{S}) \cdot p(\mathcal{S})\]</div>
 <div class="arithmatex">\[p(\theta | d) = \sum_{\mathcal{M}} p(\theta | d, \mathcal{M}) \cdot p(\mathcal{M} | d)\]</div>
-<p><strong>This is unique to the evidence-based framework</strong>—can't do this with <a href="../information-criteria/">AIC/BIC</a>!</p>
+<p>This is unique to the evidence-based framework — you can't do this with <a href="../information-criteria/">AIC/BIC</a>.</p>
 <hr />
 <p><strong>Next:</strong>
 - <a href="../dark-energy-models/">dark-energy-models</a> - Application to cosmology
@@ -228,9 +222,20 @@ $<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatte
 - <a href="../nested-sampling/">nested-sampling</a> - Computing evidences</p>
 <hr />
 <p><strong>References:</strong></p>
-<p>[Trotta2008]: Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.</p>
-<p>[TrottaDickey]: Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.</p>
-<p>[Hoeting1999]: Hoeting, J. A., et al. (1999). Bayesian model averaging: a tutorial. <em>Statistical Science</em>, 14(4), 382-401.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:Trotta2008">
+<p>Trotta, R. (2008). Bayes in the sky: Bayesian inference and model selection in cosmology. <em>Contemporary Physics</em>, 49(2), 71-104.&#160;<a class="footnote-backref" href="#fnref:Trotta2008" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TrottaDickey">
+<p>Trotta, R. (2007). Applications of Bayesian model selection to cosmological parameters. <em>MNRAS</em>, 378(1), 72-82.&#160;<a class="footnote-backref" href="#fnref:TrottaDickey" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:Hoeting1999">
+<p>Hoeting, J. A., et al. (1999). Bayesian model averaging: a tutorial. <em>Statistical Science</em>, 14(4), 382-401.&#160;<a class="footnote-backref" href="#fnref:Hoeting1999" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 					</section>
 
 					<!-- Prev / Next navigation -->
@@ -241,7 +246,7 @@ $<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatte
 							<a href="../hierarchical-models/" class="button">← Hierarchical Models</a>
 							
 							
-							<a href="../information-criteria/" class="button primary" style="float:right">Information Criteria (AIC/BIC) →</a>
+							<a href="../dark-energy-models/" class="button primary" style="float:right">Dark Energy Models →</a>
 							
 						</div>
 					</section>
@@ -295,6 +300,8 @@ $<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatte
 										
 										<li><a href="../model-comparison/">Model Comparison</a></li>
 										
+										<li><a href="../information-criteria/">Approximate Model Comparison</a></li>
+										
 									</ul>
 								</li>
 								
@@ -318,8 +325,6 @@ $<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatte
 										<li><a href="../hierarchical-models/">Hierarchical Models</a></li>
 										
 										<li><a href="./" class="active">Marginalization</a></li>
-										
-										<li><a href="../information-criteria/">Information Criteria (AIC/BIC)</a></li>
 										
 									</ul>
 								</li>
@@ -356,6 +361,7 @@ $<span class="arithmatex">\(\mathcal{Z}_{\mathcal{C}} = \frac{1}{N_{\text{scatte
 
 					<!-- Footer -->
 					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
 						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 
