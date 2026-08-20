@@ -1,0 +1,67 @@
+site_name: Bayesian Inference Tutorial
+site_url: https://tobylovick.github.io/tutorial/
+site_description: A ground-up tutorial on Bayesian inference with emphasis on evidence and model comparison
+site_author: Toby Lovick
+site_dir: ../tutorial
+
+theme:
+  name: null
+  custom_dir: theme
+
+plugins:
+  - roamlinks  # Enables [[wikilinks]] support
+
+markdown_extensions:
+  # Math support
+  - pymdownx.arithmatex:
+      generic: true
+
+  # Code blocks
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+  # Formatting
+  - pymdownx.mark
+  - pymdownx.caret
+  - pymdownx.tilde
+  - pymdownx.keys
+
+  # Lists and tables
+  - def_list
+  - tables
+  - attr_list
+
+  # Admonitions (callout boxes)
+  - admonition
+  - pymdownx.details
+
+  # Footnotes
+  - footnotes
+
+nav:
+  - Home: index.md
+  - Start Here:
+    - Conditional Probability: conditional-probability.md
+    - Bayes' Theorem: bayes-theorem.md
+    - Analytical Update (Rowing): analytical-update.md
+    - Bayesian Inference: bayesian-inference.md
+  - Evidence & Model Comparison:
+    - The Bayesian Evidence: evidence.md
+    - KL Divergence: kl-divergence.md
+    - Prior Choice: prior-choice.md
+    - Model Comparison: model-comparison.md
+    - Approximate Model Comparison: information-criteria.md
+  - Bayesian Tension Testing:
+    - Quantifying Tension: tension-statistics.md
+  - Advanced Techniques:
+    - Hierarchical Models: hierarchical-models.md
+    - Marginalization: marginalization.md
+  - Applications:
+    - Dark Energy Models: dark-energy-models.md
+  - Computational Methods:
+    - Nested Sampling: nested-sampling.md
+    - MCMC: mcmc.md
+    - Computing Evidence: computing-evidence.md

@@ -1,0 +1,51 @@
+/* Custom CSS for Bayesian Inference Tutorial */
+
+/* Make equations more visible */
+.arithmatex {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Better code block styling */
+.highlight {
+    margin: 1em 0;
+}
+
+/* Wikilink styling - make them look distinct */
+a[href$=".md"] {
+    color: #5e81ac;
+    text-decoration: none;
+    border-bottom: 1px dotted #5e81ac;
+}
+
+a[href$=".md"]:hover {
+    color: #81a1c1;
+    border-bottom: 1px solid #81a1c1;
+}
+
+/* Box equations */
+.boxed-equation {
+    border: 2px solid #5e81ac;
+    padding: 1em;
+    margin: 1em 0;
+    border-radius: 4px;
+    background-color: rgba(94, 129, 172, 0.05);
+}
+
+/* Better table styling */
+table {
+    width: 100%;
+    margin: 1.5em 0;
+}
+
+th {
+    background-color: rgba(94, 129, 172, 0.1);
+    font-weight: 600;
+}
+
+/* References section styling */
+h2#references + p,
+h2#references + ul {
+    font-size: 0.9em;
+    line-height: 1.6;
+}

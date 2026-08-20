@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>{% if page and page.title %}{{ page.title }} – {% endif %}{{ config.site_name }}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="{{ 'assets/css/main.css'|url }}" />
+		<link rel="stylesheet" href="{{ 'assets/css/tutorial-extras.css'|url }}" />
+		<script>
+			MathJax = {
+				tex: {
+					inlineMath: [['\\(', '\\)']],
+					displayMath: [['\\[', '\\]']],
+					processEscapes: true,
+					tags: 'ams'
+				}
+			};
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+			<!-- Main -->
+			<div id="main">
+				<div class="inner">
+
+					<!-- Header -->
+					<header id="header">
+						<a href="https://tobylovick.github.io" class="back-to-site">← tobylovick.github.io</a>
+						<a href="{{ 'index.html'|url }}" class="logo"><strong>{{ config.site_name }}</strong></a>
+					</header>
+
+					<!-- Content -->
+					<section>
+						{{ page.content }}
+					</section>
+
+					<!-- Prev / Next navigation -->
+					{% if page and (page.previous_page or page.next_page) %}
+					<section>
+						<div class="page-nav">
+							{% if page.previous_page %}
+							<a href="{{ page.previous_page.url|url }}" class="button">← {{ page.previous_page.title }}</a>
+							{% endif %}
+							{% if page.next_page %}
+							<a href="{{ page.next_page.url|url }}" class="button primary" style="float:right">{{ page.next_page.title }} →</a>
+							{% endif %}
+						</div>
+					</section>
+					{% endif %}
+
+				</div>
+			</div>
+
+			<!-- Sidebar -->
+			<div id="sidebar">
+				<div class="inner">
+
+					<!-- Navigation -->
+					<nav id="menu">
+						<header class="major">
+							<h2>Contents</h2>
+						</header>
+						<ul>
+							{% for item in nav %}
+								{% if item.children %}
+								<li>
+									<span class="opener{% if item.active %} active{% endif %}">{{ item.title }}</span>
+									<ul>
+										{% for child in item.children %}
+										<li><a href="{{ child.url|url }}"{% if child.active %} class="active"{% endif %}>{{ child.title }}</a></li>
+										{% endfor %}
+									</ul>
+								</li>
+								{% else %}
+								<li><a href="{{ item.url|url }}"{% if item.active %} class="active"{% endif %}>{{ item.title }}</a></li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</nav>
+
+					<!-- Footer -->
+					<footer id="footer">
+						<p><a href="https://tobylovick.github.io" class="button primary fit">← Back to main site</a></p>
+						<p class="copyright">&copy; Toby Lovick. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+					</footer>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Scripts -->
+		<script src="{{ 'assets/js/jquery.min.js'|url }}"></script>
+		<script src="{{ 'assets/js/browser.min.js'|url }}"></script>
+		<script src="{{ 'assets/js/breakpoints.min.js'|url }}"></script>
+		<script src="{{ 'assets/js/util.js'|url }}"></script>
+		<script src="{{ 'assets/js/main.js'|url }}"></script>
+
+	</body>
+</html>
